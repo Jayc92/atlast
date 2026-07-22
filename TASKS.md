@@ -23,7 +23,7 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 
 ### Phase B — Foundation build (blocked until Phase A approval)
 
-- [!] M0 tooling ADRs (monorepo tooling, lint/format/type-check/test/build/browser-check stack) drafted for human approval — *blocked: documentation not yet approved*
+- [x] M0 tooling ADRs (monorepo tooling, lint/format/type-check/test/build/browser-check stack) drafted and human-approved — *ADRs 0001–0013 in [docs/adr/](docs/adr/README.md), formally approved 2026-07-22; acceptance authorizes M0 Phase B scaffolding only*
 - [ ] TypeScript monorepo established
 - [ ] Web application shell
 - [ ] Backend API shell

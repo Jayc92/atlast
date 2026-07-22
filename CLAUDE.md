@@ -8,7 +8,7 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 Phase A — documentation only, pending human approval.** This repository contains draft documentation. There is no application code and no approved technology decisions; architectural positions are drafts requiring human approval and later ADRs.
+**M0 Phase B — foundation build authorized (as of 2026-07-22).** The documentation set is approved and the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, authorizing M0 Phase B scaffolding only. No application code exists yet. M1 and later milestones remain gated on their own explicit authorization.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -21,14 +21,12 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**Only M0 is authorized once the documentation is approved, and each later milestone requires its own explicit authorization. Until then, do NOT:**
+**Only M0 Phase B is authorized; each later milestone requires its own explicit authorization. Within that gate:**
 
-- Scaffold applications or generate boilerplate (no `package.json`, framework init, Docker files, CI pipelines).
-- Install or propose dependencies.
-- Commit technology choices — tooling and storage selections are proposed as ADRs against the criteria in [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
-- Write application or backend code.
-- Modify `scripts/verify.sh`.
-- Connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
+- M0 Phase B scaffolding (monorepo, web app shell, backend API shell, shared packages, verification tooling) is authorized, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR.
+- Do NOT implement M1+ features (topology model, query API v1, exploration UI, overlays, impact simulation, connectors) before their milestone is authorized.
+- Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
+- Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
 
 When asked to do any of the above, point to this section and confirm the milestone gate has moved before proceeding.
 

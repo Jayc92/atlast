@@ -29,7 +29,9 @@ The stack direction is a TypeScript monorepo, established in M0 Phase B; specifi
 
 - Least privilege everywhere: each discovery adapter gets its own minimal, read-only credential scope.
 - No credentials, tokens, or secrets in source, fixtures, or documentation — ever, including "example" values that are real.
-- The topology graph is itself sensitive data (it maps the organization's attack surface). The query API MUST require authentication from its first version.
+- The topology graph is itself sensitive data (it maps the organization's attack surface). Authentication requirements distinguish two stages:
+  - **The M0 local API shell** binds to localhost by default, serves synthetic data only, and implements no users, sessions, OAuth, SSO, API keys, or identity provider. It is exempt from authentication during M0.
+  - **The first externally reachable or real-system-connected query API** MUST require authentication, MUST be governed by a separately approved authentication ADR, and MUST NOT be implemented before its milestone is explicitly authorized.
 - Security-sensitive changes MUST be flagged for human review explicitly in the PR description.
 
 ---

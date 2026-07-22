@@ -162,7 +162,7 @@ A view over the query API — graph navigation, search, health overlay toggles, 
 
 ## 4. Cross-Cutting Concerns
 
-- **Security.** Read-only credentials per adapter, scoped minimally (least privilege). The graph itself is sensitive — it is a map of the organization's attack surface — so the query API requires authentication and supports authorization boundaries from the first milestone.
+- **Security.** Read-only credentials per adapter, scoped minimally (least privilege). The graph itself is sensitive — it is a map of the organization's attack surface — so the first externally reachable or real-system-connected query API requires authentication and authorization boundaries, governed by a separately approved authentication ADR. The M0 local API shell is exempt: it binds to localhost by default, serves synthetic data only, and implements no identity mechanism ([GUARDRAILS.md § 1.4](../GUARDRAILS.md#14-security)).
 - **Multi-tenancy of trust.** Provenance answers "why should I believe this edge?" — treated as a security property, not just UX.
 - **Operability.** Atlast instruments itself (freshness lag per source, reconciliation queue depth, query latency) and exposes those signals to *external* monitoring — it never becomes its own monitoring system (see non-goals).
 - **Determinism for tests.** All components consume time and randomness through injectable interfaces so fixture-driven tests are reproducible.
