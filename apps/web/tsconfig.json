@@ -1,0 +1,24 @@
+{
+  // Type-checking configuration for apps/web (no emit; Vite performs the
+  // build per ADR-0003). Covers sources, tests, and the Vite config so
+  // `pnpm typecheck` and ESLint's projectService see every file in the
+  // package.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    // Bundler resolution matches how Vite actually resolves imports; the
+    // browser bundle never runs under Node's resolver.
+    "moduleResolution": "bundler",
+    // Vite resolves real .ts/.tsx extensions in imports; safe with noEmit
+    // because tsc never rewrites these paths.
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+    "noEmit": true,
+    "types": ["vite/client"]
+  },
+  "include": ["src", "vite.config.ts"]
+}

@@ -1,0 +1,424 @@
+/*
+ * Atlast M0 foundation page — "cartographic operations atlas" visual language.
+ *
+ * Warm paper ground, charcoal ink, rust and teal signal colors, and subtle
+ * map motifs (coordinate grid, contour rings, a dashed route line) built in
+ * pure CSS. Local font stacks only — no external assets of any kind (M0
+ * constraint: nothing on this page touches the network except /api/health).
+ */
+
+:root {
+  /* Paper and ink */
+  --paper: #f5efe2;
+  --paper-deep: #ece3d0;
+  --ink: #2b2925;
+  --ink-soft: #5c564c;
+
+  /* Signal colors — chosen for ≥ 4.5:1 contrast against the paper where
+     they carry text, per the M0 accessibility requirement. */
+  --rust: #a03d1e;
+  --teal: #1e5f5a;
+  --gridline: rgba(43, 41, 37, 0.07);
+  --hairline: rgba(43, 41, 37, 0.25);
+
+  --font-display:
+    "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    "Times New Roman", serif;
+  --font-body:
+    "Avenir Next", Avenir, "Gill Sans", "Segoe UI", "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  /* Paper ground with a faint surveyor's coordinate grid. */
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--gridline) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gridline) 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
+}
+
+.atlas-page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 1.5rem clamp(1.25rem, 5vw, 3rem) 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Contour rings in the top-right corner — a topographic hint, pure CSS. */
+.atlas-page::before {
+  content: "";
+  position: absolute;
+  top: -14rem;
+  right: -14rem;
+  width: 28rem;
+  height: 28rem;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at center,
+    transparent 0,
+    transparent 2.1rem,
+    rgba(160, 61, 30, 0.12) 2.1rem,
+    rgba(160, 61, 30, 0.12) calc(2.1rem + 1px)
+  );
+  pointer-events: none;
+}
+
+/* ---------- Masthead ---------- */
+
+.atlas-masthead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hairline);
+  padding-block: 0.75rem;
+}
+
+.atlas-meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.atlas-meta-mark {
+  color: var(--rust);
+  margin-right: 0.5em;
+}
+
+/* ---------- API connection indicator ---------- */
+
+.api-indicator {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.api-indicator-dot {
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+}
+
+.api-indicator-checking {
+  color: var(--ink-soft);
+}
+
+.api-indicator-online {
+  color: var(--teal);
+}
+
+.api-indicator-online .api-indicator-dot {
+  background: currentColor;
+}
+
+.api-indicator-unavailable {
+  color: var(--rust);
+}
+
+.api-indicator-unavailable .api-indicator-dot {
+  background: repeating-linear-gradient(
+    45deg,
+    currentColor 0,
+    currentColor 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ---------- Hero ---------- */
+
+.atlas-hero {
+  padding-block: clamp(2.5rem, 8vw, 5rem) clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.atlas-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3.5rem, 14vw, 7.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.atlas-tagline {
+  margin: 1rem 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.25rem, 4vw, 1.9rem);
+  color: var(--rust);
+  max-width: 28ch;
+  line-height: 1.25;
+}
+
+.atlas-lede {
+  margin: 1.5rem 0 0;
+  max-width: 58ch;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  color: var(--ink-soft);
+}
+
+.atlas-lede em {
+  color: var(--ink);
+}
+
+/* ---------- Sections ---------- */
+
+.atlas-main section + section {
+  margin-top: clamp(2.5rem, 7vw, 4rem);
+  border-top: 1px solid var(--hairline);
+  padding-top: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.atlas-section-heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.atlas-section-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+
+.atlas-section-note {
+  margin: 0.75rem 0 0;
+  max-width: 58ch;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+/* ---------- Vision list ---------- */
+
+.vision-list {
+  list-style: none;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.75rem 2.5rem;
+}
+
+.vision-list h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  border-bottom: 2px solid var(--rust);
+  display: inline-block;
+  padding-bottom: 0.15rem;
+}
+
+.vision-list p {
+  margin: 0.6rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+/* ---------- Milestone route ---------- */
+
+.route-list {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+
+.route-stop {
+  position: relative;
+  display: flex;
+  gap: 1.25rem;
+  padding: 0 0 1.75rem 0;
+}
+
+/* The dashed route line connecting milestone stops. */
+.route-stop:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 1.35rem;
+  top: 2.9rem;
+  bottom: 0.3rem;
+  border-left: 2px dashed var(--hairline);
+}
+
+.route-stop-id {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  border: 2px solid var(--ink-soft);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink-soft);
+}
+
+.route-stop-active .route-stop-id {
+  border-color: var(--teal);
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.route-stop-body h3 {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.route-stop-body p {
+  margin: 0.35rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  max-width: 52ch;
+}
+
+.route-stop-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--ink-soft);
+  color: var(--ink-soft);
+}
+
+.route-stop-badge-active {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* ---------- Status & footer ---------- */
+
+/* Extra class-level specificity so the panel padding wins over the shared
+   `.atlas-main section + section` spacing rule without !important. */
+.atlas-main .atlas-status.atlas-status {
+  background: var(--paper-deep);
+  border: 1px solid var(--hairline);
+  border-left: 4px solid var(--teal);
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.atlas-status p {
+  margin: 1rem 0 0;
+  max-width: 62ch;
+  color: var(--ink-soft);
+}
+
+.atlas-footer {
+  margin-top: clamp(2.5rem, 7vw, 4rem);
+  border-top: 1px solid var(--hairline);
+  padding-top: 1.25rem;
+}
+
+.atlas-footer p {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+/* ---------- Staged page-load reveal ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: atlas-reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .reveal-1 {
+    animation-delay: 0s;
+  }
+  .reveal-2 {
+    animation-delay: 0.08s;
+  }
+  .reveal-3 {
+    animation-delay: 0.18s;
+  }
+  .reveal-4 {
+    animation-delay: 0.28s;
+  }
+  .reveal-5 {
+    animation-delay: 0.4s;
+  }
+  .reveal-6 {
+    animation-delay: 0.5s;
+  }
+  .reveal-7 {
+    animation-delay: 0.6s;
+  }
+}
+
+@keyframes atlas-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Accessibility ---------- */
+
+:focus-visible {
+  outline: 3px solid var(--rust);
+  outline-offset: 3px;
+}
+
+/* ---------- Narrow viewports ---------- */
+
+@media (max-width: 30rem) {
+  .atlas-masthead {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .route-stop {
+    gap: 0.9rem;
+  }
+
+  .route-stop-id {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.75rem;
+  }
+
+  .route-stop:not(:last-child)::before {
+    left: 1.1rem;
+    top: 2.4rem;
+  }
+}

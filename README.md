@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 Phase B — foundation build underway.** The documentation set and tooling ADRs are approved; the repository holds the monorepo workspace skeleton, bootstrap tooling, and the backend API shell ([apps/api](apps/api), per [ADR-0004](docs/adr/0004-backend-api-framework.md)). M1 topology and query behavior, and the M2 exploration UI, remain gated on their respective explicit authorizations ([docs/milestones.md](docs/milestones.md)). Read [PROJECT_SPEC.md](PROJECT_SPEC.md) before contributing anything.
+> **Status: M0 Phase B — foundation build underway.** The documentation set and tooling ADRs are approved; the repository holds the monorepo workspace skeleton, bootstrap tooling, the backend API shell ([apps/api](apps/api), per [ADR-0004](docs/adr/0004-backend-api-framework.md)), and the web application shell ([apps/web](apps/web), per [ADR-0003](docs/adr/0003-frontend-framework.md)). M1 topology and query behavior, and the M2 exploration UI, remain gated on their respective explicit authorizations ([docs/milestones.md](docs/milestones.md)). Read [PROJECT_SPEC.md](PROJECT_SPEC.md) before contributing anything.
 
 ---
 
@@ -59,7 +59,7 @@ Repository-wide linting ([ADR-0006](docs/adr/0006-linting.md)) and formatting ([
 - `pnpm test` — run package test suites recursively (Vitest per [ADR-0008](docs/adr/0008-unit-testing.md)); packages without a `test` script are skipped
 - `pnpm build` — run package builds recursively; packages without a `build` script are skipped
 
-TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed. Package-level type checking covers the four shared package shells (`packages/shared`, `packages/graph-model`, `packages/connectors`, `packages/ui`) and the backend API (`apps/api`), including the API's colocated test (`apps/api/src/app.test.ts`). Type checking for `apps/web` and the standalone `tests/*` workspaces is not yet configured; it arrives with those shells.
+TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed. Package-level type checking covers the four shared package shells (`packages/shared`, `packages/graph-model`, `packages/connectors`, `packages/ui`), the backend API (`apps/api`), and the web application (`apps/web`), including each package's colocated tests. Type checking for the standalone `tests/*` workspaces is not yet configured; it arrives with those shells.
 
 ### Backend API (`apps/api`)
 
@@ -77,9 +77,23 @@ Commands (run from the repository root with `pnpm --filter @atlast/api <script>`
 
 The port defaults to `3001` and can be overridden with the `ATLAST_API_PORT` environment variable; the bind address is not configurable.
 
+### Web application (`apps/web`)
+
+The M0 web application shell ([ADR-0003](docs/adr/0003-frontend-framework.md)): a client-rendered React + Vite single-page application that renders the Atlast foundation page and checks connectivity to the local API shell. **This is the M0 shell, not the M2 exploration UI** — it contains no topology data, graph exploration, search, or query behavior; those remain gated on M1/M2 authorization ([docs/milestones.md](docs/milestones.md)).
+
+Commands (run from the repository root with `pnpm --filter @atlast/web <script>`, or inside `apps/web`):
+
+- `pnpm --filter @atlast/web dev` — start the Vite dev server on `http://127.0.0.1:5173`
+- `pnpm --filter @atlast/web test` — run the component tests (Vitest + jsdom; `fetch` is stubbed, no network access, per [ADR-0008](docs/adr/0008-unit-testing.md))
+- `pnpm --filter @atlast/web typecheck` — type-check sources, tests, and the Vite config
+- `pnpm --filter @atlast/web build` — build the static bundle into git-ignored `apps/web/dist/`
+- `pnpm --filter @atlast/web preview` — serve the built bundle on `http://127.0.0.1:4173`
+
+Both the dev and preview servers bind to `127.0.0.1` only. The page requests the relative path `/api/health` on load; Vite's dev/preview proxy forwards it to the API shell's `GET /health` at `http://127.0.0.1:3001`, so the API needs no CORS configuration and the browser bundle contains no API host. Start the API first (`pnpm --filter @atlast/api dev`) to see the "Local API connected" state; without it the page shows "Local API unavailable".
+
 ## Contributing
 
-M0 foundation implementation is underway — the backend API shell exists in [apps/api](apps/api). M1 product/domain behavior remains gated on its own explicit authorization ([docs/milestones.md](docs/milestones.md)). All contributions — documentation or code — must comply with [GUARDRAILS.md](GUARDRAILS.md).
+M0 foundation implementation is underway — the backend API shell exists in [apps/api](apps/api) and the web application shell in [apps/web](apps/web). M1 product/domain behavior remains gated on its own explicit authorization ([docs/milestones.md](docs/milestones.md)). All contributions — documentation or code — must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
