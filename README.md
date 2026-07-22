@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 Phase B — foundation build.** The documentation set and tooling ADRs are approved; the repository holds the monorepo workspace skeleton and bootstrap tooling. No application code exists yet. Read [PROJECT_SPEC.md](PROJECT_SPEC.md) before contributing anything.
+> **Status: M0 Phase B — foundation build underway.** The documentation set and tooling ADRs are approved; the repository holds the monorepo workspace skeleton, bootstrap tooling, and the backend API shell ([apps/api](apps/api), per [ADR-0004](docs/adr/0004-backend-api-framework.md)). M1 topology and query behavior, and the M2 exploration UI, remain gated on their respective explicit authorizations ([docs/milestones.md](docs/milestones.md)). Read [PROJECT_SPEC.md](PROJECT_SPEC.md) before contributing anything.
 
 ---
 
@@ -56,12 +56,30 @@ Repository-wide linting ([ADR-0006](docs/adr/0006-linting.md)) and formatting ([
 - `pnpm format:check` — verify formatting without modifying files (what verification runs)
 - `pnpm format` — apply Prettier formatting
 - `pnpm typecheck` — run TypeScript type checking recursively across workspace packages ([ADR-0002](docs/adr/0002-monorepo-task-runner.md)); packages without a `typecheck` script are skipped
+- `pnpm test` — run package test suites recursively (Vitest per [ADR-0008](docs/adr/0008-unit-testing.md)); packages without a `test` script are skipped
+- `pnpm build` — run package builds recursively; packages without a `build` script are skipped
 
-TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed, and package-level type checking currently covers the four shared package shells (`packages/shared`, `packages/graph-model`, `packages/connectors`, `packages/ui`). Type checking for the application packages (`apps/*`) and test suites arrives with those shells.
+TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed. Package-level type checking covers the four shared package shells (`packages/shared`, `packages/graph-model`, `packages/connectors`, `packages/ui`) and the backend API (`apps/api`), including the API's colocated test (`apps/api/src/app.test.ts`). Type checking for `apps/web` and the standalone `tests/*` workspaces is not yet configured; it arrives with those shells.
+
+### Backend API (`apps/api`)
+
+The M0 backend API shell ([ADR-0004](docs/adr/0004-backend-api-framework.md)): a Fastify server that binds to `127.0.0.1` only, serves no data beyond operational metadata, and implements no authentication ([GUARDRAILS.md § 1.4](GUARDRAILS.md#14-security) — the M0 local shell is exempt; there is no code path to bind any other interface). Its only route is:
+
+- `GET /health` → `200` with body `{"status":"ok","service":"atlast-api"}`
+
+Commands (run from the repository root with `pnpm --filter @atlast/api <script>`, or inside `apps/api`):
+
+- `pnpm --filter @atlast/api dev` — start the API from TypeScript source with Node's built-in watch mode ([ADR-0011](docs/adr/0011-local-development-runtime.md); no `tsx` needed — Node 24 runs the source via native type stripping)
+- `pnpm --filter @atlast/api test` — run the in-process API tests (Vitest + `fastify.inject()`, no network sockets, per [ADR-0009](docs/adr/0009-integration-testing.md))
+- `pnpm --filter @atlast/api typecheck` — type-check sources and tests
+- `pnpm --filter @atlast/api build` — compile to git-ignored `apps/api/dist/`
+- `pnpm --filter @atlast/api start` — run the built server from `dist/`
+
+The port defaults to `3001` and can be overridden with the `ATLAST_API_PORT` environment variable; the bind address is not configurable.
 
 ## Contributing
 
-Application code has not started. Until it does, contributions take the form of documentation review and refinement. All contributions — documentation or code — must comply with [GUARDRAILS.md](GUARDRAILS.md).
+M0 foundation implementation is underway — the backend API shell exists in [apps/api](apps/api). M1 product/domain behavior remains gated on its own explicit authorization ([docs/milestones.md](docs/milestones.md)). All contributions — documentation or code — must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 

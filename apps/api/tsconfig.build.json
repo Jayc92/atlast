@@ -1,0 +1,13 @@
+{
+  // Build configuration: emits compiled JavaScript into git-ignored dist/.
+  // Tests are excluded from the build; they are checked by tsconfig.json and
+  // run by Vitest directly from source.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}

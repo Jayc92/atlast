@@ -1,0 +1,22 @@
+{
+  // Type-checking configuration for apps/api (no emit; build emits via
+  // tsconfig.build.json). Covers sources and tests so `pnpm typecheck` and
+  // ESLint's projectService see every file in the package.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "verbatimModuleSyntax": true,
+    // Source stays directly runnable by Node 24's native type stripping
+    // (ADR-0011: native watch tooling, no tsx), so TypeScript-only runtime
+    // syntax is banned and relative imports use real .ts extensions,
+    // rewritten to .js on build emit.
+    "erasableSyntaxOnly": true,
+    "rewriteRelativeImportExtensions": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"]
+}

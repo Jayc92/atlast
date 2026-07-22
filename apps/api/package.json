@@ -2,5 +2,20 @@
   "name": "@atlast/api",
   "version": "0.0.0",
   "private": true,
-  "description": "Atlast backend API (query API host) — shell to be scaffolded in M0 Phase B per ADR-0004."
+  "description": "Atlast backend API (query API host) — M0 shell per ADR-0004: Fastify, localhost-only, health endpoint only.",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.ts",
+    "typecheck": "tsc --project tsconfig.json",
+    "test": "vitest run",
+    "build": "tsc --project tsconfig.build.json",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "fastify": "5.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "vitest": "4.1.10"
+  }
 }
