@@ -1,0 +1,10 @@
+{
+  "name": "atlast",
+  "version": "0.0.0",
+  "private": true,
+  "description": "AI-powered Engineering Topology Platform — continuous discovery, living dependency graph, operational health overlays, and change-impact prediction. Monorepo root; see README.md.",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=24.15.0 <25"
+  }
+}

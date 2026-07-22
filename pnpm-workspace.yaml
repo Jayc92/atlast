@@ -1,0 +1,7 @@
+# Workspace layout per ADR-0001 (pnpm workspaces) and ADR-0002 (pnpm recursive
+# scripts as the task runner). fixtures/ holds data, not packages, so it is
+# deliberately not a workspace glob.
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "tests/*"

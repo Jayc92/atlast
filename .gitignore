@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output and generated artifacts (never committed — GUARDRAILS.md § 3.3)
+dist/
+coverage/
+*.tsbuildinfo
+
+# Local environment files (no secrets in the repo — GUARDRAILS.md § 1.4)
+.env
+.env.*
+
+# Editor and OS files (editor config is never committed — GUARDRAILS.md § 3.3)
+.idea/
+.vscode/
+.DS_Store
+
+# Logs
+*.log

@@ -5,6 +5,8 @@
 
 > **Approval note (2026-07-22):** Formally approved by human review. Acceptance authorizes **M0 Phase B scaffolding only**; it does not authorize M1 or later milestone work, each of which requires its own explicit authorization ([docs/milestones.md](../milestones.md)).
 
+> **Correction note (2026-07-22):** The originally approved text misidentified the current Node.js LTS line as v22; as of this date the current LTS line is **v24**. This is a factual correction of the LTS version reference, not a new architecture decision — the accepted decision ("current Node.js LTS, no containers") is unchanged.
+
 ## Context
 
 M0 needs a runtime story for local development: what executes the backend, builds the frontend, and runs the toolchain. Constraints for this phase are explicit — no Docker files, no deployment tooling, no production infrastructure, synthetic data only, and everything verifiable with one command on a contributor's machine.
@@ -15,8 +17,8 @@ Choose the runtime and its management approach so that a fresh clone reaches a r
 
 ## Decision
 
-- **Node.js, current LTS (v22 line as of this writing)** is the sole runtime for the backend API, the frontend toolchain, and all scripts.
-- The required version is pinned in **one place** (`.nvmrc`, with `engines` enforcement in the root manifest) so version managers (nvm/fnm/mise) and CI read the same source of truth.
+- **Node.js, current LTS (v24 line as of this writing)** is the sole runtime for the backend API, the frontend toolchain, and all scripts.
+- The required version is pinned in **one place**: `.nvmrc` pins the exact preferred development version (read by nvm/fnm/mise and CI), while the `engines` field in the root manifest enforces the compatible Node 24 range so a mismatched runtime fails fast.
 - **No containers for local development.** The dev environment is: install pinned Node LTS → `pnpm install` → run. The dev loop is the frontend dev server (Vite) plus the backend started directly with Node's built-in TypeScript-aware watch tooling (or `tsx` if needed — resolved at scaffold time within this ADR's scope).
 - Native Node primitives are preferred over dependencies wherever adequate (`node:test` excepted per ADR-0008's reasoning; `fetch`, `node:crypto`, etc. used directly).
 

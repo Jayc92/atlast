@@ -8,7 +8,7 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 
 ## M0 — Safe Project Foundation (active)
 
-### Phase A — Documentation (current)
+### Phase A — Documentation (approved 2026-07-22)
 
 - [x] README.md — project overview and documentation map
 - [x] PROJECT_SPEC.md — vision, goals, principles, scope, non-goals
@@ -17,14 +17,14 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 - [x] GUARDRAILS.md — engineering/coding/repository/documentation/testing standards
 - [x] CLAUDE.md — AI assistant working instructions
 - [x] TASKS.md — this file
-- [ ] Human review and approval of the documentation set
-- [ ] Non-goals ([PROJECT_SPEC.md § 7](PROJECT_SPEC.md#7-non-goals--what-atlast-will-not-become)) explicitly reviewed and accepted
+- [x] Human review and approval of the documentation set — *approved 2026-07-22 alongside ADRs 0001–0013 ([docs/adr/README.md](docs/adr/README.md))*
+- [x] Non-goals ([PROJECT_SPEC.md § 7](PROJECT_SPEC.md#7-non-goals--what-atlast-will-not-become)) explicitly reviewed and accepted — *part of the 2026-07-22 documentation approval*
 - [ ] Owners assigned to open questions in [docs/architecture.md § 7](docs/architecture.md#7-open-questions)
 
-### Phase B — Foundation build (blocked until Phase A approval)
+### Phase B — Foundation build (active — authorized 2026-07-22)
 
 - [x] M0 tooling ADRs (monorepo tooling, lint/format/type-check/test/build/browser-check stack) drafted and human-approved — *ADRs 0001–0013 in [docs/adr/](docs/adr/README.md), formally approved 2026-07-22; acceptance authorizes M0 Phase B scaffolding only*
-- [ ] TypeScript monorepo established
+- [~] TypeScript monorepo established — *root pnpm/Node config and workspace skeleton created, awaiting its checkpoint commit (empty workspace manifests only); dependencies not yet installed, package tooling not yet wired*
 - [ ] Web application shell
 - [ ] Backend API shell
 - [ ] Shared packages structure

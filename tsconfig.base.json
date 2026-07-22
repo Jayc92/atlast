@@ -1,0 +1,10 @@
+{
+  // Shared TypeScript base per ADR-0005: maximally strict mode, extended by
+  // every workspace package. Module/target/output settings are per-package
+  // concerns and intentionally absent here.
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  }
+}

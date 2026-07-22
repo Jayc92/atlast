@@ -1,0 +1,6 @@
+{
+  "name": "@atlast/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Atlast web application (exploration UI) — shell to be scaffolded in M0 Phase B per ADR-0003."
+}

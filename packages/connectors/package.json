@@ -1,0 +1,6 @@
+{
+  "name": "@atlast/connectors",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Discovery source adapters (read-only, evidence-emitting) — implementation gated on M5 authorization; synthetic fixtures only before that."
+}

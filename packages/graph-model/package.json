@@ -1,0 +1,6 @@
+{
+  "name": "@atlast/graph-model",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Topology graph model behind repository interfaces (ADR-0012) — implementation gated on M1 authorization."
+}
