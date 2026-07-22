@@ -24,7 +24,7 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 ### Phase B — Foundation build (active — authorized 2026-07-22)
 
 - [x] M0 tooling ADRs (monorepo tooling, lint/format/type-check/test/build/browser-check stack) drafted and human-approved — *ADRs 0001–0013 in [docs/adr/](docs/adr/README.md), formally approved 2026-07-22; acceptance authorizes M0 Phase B scaffolding only*
-- [~] TypeScript monorepo established — *root pnpm/Node config and workspace skeleton created, awaiting its checkpoint commit (empty workspace manifests only); dependencies not yet installed, package tooling not yet wired*
+- [~] TypeScript monorepo established — *root pnpm/Node config and workspace skeleton committed; package-manager bootstrap operational (`scripts/bootstrap.sh` verifies Node 24 + pinned pnpm and runs a frozen install) and `pnpm-lock.yaml` generated; no project dependencies or application code added yet; package tooling not yet wired*
 - [ ] Web application shell
 - [ ] Backend API shell
 - [ ] Shared packages structure

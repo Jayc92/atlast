@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: Pre-implementation.** This repository currently contains foundational documentation only. No application code exists yet. Read [PROJECT_SPEC.md](PROJECT_SPEC.md) before contributing anything.
+> **Status: M0 Phase B — foundation build.** The documentation set and tooling ADRs are approved; the repository holds the monorepo workspace skeleton and bootstrap tooling. No application code exists yet. Read [PROJECT_SPEC.md](PROJECT_SPEC.md) before contributing anything.
 
 ---
 
@@ -40,9 +40,17 @@ Atlast has deliberate boundaries. It is **not** a monitoring system, an incident
 | [GUARDRAILS.md](GUARDRAILS.md) | Engineering, coding, repository, documentation, and testing standards |
 | [CLAUDE.md](CLAUDE.md) | Working instructions for AI coding assistants in this repository |
 
+## Local Setup
+
+1. **Install Node.js 24.15.0** with your version manager — [.nvmrc](.nvmrc) pins the exact version, so `nvm install && nvm use` (or the fnm/mise equivalent) selects it automatically.
+2. **If `pnpm` is not on your PATH**, enable it via Corepack: `corepack enable pnpm`. If that fails with a permission error (the default install directory is not writable), point Corepack at a writable directory instead — it must already be on your PATH, since Corepack only places the shim there: `corepack enable --install-directory "$HOME/.npm-global/bin" pnpm`. Corepack usually ships with Node.js 24 but is not present in every installation; if the command is missing, install it first with `npm install --global corepack`.
+3. **Run `./scripts/bootstrap.sh`** from anywhere in the repository. It verifies the Node and pnpm versions, then installs the workspace with `pnpm install --frozen-lockfile`. On any mismatch it prints the exact command to fix it and exits.
+
+The exact pnpm version is pinned in [package.json](package.json)'s `packageManager` field ([ADR-0001](docs/adr/0001-monorepo-package-manager.md)), and `pnpm-lock.yaml` is a committed, reviewed artifact — every contributor and CI run installs identically.
+
 ## Contributing
 
-Implementation has not started. Until it does, contributions take the form of documentation review and refinement. All contributions — documentation or code — must comply with [GUARDRAILS.md](GUARDRAILS.md).
+Application code has not started. Until it does, contributions take the form of documentation review and refinement. All contributions — documentation or code — must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
