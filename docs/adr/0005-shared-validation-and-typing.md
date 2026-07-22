@@ -21,7 +21,7 @@ Keep one definition of every domain shape that yields both compile-time types an
 
 ## Alternatives Considered
 
-- **TypeScript types/interfaces only, hand-rolled runtime guards** — no dependency, but two parallel definitions per shape that *will* drift; hand-written guards are precisely the boring-but-error-prone code schema libraries exist to eliminate.
+- **TypeScript types/interfaces only, hand-rolled runtime guards** — no dependency, but two parallel definitions per shape that _will_ drift; hand-written guards are precisely the boring-but-error-prone code schema libraries exist to eliminate.
 - **JSON Schema as the source of truth (with type generation)** — language-neutral and Fastify-native, but authoring complex schemas in JSON is poor DX, and codegen adds a build step where Zod's inference is instantaneous. Fastify interop is achievable from Zod instead.
 - **Valibot / ArkType** — smaller or faster than Zod, but younger with smaller ecosystems; "boring, stable" favors Zod, the de-facto standard.
 - **Protobuf / OpenAPI-first codegen** — appropriate for polyglot organizations; heavyweight for a single-language monorepo at M0. The schema-per-route approach keeps a later OpenAPI export possible.
@@ -34,12 +34,12 @@ Keep one definition of every domain shape that yields both compile-time types an
 ## Consequences
 
 - The shared domain package becomes the most load-bearing package in the monorepo; changes to it are effectively contract changes and reviewed as such.
-- Provenance, confidence, and freshness are **required fields** in the base fact schemas — code that omits them fails type-check *and* runtime validation, making [GUARDRAILS.md § 1.2](../../GUARDRAILS.md#12-evidence-and-honesty-requirements) structurally enforced.
+- Provenance, confidence, and freshness are **required fields** in the base fact schemas — code that omits them fails type-check _and_ runtime validation, making [GUARDRAILS.md § 1.2](../../GUARDRAILS.md#12-evidence-and-honesty-requirements) structurally enforced.
 - Domain vocabulary is enforced at the type level: the schemas export `Entity`, `Relationship`, `Evidence` — no synonyms can exist in the model layer.
 
 ## Risks
 
-- Zod schema definitions can accrete cleverness (deep transforms, refinements-as-business-logic). Mitigation: schemas define *shape and constraint*, not behavior; review enforces this line.
+- Zod schema definitions can accrete cleverness (deep transforms, refinements-as-business-logic). Mitigation: schemas define _shape and constraint_, not behavior; review enforces this line.
 - A future non-TypeScript consumer would need a translated contract. Mitigation: schema-per-route (ADR-0004) preserves a path to exporting JSON Schema/OpenAPI.
 
 ## Why This Fits Atlast

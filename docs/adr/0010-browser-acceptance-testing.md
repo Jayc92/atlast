@@ -7,7 +7,7 @@
 
 ## Context
 
-M0's exit criteria include automated **browser acceptance checks** wired into `scripts/verify.sh`, and M2's exit criteria hinge on them: a user must be able to navigate a synthetic topology, search, and inspect evidence *from the UI alone* ([docs/milestones.md](../milestones.md)). These tests are the only layer that exercises the full assembled system — real browser, real frontend bundle, real backend server, real HTTP — and they must still be deterministic ([GUARDRAILS.md § 5](../../GUARDRAILS.md#5-testing-philosophy)).
+M0's exit criteria include automated **browser acceptance checks** wired into `scripts/verify.sh`, and M2's exit criteria hinge on them: a user must be able to navigate a synthetic topology, search, and inspect evidence _from the UI alone_ ([docs/milestones.md](../milestones.md)). These tests are the only layer that exercises the full assembled system — real browser, real frontend bundle, real backend server, real HTTP — and they must still be deterministic ([GUARDRAILS.md § 5](../../GUARDRAILS.md#5-testing-philosophy)).
 
 ## Problem
 
@@ -20,7 +20,7 @@ Use **Playwright** (with `@playwright/test`) for browser acceptance tests:
 - Playwright's `webServer` option boots the real backend (fixture-loaded, synthetic data) and the built frontend; tests run against genuine HTTP.
 - **Chromium-only at M0** — one browser keeps CI fast and flake-free; cross-browser coverage is a deliberate later expansion, not a default cost.
 - Determinism rules: tests use web-first assertions (auto-waiting) — **no fixed sleeps ever**; the backend serves fixture data so every run sees identical topology; anything time-displaying uses the injected clock.
-- Scope discipline: acceptance tests cover the *primary user journeys* only (M0: the shells boot and render, the app talks to the API end to end). Component-level UI behavior belongs in unit tests (ADR-0008).
+- Scope discipline: acceptance tests cover the _primary user journeys_ only (M0: the shells boot and render, the app talks to the API end to end). Component-level UI behavior belongs in unit tests (ADR-0008).
 
 ## Alternatives Considered
 

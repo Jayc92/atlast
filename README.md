@@ -31,14 +31,14 @@ Atlast has deliberate boundaries. It is **not** a monitoring system, an incident
 
 ## Documentation Map
 
-| Document | Purpose |
-|---|---|
-| [PROJECT_SPEC.md](PROJECT_SPEC.md) | Vision, goals, guiding principles, scope, and non-goals |
-| [docs/architecture.md](docs/architecture.md) | Architecture philosophy and conceptual system design |
-| [docs/milestones.md](docs/milestones.md) | Synthetic-first delivery plan (M0 foundation → M1 synthetic topology model → M2 interactive interface → M3 health overlays → M4 change-impact simulation → M5 read-only local Kubernetes connector); predictive AI is post-M5 |
-| [TASKS.md](TASKS.md) | Current work breakdown and task tracking |
-| [GUARDRAILS.md](GUARDRAILS.md) | Engineering, coding, repository, documentation, and testing standards |
-| [CLAUDE.md](CLAUDE.md) | Working instructions for AI coding assistants in this repository |
+| Document                                     | Purpose                                                                                                                                                                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [PROJECT_SPEC.md](PROJECT_SPEC.md)           | Vision, goals, guiding principles, scope, and non-goals                                                                                                                                                                       |
+| [docs/architecture.md](docs/architecture.md) | Architecture philosophy and conceptual system design                                                                                                                                                                          |
+| [docs/milestones.md](docs/milestones.md)     | Synthetic-first delivery plan (M0 foundation → M1 synthetic topology model → M2 interactive interface → M3 health overlays → M4 change-impact simulation → M5 read-only local Kubernetes connector); predictive AI is post-M5 |
+| [TASKS.md](TASKS.md)                         | Current work breakdown and task tracking                                                                                                                                                                                      |
+| [GUARDRAILS.md](GUARDRAILS.md)               | Engineering, coding, repository, documentation, and testing standards                                                                                                                                                         |
+| [CLAUDE.md](CLAUDE.md)                       | Working instructions for AI coding assistants in this repository                                                                                                                                                              |
 
 ## Local Setup
 
@@ -47,6 +47,16 @@ Atlast has deliberate boundaries. It is **not** a monitoring system, an incident
 3. **Run `./scripts/bootstrap.sh`** from anywhere in the repository. It verifies the Node and pnpm versions, then installs the workspace with `pnpm install --frozen-lockfile`. On any mismatch it prints the exact command to fix it and exits.
 
 The exact pnpm version is pinned in [package.json](package.json)'s `packageManager` field ([ADR-0001](docs/adr/0001-monorepo-package-manager.md)), and `pnpm-lock.yaml` is a committed, reviewed artifact — every contributor and CI run installs identically.
+
+## Development Commands
+
+Repository-wide linting ([ADR-0006](docs/adr/0006-linting.md)) and formatting ([ADR-0007](docs/adr/0007-formatting.md)) run from the repository root:
+
+- `pnpm lint` — run ESLint across the repository
+- `pnpm format:check` — verify formatting without modifying files (what verification runs)
+- `pnpm format` — apply Prettier formatting
+
+TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed, but package-level type checking is not wired yet — per-package `tsconfig` files and a `typecheck` script arrive with the application and package shells.
 
 ## Contributing
 

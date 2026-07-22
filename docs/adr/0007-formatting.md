@@ -19,7 +19,7 @@ Use **Prettier** with near-default configuration (deviations, if any, limited to
 
 ## Alternatives Considered
 
-- **Biome (format)** — the strongest alternative: much faster, Prettier-compatible output for TS/JSON/CSS. Rejected *for now* solely for coverage: Markdown and YAML support has not reached Prettier's maturity, and this repo's documentation weight makes Markdown formatting first-class, not incidental. If we later adopt Biome for linting (see ADR-0006's change conditions), formatting would consolidate with it.
+- **Biome (format)** — the strongest alternative: much faster, Prettier-compatible output for TS/JSON/CSS. Rejected _for now_ solely for coverage: Markdown and YAML support has not reached Prettier's maturity, and this repo's documentation weight makes Markdown formatting first-class, not incidental. If we later adopt Biome for linting (see ADR-0006's change conditions), formatting would consolidate with it.
 - **dprint** — fast and pluggable, but a smaller community and a plugin-configuration surface that is more machinery than the problem deserves.
 - **No enforced formatter (editor discretion)** — guarantees style churn in diffs and review nitpicks; rejected outright.
 
@@ -42,7 +42,7 @@ Use **Prettier** with near-default configuration (deviations, if any, limited to
 
 - **Simplicity over cleverness:** default Prettier is the single most boring formatting decision available in this ecosystem.
 - **Excellent developer experience:** save-on-format everywhere, zero style review comments.
-- **Docs are a deliverable:** one tool formats code *and* the documentation set to the same standard.
+- **Docs are a deliverable:** one tool formats code _and_ the documentation set to the same standard.
 
 ## Conditions That Would Justify Changing This Decision
 

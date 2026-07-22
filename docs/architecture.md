@@ -1,6 +1,6 @@
 # Atlast — Architecture
 
-**Status:** Draft — pending human approval; no implementation exists. This document defines the architecture *philosophy* and the conceptual shape of the system so that implementation decisions have something to be measured against. Every design position here is a draft: binding decisions are made only through human-approved ADRs in `docs/adr/`. The core stack direction is a TypeScript monorepo (web application, backend API, shared packages — see [milestones.md M0](milestones.md#m0--safe-project-foundation-active)); specific tooling and storage choices are evaluated against § 6 and require approval before use.
+**Status:** Draft — pending human approval; no implementation exists. This document defines the architecture _philosophy_ and the conceptual shape of the system so that implementation decisions have something to be measured against. Every design position here is a draft: binding decisions are made only through human-approved ADRs in `docs/adr/`. The core stack direction is a TypeScript monorepo (web application, backend API, shared packages — see [milestones.md M0](milestones.md#m0--safe-project-foundation-active)); specific tooling and storage choices are evaluated against § 6 and require approval before use.
 
 ---
 
@@ -10,7 +10,7 @@ Six commitments shape every structural decision. They restate the guiding princi
 
 ### 1.1 Evidence in, assertions out
 
-Atlast is a pipeline from **raw observations** to **confident assertions**. Discovery sources emit immutable, timestamped *evidence*; a reconciliation layer aggregates evidence into graph *facts* (entities and relationships) with computed confidence. Nothing enters the graph without evidence behind it, and every fact can be traced back to the observations that produced it.
+Atlast is a pipeline from **raw observations** to **confident assertions**. Discovery sources emit immutable, timestamped _evidence_; a reconciliation layer aggregates evidence into graph _facts_ (entities and relationships) with computed confidence. Nothing enters the graph without evidence behind it, and every fact can be traced back to the observations that produced it.
 
 Consequence: the evidence store and the graph are **separate concerns**. Evidence is append-only and dumb; the graph is derived and rebuildable. If reconciliation logic improves, the graph can be recomputed from retained evidence.
 
@@ -22,7 +22,7 @@ Consequence: the core must be stable and small; the edges of the system are wher
 
 ### 1.3 Read-only, permanently
 
-Atlast holds read credentials only. There is no code path — present or future — that mutates an observed system. This constraint is architectural, not procedural: components are not given write-capable clients, and the threat model assumes Atlast itself may be compromised, so it must be *incapable* of causing changes, not merely *instructed* not to.
+Atlast holds read credentials only. There is no code path — present or future — that mutates an observed system. This constraint is architectural, not procedural: components are not given write-capable clients, and the threat model assumes Atlast itself may be compromised, so it must be _incapable_ of causing changes, not merely _instructed_ not to.
 
 ### 1.4 Honest degradation
 
@@ -30,7 +30,7 @@ Every component must have a defined behavior for missing, stale, or conflicting 
 
 ### 1.5 Boring core, isolated intelligence
 
-The graph, ingestion, and query layers use the most conservative technology that meets requirements — they are consulted during incidents and must out-survive the systems they map. AI capability is isolated in a distinct analysis layer that consumes the graph through the same API as everyone else. If the AI layer is down, the map still works. The AI layer can be ambitious *because* the core is boring.
+The graph, ingestion, and query layers use the most conservative technology that meets requirements — they are consulted during incidents and must out-survive the systems they map. AI capability is isolated in a distinct analysis layer that consumes the graph through the same API as everyone else. If the AI layer is down, the map still works. The AI layer can be ambitious _because_ the core is boring.
 
 ### 1.6 Time is a dimension, not an afterthought
 
@@ -40,7 +40,7 @@ Topology questions are frequently historical ("what changed before this incident
 
 ## 2. Conceptual System Overview
 
-The diagram shows the *target* shape. Delivery is staged ([milestones.md](milestones.md)): through M4 the discovery layer is synthetic fixtures only; M5 adds one read-only local Kubernetes adapter; the remaining adapters and the predictive parts of the AI engine are post-M5.
+The diagram shows the _target_ shape. Delivery is staged ([milestones.md](milestones.md)): through M4 the discovery layer is synthetic fixtures only; M5 adds one read-only local Kubernetes adapter; the remaining adapters and the predictive parts of the AI engine are post-M5.
 
 ```
         ┌──────────────────────────────────────────────────────────┐
@@ -95,7 +95,7 @@ The diagram shows the *target* shape. Delivery is staged ([milestones.md](milest
 A set of independent **adapters**, one per signal type. Delivery is deliberately narrow: through M4 the only "source" is synthetic fixtures; the first real adapter is M5's read-only connector to a disposable local Kubernetes cluster, and further adapters (cloud APIs, tracing, config, code analysis) are post-M5. Each adapter:
 
 - Speaks one external protocol (e.g., the Kubernetes API; later: tracing backends, cloud provider APIs, config repositories, deploy metadata, code analysis).
-- Emits **evidence** in a single normalized format: *"at time T, source S observed indication of entity/relationship X, with source-native detail D."*
+- Emits **evidence** in a single normalized format: _"at time T, source S observed indication of entity/relationship X, with source-native detail D."_
 - Owns its own scheduling, rate limiting, and failure handling.
 - Is individually deployable, disableable, and testable against fixtures (`fixtures/`).
 
@@ -131,7 +131,7 @@ The product's core asset. Model requirements:
 Projects operational state onto graph entities. Through M4, overlay state is **synthetic**, generated to cover at minimum: healthy, degraded, down, disconnected, expiring certificate, and latent downstream risk ([milestones.md M3](milestones.md#m3--operational-health-overlays-gated)). Real overlay sources (alerting, SLOs, incidents, deploys) are post-M5. Overlays:
 
 - Are ephemeral or externally sourced — losing an overlay loses no topology.
-- Never create or modify entities or relationships. An overlay referencing an unknown entity is a *signal* for discovery, not a graph write.
+- Never create or modify entities or relationships. An overlay referencing an unknown entity is a _signal_ for discovery, not a graph write.
 
 ### 3.6 Query API
 
@@ -164,7 +164,7 @@ A view over the query API — graph navigation, search, health overlay toggles, 
 
 - **Security.** Read-only credentials per adapter, scoped minimally (least privilege). The graph itself is sensitive — it is a map of the organization's attack surface — so the first externally reachable or real-system-connected query API requires authentication and authorization boundaries, governed by a separately approved authentication ADR. The M0 local API shell is exempt: it binds to localhost by default, serves synthetic data only, and implements no identity mechanism ([GUARDRAILS.md § 1.4](../GUARDRAILS.md#14-security)).
 - **Multi-tenancy of trust.** Provenance answers "why should I believe this edge?" — treated as a security property, not just UX.
-- **Operability.** Atlast instruments itself (freshness lag per source, reconciliation queue depth, query latency) and exposes those signals to *external* monitoring — it never becomes its own monitoring system (see non-goals).
+- **Operability.** Atlast instruments itself (freshness lag per source, reconciliation queue depth, query latency) and exposes those signals to _external_ monitoring — it never becomes its own monitoring system (see non-goals).
 - **Determinism for tests.** All components consume time and randomness through injectable interfaces so fixture-driven tests are reproducible.
 
 ---
@@ -183,7 +183,7 @@ Rejected designs, recorded so they are not re-litigated:
 
 ## 6. Technology Selection Criteria (draft — human approval required)
 
-The one settled direction is a **TypeScript monorepo** containing a web application, a backend API, and shared packages, established in M0 Phase B. Everything else below is a *criterion*, not a decision: each concrete choice is proposed as an ADR in `docs/adr/` and requires human approval before use (see [GUARDRAILS.md](../GUARDRAILS.md)).
+The one settled direction is a **TypeScript monorepo** containing a web application, a backend API, and shared packages, established in M0 Phase B. Everything else below is a _criterion_, not a decision: each concrete choice is proposed as an ADR in `docs/adr/` and requires human approval before use (see [GUARDRAILS.md](../GUARDRAILS.md)).
 
 1. **M0 tooling** — linting, formatting, type checking, test runner, build, and browser acceptance checks: prefer the most boring, widely supported option in the TypeScript ecosystem; all wired into `scripts/verify.sh` as the single entry point.
 2. **Graph storage** — must support typed property graphs, temporal/versioned queries (natively or via modeling), and horizontal read scaling. Evaluate dedicated graph databases against relational modeling honestly; choose the most boring option that meets the temporal requirement. (Through M1–M4, in-process/synthetic-backed storage may suffice — that too is an ADR.)

@@ -17,14 +17,14 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 - [x] GUARDRAILS.md — engineering/coding/repository/documentation/testing standards
 - [x] CLAUDE.md — AI assistant working instructions
 - [x] TASKS.md — this file
-- [x] Human review and approval of the documentation set — *approved 2026-07-22 alongside ADRs 0001–0013 ([docs/adr/README.md](docs/adr/README.md))*
-- [x] Non-goals ([PROJECT_SPEC.md § 7](PROJECT_SPEC.md#7-non-goals--what-atlast-will-not-become)) explicitly reviewed and accepted — *part of the 2026-07-22 documentation approval*
+- [x] Human review and approval of the documentation set — _approved 2026-07-22 alongside ADRs 0001–0013 ([docs/adr/README.md](docs/adr/README.md))_
+- [x] Non-goals ([PROJECT_SPEC.md § 7](PROJECT_SPEC.md#7-non-goals--what-atlast-will-not-become)) explicitly reviewed and accepted — _part of the 2026-07-22 documentation approval_
 - [ ] Owners assigned to open questions in [docs/architecture.md § 7](docs/architecture.md#7-open-questions)
 
 ### Phase B — Foundation build (active — authorized 2026-07-22)
 
-- [x] M0 tooling ADRs (monorepo tooling, lint/format/type-check/test/build/browser-check stack) drafted and human-approved — *ADRs 0001–0013 in [docs/adr/](docs/adr/README.md), formally approved 2026-07-22; acceptance authorizes M0 Phase B scaffolding only*
-- [~] TypeScript monorepo established — *root pnpm/Node config and workspace skeleton committed; package-manager bootstrap operational (`scripts/bootstrap.sh` verifies Node 24 + pinned pnpm and runs a frozen install) and `pnpm-lock.yaml` generated; no project dependencies or application code added yet; package tooling not yet wired*
+- [x] M0 tooling ADRs (monorepo tooling, lint/format/type-check/test/build/browser-check stack) drafted and human-approved — _ADRs 0001–0013 in [docs/adr/](docs/adr/README.md), formally approved 2026-07-22; acceptance authorizes M0 Phase B scaffolding only_
+- [~] TypeScript monorepo established — _root pnpm/Node config and workspace skeleton committed; package-manager bootstrap operational (`scripts/bootstrap.sh` verifies Node 24 + pinned pnpm and runs a frozen install) and `pnpm-lock.yaml` generated; TypeScript 6.0.3 pinned at the workspace root; repository-wide linting (`pnpm lint`, ESLint + typescript-eslint strict type-aware config per ADR-0006) and formatting (`pnpm format` / `pnpm format:check`, Prettier per ADR-0007) operational; package-level type checking still pending (per-package tsconfigs and a `typecheck` script arrive with the app/package shells); no application code added_
 - [ ] Web application shell
 - [ ] Backend API shell
 - [ ] Shared packages structure

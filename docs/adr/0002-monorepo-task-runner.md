@@ -19,7 +19,7 @@ Use **pnpm's built-in recursive script execution** (`pnpm --recursive run <task>
 
 ## Alternatives Considered
 
-- **Turborepo** — remote/local caching and task-graph parallelism. The strongest alternative: minimal config, widely used. Rejected *for now* because with fewer than ~6 small packages, full verification is fast enough that caching infrastructure is premature; it adds a dependency, a config file, and cache-invalidation semantics to debug for no present gain.
+- **Turborepo** — remote/local caching and task-graph parallelism. The strongest alternative: minimal config, widely used. Rejected _for now_ because with fewer than ~6 small packages, full verification is fast enough that caching infrastructure is premature; it adds a dependency, a config file, and cache-invalidation semantics to debug for no present gain.
 - **Nx** — powerful, but its plugin ecosystem, generators, and daemon are a large conceptual surface aimed at repos with dozens of projects. Directly conflicts with "simplicity over cleverness."
 - **Make / shell scripts per task** — no new dependency, but reimplements topological ordering that pnpm already provides, and Make is a weaker fit for Windows contributors.
 
@@ -41,7 +41,7 @@ Use **pnpm's built-in recursive script execution** (`pnpm --recursive run <task>
 
 ## Why This Fits Atlast
 
-- **Simplicity over cleverness / boring core:** the boring option here is *no tool* — the package manager already does the job.
+- **Simplicity over cleverness / boring core:** the boring option here is _no tool_ — the package manager already does the job.
 - **Minimize operational burden:** nothing to configure, cache, or invalidate.
 - **One-command verification:** a thin shell script over pnpm keeps `scripts/verify.sh` fully transparent — you can read exactly what "verified" means.
 

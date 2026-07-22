@@ -18,17 +18,17 @@ Provide storage for the M0 foundation that (a) carries the full model semantics 
 **This decision is scoped to M0 only.** It does not commit M1–M4 to memory-only storage; the M1 storage question is explicitly reopened below.
 
 - **Storage engine (M0): an in-process, in-memory model loaded from versioned fixture files** (JSON in `fixtures/`, validated by the shared domain schemas per ADR-0005). No database — graph, relational, or embedded — is adopted in M0.
-- **Access exclusively through repository interfaces** defined in the shared domain package: an append-only `EvidenceStore` interface and a `TopologyGraphStore` interface whose read operations *require* as-of-time parameters and *return* provenance, confidence, and freshness. Consumers — including the query API implementation — depend only on these interfaces. This is the enforcement point for "no side doors."
+- **Access exclusively through repository interfaces** defined in the shared domain package: an append-only `EvidenceStore` interface and a `TopologyGraphStore` interface whose read operations _require_ as-of-time parameters and _return_ provenance, confidence, and freshness. Consumers — including the query API implementation — depend only on these interfaces. This is the enforcement point for "no side doors."
 - **The model is temporal from day one:** the repository contract carries snapshot and as-of-time semantics from its first version, so any storage implementation — this one or a successor — must satisfy an already-defined temporal contract rather than shape it.
 - **Persistence at this stage is the fixture files themselves** — the graph is derived and rebuildable from evidence by design ([architecture § 1.1](../architecture.md#11-evidence-in-assertions-out)), so losing in-memory state loses nothing.
 - **The M1 storage decision is mandatory and explicit:** M1 MUST decide, through a new ADR, whether to (a) retain the in-memory implementation for the synthetic milestones, or (b) introduce SQLite or PostgreSQL behind the same repository interfaces. Silently carrying this M0 arrangement forward is not an option. A dedicated graph database is not selected in either case until measured requirements (observed query patterns, scale, temporal-query performance) justify it.
 
 ## Alternatives Considered
 
-- **SQLite (embedded) from M0** — the strongest alternative: real persistence, real query planning, zero server. Rejected *for M0* because it front-loads schema-migration machinery and SQL modeling decisions before the domain model has stabilized, and its benefits (durability, scale) address problems fixture-scale synthetic data does not have. It is a leading candidate, alongside PostgreSQL, in the mandatory M1 storage ADR.
+- **SQLite (embedded) from M0** — the strongest alternative: real persistence, real query planning, zero server. Rejected _for M0_ because it front-loads schema-migration machinery and SQL modeling decisions before the domain model has stabilized, and its benefits (durability, scale) address problems fixture-scale synthetic data does not have. It is a leading candidate, alongside PostgreSQL, in the mandatory M1 storage ADR.
 - **A dedicated graph database (Neo4j, etc.) now** — explicitly prohibited this phase, and rightly: choosing one before the query API exists would let a vendor's query model shape our contract instead of the reverse; it also adds a server dependency, violating no-infrastructure.
 - **Postgres now** — a production-grade answer to a question we haven't finished asking, plus local/CI infrastructure burden the milestone forbids.
-- **Flat event-log files with on-boot replay as the *permanent* strategy** — attractive purity (evidence-first), but this ADR only needs to cover M0; committing to replay-only persistence long-term is a real storage decision that belongs to the M1 ADR's evaluation.
+- **Flat event-log files with on-boot replay as the _permanent_ strategy** — attractive purity (evidence-first), but this ADR only needs to cover M0; committing to replay-only persistence long-term is a real storage decision that belongs to the M1 ADR's evaluation.
 
 ## Tradeoffs
 

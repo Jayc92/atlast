@@ -7,7 +7,7 @@
 
 ## Context
 
-[GUARDRAILS.md § 5](../../GUARDRAILS.md#5-testing-philosophy) names the system's contracts — the evidence format, the reconciliation rules, the query API — as the prime test surfaces, and requires that every component be testable against `fixtures/` with no live infrastructure. Through M4 there are no external systems *by design*, so "integration" cannot mean "test against real services"; it means testing assembled components through their real contracts.
+[GUARDRAILS.md § 5](../../GUARDRAILS.md#5-testing-philosophy) names the system's contracts — the evidence format, the reconciliation rules, the query API — as the prime test surfaces, and requires that every component be testable against `fixtures/` with no live infrastructure. Through M4 there are no external systems _by design_, so "integration" cannot mean "test against real services"; it means testing assembled components through their real contracts.
 
 ## Problem
 

@@ -7,7 +7,7 @@
 
 ## Context
 
-M0 delivers a web application shell; M2 grows it into an interactive graph exploration UI — navigation and layout of a dependency graph, search, entity detail with provenance/confidence/freshness, overlay toggles (M3), impact views (M4), and history playback ([docs/milestones.md](../milestones.md)). The UI is architecturally a *view* over the query API with no state the API cannot serve ([architecture § 3.8](../architecture.md#38-exploration-ui)). There is no marketing site, no SEO requirement, no server-side rendering need, and — per this milestone's constraints — no deployment tooling or production infrastructure.
+M0 delivers a web application shell; M2 grows it into an interactive graph exploration UI — navigation and layout of a dependency graph, search, entity detail with provenance/confidence/freshness, overlay toggles (M3), impact views (M4), and history playback ([docs/milestones.md](../milestones.md)). The UI is architecturally a _view_ over the query API with no state the API cannot serve ([architecture § 3.8](../architecture.md#38-exploration-ui)). There is no marketing site, no SEO requirement, no server-side rendering need, and — per this milestone's constraints — no deployment tooling or production infrastructure.
 
 ## Problem
 
@@ -15,7 +15,7 @@ Choose a frontend stack that supports a long-lived, highly interactive, canvas/S
 
 ## Decision
 
-Build the web application as a **client-rendered single-page application using React, built with Vite**, in strict TypeScript. All data access goes through the backend query API (no side doors). Graph *visualization* libraries are explicitly **not** chosen here — that is an M2 decision with its own ADR.
+Build the web application as a **client-rendered single-page application using React, built with Vite**, in strict TypeScript. All data access goes through the backend query API (no side doors). Graph _visualization_ libraries are explicitly **not** chosen here — that is an M2 decision with its own ADR.
 
 ## Alternatives Considered
 

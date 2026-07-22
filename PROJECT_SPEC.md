@@ -10,7 +10,7 @@
 
 ### 1.1 The Problem
 
-Modern engineering organizations run hundreds or thousands of interconnected systems. The knowledge of *what exists*, *how it connects*, and *what happens when it changes* is scattered across stale wikis, tribal memory, and half-maintained service catalogs. This produces three chronic, expensive failure modes:
+Modern engineering organizations run hundreds or thousands of interconnected systems. The knowledge of _what exists_, _how it connects_, and _what happens when it changes_ is scattered across stale wikis, tribal memory, and half-maintained service catalogs. This produces three chronic, expensive failure modes:
 
 - **Blind changes.** Engineers modify or decommission systems without knowing who depends on them. Outages follow.
 - **Slow incidents.** During an incident, responders spend the first critical minutes reconstructing topology instead of fixing the problem.
@@ -20,7 +20,7 @@ Modern engineering organizations run hundreds or thousands of interconnected sys
 
 Atlast is the **continuously accurate, machine-derived map of an engineering organization** — a living dependency graph that observes reality, overlays operational health, and answers the question every engineer asks before every change:
 
-> *"If I change this, what breaks?"*
+> _"If I change this, what breaks?"_
 
 The long-term ambition, in order of increasing capability:
 
@@ -33,12 +33,12 @@ Atlast succeeds when impact analysis stops being a meeting and becomes a query.
 
 ### 1.3 Who It Serves
 
-| Audience | Primary need |
-|---|---|
-| Engineers making changes | "What is the blast radius of this change?" |
-| Incident responders | "What is upstream/downstream of the failing system, right now?" |
-| Platform & SRE teams | "Where is our architecture fragile?" |
-| Engineering leadership | "What do we actually run, who owns it, and how healthy is it?" |
+| Audience                 | Primary need                                                    |
+| ------------------------ | --------------------------------------------------------------- |
+| Engineers making changes | "What is the blast radius of this change?"                      |
+| Incident responders      | "What is upstream/downstream of the failing system, right now?" |
+| Platform & SRE teams     | "Where is our architecture fragile?"                            |
+| Engineering leadership   | "What do we actually run, who owns it, and how healthy is it?"  |
 
 ---
 
@@ -64,7 +64,7 @@ Atlast succeeds when impact analysis stops being a meeting and becomes a query.
 
 - Graph accuracy: independently audited dependency edges are ≥ 95% correct.
 - Freshness: topology reflects a real-world change within minutes, not days.
-- Adoption signal: engineers consult Atlast *before* changes, not only during postmortems.
+- Adoption signal: engineers consult Atlast _before_ changes, not only during postmortems.
 - Prediction value: predicted blast radius demonstrably overlaps actual incident impact.
 
 ---
@@ -133,16 +133,16 @@ Consistent vocabulary for all documentation, code, and discussion:
 
 These are permanent boundaries, not deferred features. Each exists to protect the core product.
 
-| Non-goal | Why it is excluded |
-|---|---|
-| **A monitoring/observability platform** | Atlast consumes health signals; it never produces them. Building collection competes with the tools it must integrate with, and bloats the core. |
-| **An incident management tool** | Atlast informs responders with topology and impact context. Paging, escalation, and incident workflow belong to dedicated tools. |
-| **A hand-edited CMDB** | Manual curation is precisely the failure mode Atlast replaces. Humans annotate; they never author topology. |
-| **A deployment or orchestration platform** | Read-only is a founding constraint (Principle 3). Atlast predicts impact; it never applies changes. |
-| **An autonomous remediation engine** | Permanent exclusion, by human decision. Atlast MAY (post-M5, if scheduled) *recommend* or *generate* remediation plans as advisory output, but it MUST NOT execute changes against observed systems or hold write-capable credentials — ever. "AI-powered" means AI-assisted analysis and recommendation, never action. |
-| **A general-purpose data warehouse or BI tool** | Atlast answers topology and impact questions. Arbitrary analytics on ingested data is scope creep away from the graph. |
-| **A security scanner / compliance auditor** | Topology data may *inform* security tooling via the API, but vulnerability scanning and compliance workflows are separate products. |
-| **A code-quality or static-analysis product** | Code is read only as a discovery signal for dependencies, never to judge or lint it. |
+| Non-goal                                        | Why it is excluded                                                                                                                                                                                                                                                                                                      |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A monitoring/observability platform**         | Atlast consumes health signals; it never produces them. Building collection competes with the tools it must integrate with, and bloats the core.                                                                                                                                                                        |
+| **An incident management tool**                 | Atlast informs responders with topology and impact context. Paging, escalation, and incident workflow belong to dedicated tools.                                                                                                                                                                                        |
+| **A hand-edited CMDB**                          | Manual curation is precisely the failure mode Atlast replaces. Humans annotate; they never author topology.                                                                                                                                                                                                             |
+| **A deployment or orchestration platform**      | Read-only is a founding constraint (Principle 3). Atlast predicts impact; it never applies changes.                                                                                                                                                                                                                     |
+| **An autonomous remediation engine**            | Permanent exclusion, by human decision. Atlast MAY (post-M5, if scheduled) _recommend_ or _generate_ remediation plans as advisory output, but it MUST NOT execute changes against observed systems or hold write-capable credentials — ever. "AI-powered" means AI-assisted analysis and recommendation, never action. |
+| **A general-purpose data warehouse or BI tool** | Atlast answers topology and impact questions. Arbitrary analytics on ingested data is scope creep away from the graph.                                                                                                                                                                                                  |
+| **A security scanner / compliance auditor**     | Topology data may _inform_ security tooling via the API, but vulnerability scanning and compliance workflows are separate products.                                                                                                                                                                                     |
+| **A code-quality or static-analysis product**   | Code is read only as a discovery signal for dependencies, never to judge or lint it.                                                                                                                                                                                                                                    |
 
 **The test for scope creep:** if a proposed feature would still make sense with the dependency graph removed, it does not belong in Atlast.
 
@@ -150,13 +150,13 @@ These are permanent boundaries, not deferred features. Each exists to protect th
 
 ## 8. Risks (Initial Register)
 
-| Risk | Impact | Mitigation direction |
-|---|---|---|
-| Graph accuracy insufficient to earn trust | Adoption failure — one wrong answer costs ten right ones | Evidence-first model, visible confidence, accuracy measured against synthetic fixtures from M1 |
-| Real-system contact before the core is proven | Fragile foundation, unearned risk | Synthetic-first sequencing: M0–M4 on fixtures only; a single read-only local connector arrives at M5 |
-| AI predictions perceived as a black box | Predictions ignored or, worse, blindly trusted | Explainability is a hard requirement (Principle 5), not a polish item |
-| Scope creep toward monitoring/CMDB/deployment | Identity loss, unbounded surface | § 7 non-goals + the scope-creep test, enforced in review |
-| Stale data presented as current | Confidently wrong map — the worst failure mode | Freshness metadata on every fact; visible degradation (Principle 8) |
+| Risk                                          | Impact                                                   | Mitigation direction                                                                                 |
+| --------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Graph accuracy insufficient to earn trust     | Adoption failure — one wrong answer costs ten right ones | Evidence-first model, visible confidence, accuracy measured against synthetic fixtures from M1       |
+| Real-system contact before the core is proven | Fragile foundation, unearned risk                        | Synthetic-first sequencing: M0–M4 on fixtures only; a single read-only local connector arrives at M5 |
+| AI predictions perceived as a black box       | Predictions ignored or, worse, blindly trusted           | Explainability is a hard requirement (Principle 5), not a polish item                                |
+| Scope creep toward monitoring/CMDB/deployment | Identity loss, unbounded surface                         | § 7 non-goals + the scope-creep test, enforced in review                                             |
+| Stale data presented as current               | Confidently wrong map — the worst failure mode           | Freshness metadata on every fact; visible degradation (Principle 8)                                  |
 
 ---
 

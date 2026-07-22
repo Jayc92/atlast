@@ -1,0 +1,10 @@
+# Dependencies and build/test output
+node_modules/
+dist/
+coverage/
+
+# Committed lockfile — pnpm-generated, never hand-edited
+pnpm-lock.yaml
+
+# Generated artifacts
+*.generated.*

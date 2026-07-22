@@ -9,7 +9,7 @@
 
 M0 delivers a backend API shell that will grow into the query API — the single read contract for every consumer ([architecture § 3.6](../architecture.md#36-query-api)). It must carry provenance/confidence/freshness in its response types and be testable deterministically against fixtures with no live infrastructure. The stack is TypeScript on Node.js (ADR-0011).
 
-**Authentication is deliberately out of M0 scope** (human review decision, 2026-07-22). M0 implements no users, sessions, OAuth, SSO, API keys, or identity provider; the M0 API binds to **localhost by default**, so the unauthenticated shell is never network-exposed. Per [GUARDRAILS.md § 1.4](../../GUARDRAILS.md#14-security), the M0 local shell is exempt, while the first *externally reachable or real-system-connected* query API must require authentication, governed by a separately approved authentication ADR, and must not be implemented before its milestone is explicitly authorized. The M0 design preserves a clean future authentication boundary — a single top-level request-lifecycle hook point where an auth plugin will attach — without implementing it now.
+**Authentication is deliberately out of M0 scope** (human review decision, 2026-07-22). M0 implements no users, sessions, OAuth, SSO, API keys, or identity provider; the M0 API binds to **localhost by default**, so the unauthenticated shell is never network-exposed. Per [GUARDRAILS.md § 1.4](../../GUARDRAILS.md#14-security), the M0 local shell is exempt, while the first _externally reachable or real-system-connected_ query API must require authentication, governed by a separately approved authentication ADR, and must not be implemented before its milestone is explicitly authorized. The M0 design preserves a clean future authentication boundary — a single top-level request-lifecycle hook point where an auth plugin will attach — without implementing it now.
 
 ## Problem
 
@@ -24,7 +24,7 @@ Use **Fastify** as the backend API framework, with JSON-schema-backed route vali
 - **Express** — the strongest alternative by ubiquity. Rejected because it validates nothing by default (input validation would be hand-rolled per route, a standing security risk), its TypeScript story is bolt-on, and its middleware-everything model makes contract enforcement conventions rather than structure.
 - **NestJS** — full application framework with DI, decorators, and modules. Rejected as directly contrary to "simplicity over cleverness": a large abstraction layer for an API whose core is one read contract.
 - **Hono** — modern, fast, multi-runtime. Rejected as younger and optimized for edge runtimes we are not targeting; less battle-tested for a long-lived server.
-- **tRPC (alone)** — end-to-end types without codegen, but couples all consumers to TypeScript clients. The query API must serve *any* consumer (external integrations are in scope, [PROJECT_SPEC.md § 5.1](../../PROJECT_SPEC.md#51-in-scope)), so an HTTP/JSON contract is required; tRPC could only ever be a supplement.
+- **tRPC (alone)** — end-to-end types without codegen, but couples all consumers to TypeScript clients. The query API must serve _any_ consumer (external integrations are in scope, [PROJECT_SPEC.md § 5.1](../../PROJECT_SPEC.md#51-in-scope)), so an HTTP/JSON contract is required; tRPC could only ever be a supplement.
 
 ## Tradeoffs
 
@@ -40,7 +40,7 @@ Use **Fastify** as the backend API framework, with JSON-schema-backed route vali
 ## Risks
 
 - Fastify major versions have historically required plugin-ecosystem catch-up. Mitigation: minimal plugin usage; version pinning; upgrades as deliberate PRs.
-- Schema-first routing is more upfront ceremony per route. Accepted: for this product, the contract *is* the product surface — ceremony at the boundary is the point.
+- Schema-first routing is more upfront ceremony per route. Accepted: for this product, the contract _is_ the product surface — ceremony at the boundary is the point.
 
 ## Why This Fits Atlast
 

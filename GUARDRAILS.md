@@ -75,7 +75,7 @@ tests/               Test suites
 
 - `main` is always releasable (for now: always internally consistent documentation). Work happens on short-lived branches merged via pull request.
 - Branch names: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`, `adr/<topic>`.
-- Commits follow Conventional Commits (`docs:`, `feat:`, `fix:`, `test:`, `refactor:`, `chore:`), imperative mood, subject ≤ 72 chars, body explains *why* when it isn't obvious.
+- Commits follow Conventional Commits (`docs:`, `feat:`, `fix:`, `test:`, `refactor:`, `chore:`), imperative mood, subject ≤ 72 chars, body explains _why_ when it isn't obvious.
 - Commits are atomic: one logical change each. No "misc fixes" commits.
 
 ### 3.3 Pull requests

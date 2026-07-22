@@ -11,7 +11,7 @@ M0 requires automated linting wired into `scripts/verify.sh` ([docs/milestones.m
 
 ## Problem
 
-Choose a linter that can enforce *semantic* correctness rules (which require type information — e.g., detecting an unawaited Promise or an unsafe `any` flow), applied uniformly across all workspace packages.
+Choose a linter that can enforce _semantic_ correctness rules (which require type information — e.g., detecting an unawaited Promise or an unsafe `any` flow), applied uniformly across all workspace packages.
 
 ## Decision
 

@@ -37,7 +37,7 @@ Choose the runtime and its management approach so that a fresh clone reaches a r
 
 - Onboarding is: clone, install pinned Node, `pnpm install`, run verify — the entire environment story fits in a README paragraph.
 - CI uses the identical pinned version, eliminating a whole class of works-on-my-machine drift.
-- When deployment eventually becomes in-scope (post-M5 at the earliest), containerization is a *packaging* decision layered on top — nothing here blocks it.
+- When deployment eventually becomes in-scope (post-M5 at the earliest), containerization is a _packaging_ decision layered on top — nothing here blocks it.
 
 ## Risks
 

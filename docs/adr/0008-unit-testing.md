@@ -23,7 +23,7 @@ Use **Vitest** as the unit test runner in every package, with a shared base conf
 
 ## Alternatives Considered
 
-- **Node's built-in `node:test`** — the strongest alternative on "boring" grounds: zero dependencies, part of the platform. Rejected *at M0* because TypeScript/ESM ergonomics still require loader plumbing, its mocking/fake-timer facilities are less mature, and it cannot run browser-oriented frontend component tests — which would force a second runner and split the testing story.
+- **Node's built-in `node:test`** — the strongest alternative on "boring" grounds: zero dependencies, part of the platform. Rejected _at M0_ because TypeScript/ESM ergonomics still require loader plumbing, its mocking/fake-timer facilities are less mature, and it cannot run browser-oriented frontend component tests — which would force a second runner and split the testing story.
 - **Jest** — the long-time incumbent, but its ESM support remains the painful part of an otherwise mature tool, and its transform pipeline is legacy weight Vitest sheds; Vitest is its practical successor with a near-identical API.
 - **Different runners per package** (e.g., `node:test` backend + something browser-capable for frontend) — two tools, two configs, two sets of conventions; violates simplicity for no benefit.
 
@@ -51,6 +51,6 @@ Use **Vitest** as the unit test runner in every package, with a shared base conf
 
 ## Conditions That Would Justify Changing This Decision
 
-- `node:test` reaching ergonomic parity (TS loading, timers, mocking) *and* a solved frontend-component story — the zero-dependency option should win when it's actually equivalent.
+- `node:test` reaching ergonomic parity (TS loading, timers, mocking) _and_ a solved frontend-component story — the zero-dependency option should win when it's actually equivalent.
 - Vitest maintenance faltering or a destructive breaking change without a migration path.
 - Evidence that runner behavior differences (local vs CI) are causing nondeterminism the project cannot tolerate.
