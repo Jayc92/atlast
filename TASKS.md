@@ -24,10 +24,10 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 ### Phase B — Foundation build (active — authorized 2026-07-22)
 
 - [x] M0 tooling ADRs (monorepo tooling, lint/format/type-check/test/build/browser-check stack) drafted and human-approved — _ADRs 0001–0013 in [docs/adr/](docs/adr/README.md), formally approved 2026-07-22; acceptance authorizes M0 Phase B scaffolding only_
-- [~] TypeScript monorepo established — _root pnpm/Node config and workspace skeleton committed; package-manager bootstrap operational (`scripts/bootstrap.sh` verifies Node 24 + pinned pnpm and runs a frozen install) and `pnpm-lock.yaml` generated; TypeScript 6.0.3 pinned at the workspace root; repository-wide linting (`pnpm lint`, ESLint + typescript-eslint strict type-aware config per ADR-0006) and formatting (`pnpm format` / `pnpm format:check`, Prettier per ADR-0007) operational; package-level type checking still pending (per-package tsconfigs and a `typecheck` script arrive with the app/package shells); no application code added_
+- [~] TypeScript monorepo established — _root pnpm/Node config and workspace skeleton committed; package-manager bootstrap operational (`scripts/bootstrap.sh` verifies Node 24 + pinned pnpm and runs a frozen install) and `pnpm-lock.yaml` generated; TypeScript 6.0.3 pinned at the workspace root; repository-wide linting (`pnpm lint`, ESLint + typescript-eslint strict type-aware config per ADR-0006) and formatting (`pnpm format` / `pnpm format:check`, Prettier per ADR-0007) operational; recursive package-level type checking operational (`pnpm typecheck` per ADR-0002, currently covering the four shared package shells; app/test type checking arrives with those shells); no application code added_
 - [ ] Web application shell
 - [ ] Backend API shell
-- [ ] Shared packages structure
+- [x] Shared packages structure — _compile-only package shells for `packages/shared`, `packages/graph-model`, `packages/connectors`, and `packages/ui`: per-package strict tsconfigs, `typecheck` scripts, and empty `export {}` entrypoints. These are **empty M0 package boundaries only** — domain schemas/contracts and the graph model remain gated on M1 authorization, connector implementation on M5, and UI components on the authorized web/UI work_
 - [ ] Automated linting, formatting, type checking, tests, builds, browser acceptance checks
 - [ ] `scripts/verify.sh` populated as the single verification entry point
 - [ ] Synthetic-data-only guarantee verified: repo holds no external connections or credentials

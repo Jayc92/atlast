@@ -2,5 +2,9 @@
   "name": "@atlast/ui",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared UI components for the Atlast web application — populated in M0 Phase B."
+  "description": "Shared UI components for the Atlast web application — populated in M0 Phase B.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --project tsconfig.json"
+  }
 }

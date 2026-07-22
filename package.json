@@ -9,6 +9,7 @@
   },
   "scripts": {
     "lint": "eslint .",
+    "typecheck": "pnpm --recursive --if-present run typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

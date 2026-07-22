@@ -55,8 +55,9 @@ Repository-wide linting ([ADR-0006](docs/adr/0006-linting.md)) and formatting ([
 - `pnpm lint` — run ESLint across the repository
 - `pnpm format:check` — verify formatting without modifying files (what verification runs)
 - `pnpm format` — apply Prettier formatting
+- `pnpm typecheck` — run TypeScript type checking recursively across workspace packages ([ADR-0002](docs/adr/0002-monorepo-task-runner.md)); packages without a `typecheck` script are skipped
 
-TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed, but package-level type checking is not wired yet — per-package `tsconfig` files and a `typecheck` script arrive with the application and package shells.
+TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed, and package-level type checking currently covers the four shared package shells (`packages/shared`, `packages/graph-model`, `packages/connectors`, `packages/ui`). Type checking for the application packages (`apps/*`) and test suites arrives with those shells.
 
 ## Contributing
 
