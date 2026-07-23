@@ -1,9 +1,11 @@
 # ADR-0014: Core Topology Domain Model — Stable Subjects, Content-Addressed Assertion Revisions, Mandatory Provenance, Confidence, and Freshness
 
-**Status:** Accepted
+**Status:** Accepted; amended by [ADR-0019](0019-subject-identity-and-assertion-claims.md)
 **Date:** 2026-07-23
 
 > **Approval note (2026-07-23):** Accepted by human review as part of the **M1 architecture baseline**. Acceptance settles the M1 domain-model design only — it does **not** authorize implementation. M1 implementation requires a separate, explicit human authorization ([docs/milestones.md](../milestones.md)).
+
+> **Amendment notice (2026-07-23):** [ADR-0019](0019-subject-identity-and-assertion-claims.md) (Accepted) amends this ADR's typed-subject clauses: subjects carry **identity only** (`schemaVersion`, `identifier`, `subjectKind`); entity type, relationship type, and endpoint identifiers live in the GraphAssertion's canonical claim, and invariant 4's referential integrity is validated per claim at the repository layer. The decision text below is **preserved verbatim as accepted** — where it places type or endpoints on subjects, ADR-0019 controls. All other decisions in this ADR stand unchanged.
 
 ## Context
 

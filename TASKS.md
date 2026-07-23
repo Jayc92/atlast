@@ -1,6 +1,6 @@
 # Atlast — Tasks
 
-The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). Tasks are grouped by milestone ([docs/milestones.md](docs/milestones.md)); each milestone requires explicit authorization — **M0 is complete (2026-07-22). M1 implementation was explicitly authorized 2026-07-23** (plan approved, ADRs 0014–0018 Accepted) and is **active, slice-gated: only Slice S1 is currently authorized**; S2–S8 are each released explicitly after the preceding slice is reviewed and merged. **M2 and later milestones remain unauthorized.**
+The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). Tasks are grouped by milestone ([docs/milestones.md](docs/milestones.md)); each milestone requires explicit authorization — **M0 is complete (2026-07-22). M1 implementation was explicitly authorized 2026-07-23** (plan approved, ADRs 0014–0019 Accepted; 0014/0015 amended by ADR-0019) and is **active, slice-gated: only Slice S1 is currently authorized**; S2–S8 are each released explicitly after the preceding slice is reviewed and merged. **M2 and later milestones remain unauthorized.**
 
 **Legend:** `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked (note the blocker)
 
@@ -45,12 +45,13 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 - [x] ADR-0016 temporal graph and snapshots — _Accepted 2026-07-23_
 - [x] ADR-0017 M1 query API surface — _Accepted 2026-07-23_
 - [x] ADR-0018 M1 storage strategy (mandatory per ADR-0012) — _Accepted 2026-07-23_
+- [x] [ADR-0019](docs/adr/0019-subject-identity-and-assertion-claims.md) subject identity and assertion claims — _Accepted 2026-07-23 by human review; resolves the ADR-0014/ADR-0015 contradiction (typed subjects vs. coexisting conflicting type claims) by amending only those clauses (metadata-only notices on 0014/0015); fixes the S1/S2/S6 validation-layer split; unblocks S1 below without authorizing S2+_
 
 ### Implementation (authorized 2026-07-23 — active, slice-gated per [docs/m1-plan.md § 4](docs/m1-plan.md))
 
 **M1 implementation was explicitly authorized by human decision on 2026-07-23.** The authorization permits executing the approved plan **one slice at a time, each independently reviewed**:
 
-- [ ] **S1 — Domain schemas in `packages/shared`** (Evidence incl. safe-integer `recordedSequence`, subjects, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, schema-rejection tests) — **the only currently authorized slice**; not started
+- [ ] **S1 — Domain schemas in `packages/shared`** (Evidence incl. safe-integer `recordedSequence`, identity-only subjects and claim union per ADR-0014 as amended by [ADR-0019](docs/adr/0019-subject-identity-and-assertion-claims.md), content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, schema-rejection tests; schema validation only — no repository lookups, per ADR-0019 § 4) — **the only currently authorized slice**; not started
 - [!] S2 — Repository interfaces + contract-test suite skeleton — _gated: released only after S1 is reviewed and merged_
 - [!] S3 — Fixture suite v1 in `fixtures/demo-company/` — _gated on slice release_
 - [!] S4 — Temporal foundations in `packages/graph-model` — _gated on slice release_
@@ -63,7 +64,7 @@ M1 exit criteria remain as approved ([docs/m1-plan.md § 11](docs/m1-plan.md), [
 
 - [ ] Model and query API run wholly from fixtures in CI with no external dependencies
 - [ ] Every fact in the graph is traceable to its synthetic evidence via the API
-- [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0018 Accepted 2026-07-23_
+- [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0019 Accepted 2026-07-23 (0014/0015 amended by ADR-0019)_
 - [ ] No-real-systems constraint verified: M1 boundary re-audit passes (S8)
 
 ## M2 — Interactive Topology Interface (gated — not authorized)
