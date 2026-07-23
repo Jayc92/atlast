@@ -59,7 +59,7 @@ Repository-wide linting ([ADR-0006](docs/adr/0006-linting.md)) and formatting ([
 - `pnpm test` — run package test suites recursively (Vitest per [ADR-0008](docs/adr/0008-unit-testing.md)); packages without a `test` script are skipped
 - `pnpm build` — run package builds recursively; packages without a `build` script are skipped
 
-TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed. Package-level type checking covers the four shared package shells (`packages/shared`, `packages/graph-model`, `packages/connectors`, `packages/ui`), the backend API (`apps/api`), and the web application (`apps/web`), including each package's colocated tests. Type checking for the standalone `tests/*` workspaces is not yet configured; it arrives with those shells.
+TypeScript 6.0.3 and the strict shared base configuration ([tsconfig.base.json](tsconfig.base.json)) are installed. Package-level type checking covers the four shared package shells (`packages/shared`, `packages/graph-model`, `packages/connectors`, `packages/ui`), the backend API (`apps/api`), the web application (`apps/web`), and the browser acceptance suite (`tests/acceptance`), including each package's colocated tests. Type checking for the standalone `tests/unit` and `tests/integration` workspaces is not yet configured; it arrives with those shells.
 
 ### Backend API (`apps/api`)
 
@@ -90,6 +90,25 @@ Commands (run from the repository root with `pnpm --filter @atlast/web <script>`
 - `pnpm --filter @atlast/web preview` — serve the built bundle on `http://127.0.0.1:4173`
 
 Both the dev and preview servers bind to `127.0.0.1` only. The page requests the relative path `/api/health` on load; Vite's dev/preview proxy forwards it to the API shell's `GET /health` at `http://127.0.0.1:3001`, so the API needs no CORS configuration and the browser bundle contains no API host. Start the API first (`pnpm --filter @atlast/api dev`) to see the "Local API connected" state; without it the page shows "Local API unavailable".
+
+### Browser acceptance tests (`tests/acceptance`)
+
+The M0 browser acceptance suite ([ADR-0010](docs/adr/0010-browser-acceptance-testing.md)): Playwright drives the primary shell journey against the fully assembled system — the real built API server and the real built web bundle behind the Vite preview proxy, over genuine HTTP in a real browser. The suite is Chromium-only at M0 and runs the same journey in two projects:
+
+- `desktop-chromium` — 1280×720 viewport
+- `mobile-chromium` — 390×844 viewport
+
+One-time browser installation (downloads the Chromium build pinned by the Playwright package version):
+
+- `pnpm --filter @atlast/tests-acceptance browser:install`
+
+Running the suite:
+
+- `pnpm --filter @atlast/tests-acceptance test` — run the acceptance suite (also discovered by the root `pnpm test`)
+
+The tests boot everything themselves through Playwright's `webServer` lifecycle: they build `@atlast/api` and start its built server on `http://127.0.0.1:3001`, build `@atlast/web` and serve the bundle with `vite preview` on `http://127.0.0.1:4173`, wait on each server's readiness URL, and tear both processes down after the run — no manually started processes or pre-existing `dist/` output are used, and everything stays on the loopback interface. Assertions are web-first (auto-waiting) with no fixed sleeps.
+
+Playwright writes generated artifacts — traces and screenshots (retained only on failure) under `test-results/`, plus any `playwright-report/` and `blob-report/` output — which are git-ignored and never committed.
 
 ## Contributing
 

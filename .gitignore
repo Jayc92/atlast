@@ -6,6 +6,11 @@ dist/
 coverage/
 *.tsbuildinfo
 
+# Playwright output (acceptance traces/screenshots/reports — ADR-0010)
+playwright-report/
+test-results/
+blob-report/
+
 # Local environment files (no secrets in the repo — GUARDRAILS.md § 1.4)
 .env
 .env.*

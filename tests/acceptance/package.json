@@ -2,5 +2,15 @@
   "name": "@atlast/tests-acceptance",
   "version": "0.0.0",
   "private": true,
-  "description": "Browser acceptance test suite (Playwright per ADR-0010) — populated in M0 Phase B."
+  "description": "Browser acceptance test suite (Playwright per ADR-0010) — M0 primary shell journey against the built API and web application, Chromium only.",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc --project tsconfig.json",
+    "browser:install": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "@types/node": "24.13.3"
+  }
 }

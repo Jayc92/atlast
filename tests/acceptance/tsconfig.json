@@ -1,0 +1,18 @@
+{
+  // Type-checking configuration for the browser acceptance suite (ADR-0010).
+  // No emit — Playwright runs the TypeScript sources directly; tsc exists
+  // here purely so `pnpm typecheck` covers this workspace like every other.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2024",
+    // DOM lib is required because @playwright/test's types reference browser
+    // globals, and page.evaluate callbacks genuinely execute in the browser.
+    "lib": ["ES2024", "DOM"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["playwright.config.ts", "specs/**/*.ts"]
+}
