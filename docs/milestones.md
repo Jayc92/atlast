@@ -39,7 +39,11 @@
 
 ---
 
-## M1 — Synthetic Topology Model (gated)
+<a id="m1--synthetic-topology-model-gated"></a>
+
+## M1 — Synthetic Topology Model (plan approved 2026-07-23; implementation gated)
+
+> **Planning status:** the M1 plan ([docs/m1-plan.md](m1-plan.md)) was approved 2026-07-23 as the M1 implementation baseline, and ADRs [0014](adr/0014-core-topology-domain-model.md)–[0018](adr/0018-m1-storage-strategy.md) are Accepted. **Implementation remains gated:** plan approval and ADR acceptance do not authorize implementation, which requires its own explicit human authorization — not yet given.
 
 **Goal:** The core domain — entities, relationships, evidence, provenance, confidence, freshness, snapshots — modeled and queryable, driven entirely by synthetic fixtures.
 

@@ -8,7 +8,14 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 complete (2026-07-22). No new implementation milestone is currently authorized.** The documentation set is approved, the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, and the full M0 foundation exists and passes CI: the monorepo workspace, the backend API shell (`apps/api`), the web application shell (`apps/web`), the shared package shells (`packages/*`), the browser acceptance suite (`tests/acceptance`), the verification tooling (`scripts/bootstrap.sh`, `scripts/verify.sh`), and the GitHub Actions workflow that runs it. See [TASKS.md](TASKS.md) for exact per-task status. Until a human explicitly authorizes M1, the only permitted changes are maintenance and corrections to the completed M0 foundation (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — no M1 work of any kind before that explicit authorization, and M2+ milestones each remain gated on their own.
+**M0 complete (2026-07-22). M1 plan approved and ADRs 0014–0018 Accepted (2026-07-23); M1 implementation NOT authorized.** The documentation set is approved, the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, and the full M0 foundation exists and passes CI: the monorepo workspace, the backend API shell (`apps/api`), the web application shell (`apps/web`), the shared package shells (`packages/*`), the browser acceptance suite (`tests/acceptance`), the verification tooling (`scripts/bootstrap.sh`, `scripts/verify.sh`), and the GitHub Actions workflow that runs it. The M1 architecture baseline is settled: [docs/m1-plan.md](docs/m1-plan.md) is approved and ADRs 0014–0018 are Accepted. See [TASKS.md](TASKS.md) for exact per-task status.
+
+Permitted work right now, and nothing beyond it:
+
+- **Maintenance and corrections to the completed M0 foundation** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs).
+- **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0018). Planning maintenance never writes domain code, fixtures, schemas, API routes, tests, or migrations.
+
+**All M1 implementation is prohibited until a human explicitly authorizes it** — plan approval and ADR acceptance settle _what_ M1 will be; they are not the authorization to build it. When that authorization is given, it is recorded in TASKS.md and docs/milestones.md. M2+ milestones each remain gated on their own explicit authorization.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 

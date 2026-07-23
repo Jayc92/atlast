@@ -4,6 +4,8 @@ Binding decisions are made only through human-approved ADRs ([GUARDRAILS.md § 1
 
 ## Index
 
+### Accepted (M0 — approved 2026-07-22)
+
 | ADR                                          | Decision                                                                                                                 | Status   |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------- |
 | [0001](0001-monorepo-package-manager.md)     | Monorepo package manager — pnpm                                                                                          | Accepted |
@@ -21,3 +23,15 @@ Binding decisions are made only through human-approved ADRs ([GUARDRAILS.md § 1
 | [0013](0013-ci-philosophy.md)                | CI philosophy — CI runs exactly `scripts/verify.sh`, hermetically                                                        | Accepted |
 
 **Approval note (2026-07-22):** ADRs 0001–0013 were formally approved by human review. Acceptance authorizes **M0 Phase B scaffolding only** — it does not authorize M1 or later milestone work, each of which requires its own explicit authorization per [docs/milestones.md](../milestones.md).
+
+### Accepted (M1 planning decisions — approved 2026-07-23)
+
+| ADR                                                   | Decision                                                                            | Status   |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------- | -------- |
+| [0014](0014-core-topology-domain-model.md)            | Core topology domain model — stable subjects, content-addressed assertion revisions | Accepted |
+| [0015](0015-deterministic-identity-reconciliation.md) | Identity reconciliation — rules-first, deterministic, conflict-preserving           | Accepted |
+| [0016](0016-temporal-graph-and-snapshots.md)          | Temporal graph and snapshots — bitemporal records, derived snapshots, exact replay  | Accepted |
+| [0017](0017-m1-query-api-surface.md)                  | M1 query API surface — purpose-built, bounded, evidence-linked REST contract        | Accepted |
+| [0018](0018-m1-storage-strategy.md)                   | M1 storage strategy — retain fixture-backed in-memory storage behind the interfaces | Accepted |
+
+**Approval note (2026-07-23):** ADRs 0014–0018 were accepted by human review as the **M1 architecture baseline**, alongside approval of [docs/m1-plan.md](../m1-plan.md). Acceptance settles the M1 planning decisions only — **it does not authorize M1 implementation**, which requires its own separate, explicit human authorization per [docs/milestones.md](../milestones.md).

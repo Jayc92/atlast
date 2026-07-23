@@ -1,6 +1,6 @@
 # Atlast — Tasks
 
-The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). Tasks are grouped by milestone ([docs/milestones.md](docs/milestones.md)); each milestone requires explicit authorization — **M0 is complete (2026-07-22), and no implementation milestone is currently authorized: M1 requires its own explicit authorization before any M1 work begins**.
+The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). Tasks are grouped by milestone ([docs/milestones.md](docs/milestones.md)); each milestone requires explicit authorization — **M0 is complete (2026-07-22). The M1 plan is approved and ADRs 0014–0018 are Accepted (2026-07-23), but M1 implementation is NOT authorized — plan approval does not authorize implementation, which requires its own explicit human decision.**
 
 **Legend:** `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked (note the blocker)
 
@@ -35,9 +35,22 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 
 ---
 
-## M1 — Synthetic Topology Model (gated — not authorized)
+## M1 — Synthetic Topology Model (plan approved 2026-07-23 — implementation NOT authorized)
 
-High-level breakdown; M0 is closed — expand this list only when M1 receives its own explicit authorization:
+### Planning (complete — approved 2026-07-23)
+
+- [x] [docs/m1-plan.md](docs/m1-plan.md) — M1 architecture and implementation plan — _approved 2026-07-23 as the M1 implementation baseline_
+- [x] ADR-0014 core topology domain model — _Accepted 2026-07-23_
+- [x] ADR-0015 deterministic identity reconciliation — _Accepted 2026-07-23_
+- [x] ADR-0016 temporal graph and snapshots — _Accepted 2026-07-23_
+- [x] ADR-0017 M1 query API surface — _Accepted 2026-07-23_
+- [x] ADR-0018 M1 storage strategy (mandatory per ADR-0012) — _Accepted 2026-07-23_
+
+**Plan approval and ADR acceptance do not authorize implementation.** Implementation below begins only on its own explicit human authorization, recorded here and in [docs/milestones.md](docs/milestones.md) — **that authorization has not been given.**
+
+### Implementation (gated — NOT authorized)
+
+High-level breakdown; expand per [docs/m1-plan.md § 4](docs/m1-plan.md) only when M1 implementation receives its own explicit authorization:
 
 - [ ] ADRs: graph/evidence representation (per [architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required))
 - [ ] Entity/Relationship/Evidence model with provenance, confidence, freshness
