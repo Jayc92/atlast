@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 Phase B — foundation build underway.** The documentation set and tooling ADRs are approved; the repository holds the monorepo workspace skeleton, bootstrap tooling, the backend API shell ([apps/api](apps/api), per [ADR-0004](docs/adr/0004-backend-api-framework.md)), and the web application shell ([apps/web](apps/web), per [ADR-0003](docs/adr/0003-frontend-framework.md)). M1 topology and query behavior, and the M2 exploration UI, remain gated on their respective explicit authorizations ([docs/milestones.md](docs/milestones.md)). Read [PROJECT_SPEC.md](PROJECT_SPEC.md) before contributing anything.
+> **Status: M0 complete (2026-07-22).** The safe project foundation is finished: the approved documentation set and ADRs 0001–0013, the monorepo workspace, the backend API shell ([apps/api](apps/api), per [ADR-0004](docs/adr/0004-backend-api-framework.md)), the web application shell ([apps/web](apps/web), per [ADR-0003](docs/adr/0003-frontend-framework.md)), the shared package shells, the browser acceptance suite, and GitHub Actions CI running `scripts/verify.sh`. **M1 remains gated and is not authorized** — Atlast does not yet implement topology discovery, the graph model, query behavior, or any other M1+ product capability; those descriptions below are the product vision, not current behavior ([docs/milestones.md](docs/milestones.md)). Read [PROJECT_SPEC.md](PROJECT_SPEC.md) before contributing anything.
 
 ---
 
@@ -127,7 +127,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-M0 foundation implementation is underway — the backend API shell exists in [apps/api](apps/api) and the web application shell in [apps/web](apps/web). M1 product/domain behavior remains gated on its own explicit authorization ([docs/milestones.md](docs/milestones.md)). All contributions — documentation or code — must comply with [GUARDRAILS.md](GUARDRAILS.md).
+The M0 foundation is complete — the backend API shell lives in [apps/api](apps/api) and the web application shell in [apps/web](apps/web). Until M1 is explicitly authorized, contributions are limited to maintenance and corrections of the completed M0 foundation; M1 product/domain behavior remains gated on its own explicit authorization ([docs/milestones.md](docs/milestones.md)). All contributions — documentation or code — must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
