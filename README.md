@@ -48,6 +48,16 @@ Atlast has deliberate boundaries. It is **not** a monitoring system, an incident
 
 The exact pnpm version is pinned in [package.json](package.json)'s `packageManager` field ([ADR-0001](docs/adr/0001-monorepo-package-manager.md)), and `pnpm-lock.yaml` is a committed, reviewed artifact — every contributor and CI run installs identically.
 
+## Verifying the Repository
+
+The normal working sequence is:
+
+1. `./scripts/bootstrap.sh` — verify the toolchain and install the workspace (once per clone, and after dependency changes)
+2. `pnpm --filter @atlast/tests-acceptance browser:install` — one-time download of the pinned Playwright Chromium build (needed before the first verification run, and again only when the Playwright version changes)
+3. `./scripts/verify.sh` — run the full verification pipeline
+
+`scripts/verify.sh` is the single verification entry point ([GUARDRAILS.md § 5](GUARDRAILS.md#5-testing-philosophy), [ADR-0013](docs/adr/0013-ci-philosophy.md)): CI runs exactly this script, so a local pass and a CI pass mean the same thing. It runs, in order: git whitespace validation, formatting checks (`pnpm format:check`), linting (`pnpm lint`), type checking (`pnpm typecheck`), non-browser tests (all workspace Vitest suites), production builds (`pnpm build`), and browser acceptance (the Playwright suite in `tests/acceptance`). It stops at the first failure and requires no interaction. It never installs or upgrades dependencies, never runs formatting in write mode, and does not intentionally modify tracked source, tests, configuration, documentation, manifests, or lockfiles — though its build and test stages do create or update generated, git-ignored artifacts such as `dist/`, `test-results/`, and Playwright failure reports.
+
 ## Development Commands
 
 Repository-wide linting ([ADR-0006](docs/adr/0006-linting.md)) and formatting ([ADR-0007](docs/adr/0007-formatting.md)) run from the repository root:

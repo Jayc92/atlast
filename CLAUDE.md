@@ -8,7 +8,7 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 Phase B — foundation build authorized (as of 2026-07-22).** The documentation set is approved and the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, authorizing M0 Phase B scaffolding only. No application code exists yet. M1 and later milestones remain gated on their own explicit authorization.
+**M0 Phase B — foundation build underway (authorized 2026-07-22).** The documentation set is approved and the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, authorizing M0 Phase B scaffolding only. The M0 scaffolding now exists: the monorepo workspace, the backend API shell (`apps/api`), the web application shell (`apps/web`), the shared package shells (`packages/*`), the browser acceptance suite (`tests/acceptance`), and the verification tooling (`scripts/bootstrap.sh`, `scripts/verify.sh`). See [TASKS.md](TASKS.md) for exact per-task status. M1 and later milestones remain gated on their own explicit authorization.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -52,7 +52,8 @@ When asked to do any of the above, point to this section and confirm the milesto
 
 - Before changing anything, read the documents your change touches; keep the documentation set internally consistent (a contradiction between docs is a defect).
 - Update [TASKS.md](TASKS.md) as work starts and completes — it is the only place in-flight work is tracked.
-- Run `scripts/verify.sh` before declaring any change complete (once it has content).
+- `scripts/verify.sh` is the required completion gate: run it and see it pass before declaring any change complete.
+- `scripts/verify.sh` is a protected verification contract ([ADR-0013](docs/adr/0013-ci-philosophy.md)): once its initial population is reviewed and committed, it defines what "verified" means for this repository. Never weaken, skip, rename, or remove its checks, and never edit it merely to make a failure pass — fix the code instead. Changes to the script are changes to the definition of "verified" and require their own explicit human review.
 - Flag security-sensitive or architecturally significant output explicitly for human review.
 - If a request conflicts with these rules or GUARDRAILS.md, say so and ask — do not silently comply or silently refuse.
 
