@@ -1,8 +1,8 @@
 # M0 Synthetic-Data and External-Connection Boundary Audit
 
 **Date:** 2026-07-22
-**Audited commit:** `4111d24` (`main`)
-**Status:** Complete — passed
+**Audited commit:** `4111d24` (`main`) — original audit (§ 1–12); M0 closure revalidation at `783e95c` in § 13
+**Status:** Complete — passed (original audit and closure revalidation)
 **Auditor:** AI-assisted static audit (Claude), for human review per [GUARDRAILS.md § 6](../../GUARDRAILS.md#6-ai-assistant-guardrails)
 
 This audit verifies the M0 exit criterion "nothing in the repository connects to, or holds credentials for, any external system" ([docs/milestones.md M0](../milestones.md#m0--safe-project-foundation-active)) and the synthetic-data-only constraint ([PROJECT_SPEC.md § 6](../../PROJECT_SPEC.md#6-constraints--assumptions)) against the Git-tracked content of the repository at the commit above. The criterion is evaluated in its product/runtime intent: what Atlast connects to and what credentials the repository holds — while recognizing the permitted developer-tooling connections (package-manager and browser-download) documented as explicit exceptions in § 9.
@@ -113,6 +113,23 @@ This audit is a point-in-time static review and cannot prove:
 - **Future changes.** This audit binds only commit `4111d24`. Any change adding dependencies, network code, environment access, or fixture data moves the boundary and warrants re-audit — in particular at M1 (fixture data) and M5 (first real connector).
 - **Git history.** The audit examined the tracked tree at HEAD, not every historical blob. The repository is young and has been committed directly to `main` through explicit human review checkpoints — the current tree was reviewed at those checkpoints, but the full Git history was not independently secret-scanned.
 
-## 12. Conclusion
+## 12. Conclusion (original audit, commit `4111d24`)
 
 At commit `4111d24`, within the limits stated in § 11: every Atlast product/runtime network path, under the only authorized M0 execution configuration, binds or targets `127.0.0.1` exclusively; the single environment variable in use can alter only a local port number; no credentials, sensitive files, or high-confidence secret patterns exist in tracked content; no employer or customer material is present; no product dependency provides cloud, Kubernetes, database, telemetry, LLM, identity, CI-provider, or observed-system integration capability (package-manager and browser-download tooling remain documented development-tooling exceptions, § 9); and the fixture directory is documentation-only and fictional. The static evidence supports the M0 exit criterion, read as it is intended — as a bound on the product/runtime: under the only authorized M0 configuration, Atlast product/runtime does not connect to any external system; Git-tracked repository content holds no external-system credentials; and the project operates on synthetic — currently absent — data. Permitted developer bootstrap and browser-download connections remain the explicit tooling exceptions documented in § 9.
+
+## 13. M0 Closure Revalidation (2026-07-22, commit `783e95c`)
+
+Performed at M0 closeout against the final merged M0 foundation commit `783e95c` (`main`). The original findings above (§ 1–12) remain scoped to commit `4111d24` and are preserved unmodified; this section revalidates only the delta between the two commits, which comprises four commits changing seven files: the new GitHub Actions workflow (`.github/workflows/verify.yml`), README/TASKS/audit documentation updates, removal of the two inert `tests/unit` and `tests/integration` placeholder manifests, and the corresponding `pnpm-lock.yaml` importer removals (no dependency additions, removals, or version changes).
+
+**Method:** the same § 2 pattern categories were re-run over the delta files, plus a manual read of the complete workflow file. Result — no new credentials, sensitive files, high-confidence secret patterns, employer/customer material, or product-runtime network paths were introduced. The dependency surface shrank (two empty workspace importers removed) and no manifest changed otherwise.
+
+**GitHub Actions workflow findings** (`.github/workflows/verify.yml`, the only new executable artifact in the delta):
+
+- **Read-only permissions:** the workflow declares `permissions: contents: read` and nothing broader; it cannot write to the repository or any GitHub resource.
+- **No repository secrets:** no `secrets.*` reference exists anywhere in the workflow; the job runs credential-free beyond the runner's implicit read-only checkout scope, as ADR-0013 § 2 requires.
+- **No deployment or publishing:** the job checks out, installs the pinned toolchain, and runs `./scripts/verify.sh` — there are no artifact uploads, package publishing, deployment, or notification steps.
+- **Immutable action pins:** all three third-party actions (`actions/checkout`, `pnpm/action-setup`, `actions/setup-node`) are pinned to full commit SHAs with version-identifying comments, so the executed action code cannot change under a moved tag.
+- **External connections are permitted CI/development tooling only:** the CI job contacts GitHub (checkout and action download, inherent to the platform), the npm registry (frozen-lockfile install via `scripts/bootstrap.sh`), and Playwright's browser distribution service (pinned Chromium download) — the same package-manager and browser-download tooling categories already documented as permitted exceptions in § 9, now exercised in CI as well as locally.
+- **No product-runtime change:** the workflow adds no Atlast product-runtime external integration; the product's loopback-only network posture (§ 3) is unchanged, and verification inside CI runs the identical loopback-only acceptance suite.
+
+**Conclusion of revalidation:** at commit `783e95c`, within the same § 11 limitations, the M0 exit criterion continues to hold — Atlast product/runtime connects to no external system, the repository holds no external-system credentials, and the only external connections are the documented development/CI tooling exceptions. The § 11 re-audit triggers (M1 fixture data, M5 connector) remain in force.

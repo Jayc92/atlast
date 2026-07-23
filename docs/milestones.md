@@ -1,21 +1,23 @@
 # Atlast — Milestones
 
-**Status:** Draft — this plan requires human approval, and every technology or design position it references is a draft pending an ADR. Milestones are gated by exit criteria, not dates; a milestone is done when its criteria hold, and **each milestone requires explicit authorization** — only M0 is authorized once this documentation set is approved.
+**Status:** Current — approved 2026-07-22 with the documentation set. Milestones are gated by exit criteria, not dates; a milestone is done when its criteria hold, and **each milestone requires explicit authorization**. M0 completed 2026-07-22; **completion of M0 does not authorize M1** — M1 remains gated on its own explicit authorization.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
 ---
 
-## M0 — Safe Project Foundation (active)
+<a id="m0--safe-project-foundation-active"></a>
+
+## M0 — Safe Project Foundation (completed 2026-07-22)
 
 **Goal:** A safe, fully verifiable project skeleton — documentation approved first, then a foundation that runs entirely on synthetic data with no external connections.
 
-### Phase A — Documentation (current phase)
+### Phase A — Documentation (completed 2026-07-22)
 
 - Foundational documentation drafted (this set) and submitted for human review.
 - No implementation of any kind occurs in this phase.
 
-### Phase B — Foundation build (authorized only after documentation approval)
+### Phase B — Foundation build (completed 2026-07-22; authorized only after documentation approval)
 
 - A **TypeScript monorepo**.
 - A **web application** (shell).
@@ -26,14 +28,14 @@
 - **Synthetic data only** — no connection to any real system, service, or credential.
 - Draft tooling decisions recorded as ADRs in `docs/adr/` and approved by a human before scaffolding begins.
 
-**Exit criteria:**
+**Exit criteria (all met 2026-07-22):**
 
-- [ ] Documentation set approved by a human maintainer.
-- [ ] M0 tooling ADRs written and human-approved.
-- [ ] Monorepo builds; `scripts/verify.sh` runs lint, format, type check, tests, build, and browser acceptance checks and passes in CI.
-- [ ] Nothing in the repository connects to, or holds credentials for, any external system.
+- [x] Documentation set approved by a human maintainer — _approved 2026-07-22._
+- [x] M0 tooling ADRs written and human-approved — _ADRs 0001–0013 approved 2026-07-22._
+- [x] Monorepo builds; `scripts/verify.sh` runs lint, format, type check, tests, build, and browser acceptance checks and passes in CI — _final `main` GitHub Actions run at commit `783e95c` succeeded 2026-07-22 ([run 29977876658](https://github.com/Jayc92/atlast/actions/runs/29977876658)); details in [TASKS.md](../TASKS.md)._
+- [x] Nothing in the repository connects to, or holds credentials for, any external system — _verified by the [M0 synthetic boundary audit](audits/m0-synthetic-boundary-audit.md), including its closure revalidation at `783e95c`._
 
-**Authorization note:** approval of the documentation authorizes **M0 Phase B only**. M1 requires its own authorization at M0 close.
+**Authorization note:** approval of the documentation authorized **M0 Phase B only**, and **completion of M0 does not authorize M1** — M1 work may begin only on its own explicit authorization.
 
 ---
 

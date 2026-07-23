@@ -8,7 +8,7 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 Phase B — foundation build underway (authorized 2026-07-22).** The documentation set is approved and the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, authorizing M0 Phase B scaffolding only. The M0 scaffolding now exists: the monorepo workspace, the backend API shell (`apps/api`), the web application shell (`apps/web`), the shared package shells (`packages/*`), the browser acceptance suite (`tests/acceptance`), and the verification tooling (`scripts/bootstrap.sh`, `scripts/verify.sh`). See [TASKS.md](TASKS.md) for exact per-task status. M1 and later milestones remain gated on their own explicit authorization.
+**M0 complete (2026-07-22). No new implementation milestone is currently authorized.** The documentation set is approved, the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, and the full M0 foundation exists and passes CI: the monorepo workspace, the backend API shell (`apps/api`), the web application shell (`apps/web`), the shared package shells (`packages/*`), the browser acceptance suite (`tests/acceptance`), the verification tooling (`scripts/bootstrap.sh`, `scripts/verify.sh`), and the GitHub Actions workflow that runs it. See [TASKS.md](TASKS.md) for exact per-task status. Until a human explicitly authorizes M1, the only permitted changes are maintenance and corrections to the completed M0 foundation (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — no M1 work of any kind before that explicit authorization, and M2+ milestones each remain gated on their own.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -21,9 +21,9 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**Only M0 Phase B is authorized; each later milestone requires its own explicit authorization. Within that gate:**
+**M0 is complete and no later milestone is authorized; each requires its own explicit authorization. Within that gate:**
 
-- M0 Phase B scaffolding (monorepo, web app shell, backend API shell, shared packages, verification tooling) is authorized, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR.
+- Maintenance and corrections to the completed M0 foundation are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR.
 - Do NOT implement M1+ features (topology model, query API v1, exploration UI, overlays, impact simulation, connectors) before their milestone is authorized.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
 - Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
@@ -66,7 +66,7 @@ TASKS.md             Active work breakdown
 GUARDRAILS.md        Binding engineering standards
 docs/architecture.md Architecture philosophy and conceptual design
 docs/milestones.md   Authorized milestone sequence (M0–M5) with exit criteria
-fixtures/            Synthetic test data (populated from M0 Phase B / M1)
-scripts/             Dev tooling incl. verify.sh (populated in M0 Phase B)
-tests/               Test suites (populated from M0 Phase B)
+fixtures/            Synthetic test data (population gated on M1 authorization)
+scripts/             Dev tooling incl. verify.sh
+tests/               Test suites (browser acceptance in tests/acceptance)
 ```

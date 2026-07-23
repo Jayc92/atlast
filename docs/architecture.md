@@ -1,6 +1,6 @@
 # Atlast — Architecture
 
-**Status:** Draft — pending human approval; no implementation exists. This document defines the architecture _philosophy_ and the conceptual shape of the system so that implementation decisions have something to be measured against. Every design position here is a draft: binding decisions are made only through human-approved ADRs in `docs/adr/`. The core stack direction is a TypeScript monorepo (web application, backend API, shared packages — see [milestones.md M0](milestones.md#m0--safe-project-foundation-active)); specific tooling and storage choices are evaluated against § 6 and require approval before use.
+**Status:** Current — approved 2026-07-22 with the documentation set. The M0 foundation (TypeScript monorepo, web application and backend API shells, shared package shells, verification tooling, and CI — see [milestones.md M0](milestones.md#m0--safe-project-foundation-active)) is implemented; the M1+ product/domain architecture described here (discovery, evidence, reconciliation, graph, overlays, query API, AI engine) remains conceptual and gated on milestone authorization. This document defines the architecture _philosophy_ and the conceptual shape of the system so that implementation decisions have something to be measured against. Design positions here bind only through human-approved ADRs in `docs/adr/`; tooling and storage choices are evaluated against § 6 and require approval before use.
 
 ---
 
@@ -194,9 +194,11 @@ The one settled direction is a **TypeScript monorepo** containing a web applicat
 
 ## 7. Open Questions
 
-Tracked here until resolved into ADRs:
+Tracked here until resolved into ADRs. Each question has an assigned owner and a decision gate — the future ADR in which it must be resolved. Ownership is accountability for producing that ADR when its milestone is authorized; it is **not** approval of any particular answer, which still requires the ADR's own human review.
 
-- Identity resolution strategy: rules-first with ML assist, or probabilistic from the start? (Leaning rules-first for explainability.)
-- Evidence retention horizon: full history vs. rolling window with snapshot compaction?
-- Graph query surface: expose a standard graph query language, a purpose-built API, or both?
-- How is prediction accuracy measured before real incident data accumulates? (Candidate: retrospective replay against historical incidents in fixtures.)
+| Open question                                                                                                                                          | Owner                                | Decision gate           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ----------------------- |
+| Identity resolution strategy: rules-first with ML assist, or probabilistic from the start? (Leaning rules-first for explainability.)                   | Joseph Carfagno — Founder/Maintainer | M1 graph/evidence ADR   |
+| Evidence retention horizon: full history vs. rolling window with snapshot compaction?                                                                  | Joseph Carfagno — Founder/Maintainer | M1 storage/evidence ADR |
+| Graph query surface: expose a standard graph query language, a purpose-built API, or both?                                                             | Joseph Carfagno — Founder/Maintainer | M1 query API ADR        |
+| How is prediction accuracy measured before real incident data accumulates? (Candidate: retrospective replay against historical incidents in fixtures.) | Joseph Carfagno — Founder/Maintainer | M4 planning ADR         |
