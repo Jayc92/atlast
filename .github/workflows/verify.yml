@@ -1,0 +1,66 @@
+# Atlast verification CI (M0 Phase B, per ADR-0013).
+#
+# CI is a thin shell around the repository verification contract: check out,
+# install the pinned toolchain, run scripts/verify.sh, report. No verification
+# logic lives in this file — any check worth running belongs in verify.sh so
+# it also runs locally (ADR-0013 § 1). The pipeline is hermetic and read-only:
+# no secrets, no write permissions, no artifact uploads, no deployments
+# (ADR-0013 § 2).
+name: verify
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Supersede in-flight runs for the same branch or pull request; only the
+# latest commit's verification outcome matters.
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # actions/checkout v4.2.2
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      # pnpm/action-setup v4.1.0 — installs the exact pnpm version from the
+      # packageManager field in package.json (ADR-0001, single source of
+      # truth); the action fails rather than substituting another version.
+      - name: Set up pnpm (pinned by package.json packageManager)
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+
+      # actions/setup-node v4.4.0 — installs the exact Node version from
+      # .nvmrc (ADR-0011).
+      - name: Set up Node.js (pinned by .nvmrc)
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: .nvmrc
+
+      # The same bootstrap contract contributors run locally: verifies the
+      # Node and pnpm versions, then installs with the committed frozen
+      # lockfile (ADR-0001).
+      - name: Bootstrap toolchain and install dependencies
+        run: ./scripts/bootstrap.sh
+
+      # Documented verify.sh prerequisite (not a verification stage): the
+      # Chromium build pinned by the workspace's Playwright version, plus its
+      # required Linux system dependencies for the CI runner.
+      - name: Install pinned Playwright Chromium and Linux dependencies
+        run: pnpm --filter @atlast/tests-acceptance exec playwright install --with-deps chromium
+
+      # The single source of truth for "verified" (GUARDRAILS.md § 5,
+      # ADR-0013): CI runs exactly this script and nothing else.
+      - name: Run verification contract
+        run: ./scripts/verify.sh
