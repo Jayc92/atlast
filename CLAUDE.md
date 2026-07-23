@@ -8,14 +8,15 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 complete (2026-07-22). M1 plan approved and ADRs 0014–0018 Accepted (2026-07-23); M1 implementation NOT authorized.** The documentation set is approved, the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, and the full M0 foundation exists and passes CI: the monorepo workspace, the backend API shell (`apps/api`), the web application shell (`apps/web`), the shared package shells (`packages/*`), the browser acceptance suite (`tests/acceptance`), the verification tooling (`scripts/bootstrap.sh`, `scripts/verify.sh`), and the GitHub Actions workflow that runs it. The M1 architecture baseline is settled: [docs/m1-plan.md](docs/m1-plan.md) is approved and ADRs 0014–0018 are Accepted. See [TASKS.md](TASKS.md) for exact per-task status.
+**M0 complete (2026-07-22). M1 implementation explicitly authorized (2026-07-23) — active, slice-gated.** The documentation set is approved, the M0 tooling ADRs (0001–0013 in [docs/adr/](docs/adr/README.md)) are formally Accepted, and the full M0 foundation exists and passes CI: the monorepo workspace, the backend API shell (`apps/api`), the web application shell (`apps/web`), the shared package shells (`packages/*`), the browser acceptance suite (`tests/acceptance`), the verification tooling (`scripts/bootstrap.sh`, `scripts/verify.sh`), and the GitHub Actions workflow that runs it. The M1 architecture baseline is settled ([docs/m1-plan.md](docs/m1-plan.md) approved, ADRs 0014–0018 Accepted), and M1 implementation is authorized to execute that plan. See [TASKS.md](TASKS.md) for exact per-task status.
 
 Permitted work right now, and nothing beyond it:
 
 - **Maintenance and corrections to the completed M0 foundation** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs).
-- **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0018). Planning maintenance never writes domain code, fixtures, schemas, API routes, tests, or migrations.
+- **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0018).
+- **M1 implementation — Slice S1 only** (domain schemas in `packages/shared` per the plan's § 4, with their schema-rejection tests). Work is slice-driven and independently reviewed: **S2–S8 are unauthorized** until the preceding slice is reviewed, merged, and the next slice is explicitly released — do not start a later slice, even preparatorily, without that release being recorded in TASKS.md.
 
-**All M1 implementation is prohibited until a human explicitly authorizes it** — plan approval and ADR acceptance settle _what_ M1 will be; they are not the authorization to build it. When that authorization is given, it is recorded in TASKS.md and docs/milestones.md. M2+ milestones each remain gated on their own explicit authorization.
+**M2 and later milestones remain unauthorized**, each gated on its own explicit human authorization at the preceding milestone's close.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -28,10 +29,10 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**M0 is complete and no later milestone is authorized; each requires its own explicit authorization. Within that gate:**
+**M0 is complete and M1 is the only authorized milestone (slice-gated as above); each later milestone requires its own explicit authorization. Within that gate:**
 
-- Maintenance and corrections to the completed M0 foundation are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR.
-- Do NOT implement M1+ features (topology model, query API v1, exploration UI, overlays, impact simulation, connectors) before their milestone is authorized.
+- Maintenance, corrections, and authorized M1 slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod is named by accepted ADR-0005 and still requires its justification-at-PR when introduced in S1).
+- Do NOT implement M1 slices beyond the currently released one, and do NOT implement M2+ features (exploration UI, overlays, impact simulation, connectors) before their milestone is authorized.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
 - Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
 
@@ -73,7 +74,7 @@ TASKS.md             Active work breakdown
 GUARDRAILS.md        Binding engineering standards
 docs/architecture.md Architecture philosophy and conceptual design
 docs/milestones.md   Authorized milestone sequence (M0–M5) with exit criteria
-fixtures/            Synthetic test data (population gated on M1 authorization)
+fixtures/            Synthetic test data (populated in M1 Slice S3, gated on slice release)
 scripts/             Dev tooling incl. verify.sh
 tests/               Test suites (browser acceptance in tests/acceptance)
 ```

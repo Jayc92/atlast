@@ -1,6 +1,6 @@
 # Atlast — Tasks
 
-The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). Tasks are grouped by milestone ([docs/milestones.md](docs/milestones.md)); each milestone requires explicit authorization — **M0 is complete (2026-07-22). The M1 plan is approved and ADRs 0014–0018 are Accepted (2026-07-23), but M1 implementation is NOT authorized — plan approval does not authorize implementation, which requires its own explicit human decision.**
+The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). Tasks are grouped by milestone ([docs/milestones.md](docs/milestones.md)); each milestone requires explicit authorization — **M0 is complete (2026-07-22). M1 implementation was explicitly authorized 2026-07-23** (plan approved, ADRs 0014–0018 Accepted) and is **active, slice-gated: only Slice S1 is currently authorized**; S2–S8 are each released explicitly after the preceding slice is reviewed and merged. **M2 and later milestones remain unauthorized.**
 
 **Legend:** `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked (note the blocker)
 
@@ -35,7 +35,7 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 
 ---
 
-## M1 — Synthetic Topology Model (plan approved 2026-07-23 — implementation NOT authorized)
+## M1 — Synthetic Topology Model (implementation authorized 2026-07-23 — active, slice-gated)
 
 ### Planning (complete — approved 2026-07-23)
 
@@ -46,18 +46,25 @@ The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4
 - [x] ADR-0017 M1 query API surface — _Accepted 2026-07-23_
 - [x] ADR-0018 M1 storage strategy (mandatory per ADR-0012) — _Accepted 2026-07-23_
 
-**Plan approval and ADR acceptance do not authorize implementation.** Implementation below begins only on its own explicit human authorization, recorded here and in [docs/milestones.md](docs/milestones.md) — **that authorization has not been given.**
+### Implementation (authorized 2026-07-23 — active, slice-gated per [docs/m1-plan.md § 4](docs/m1-plan.md))
 
-### Implementation (gated — NOT authorized)
+**M1 implementation was explicitly authorized by human decision on 2026-07-23.** The authorization permits executing the approved plan **one slice at a time, each independently reviewed**:
 
-High-level breakdown; expand per [docs/m1-plan.md § 4](docs/m1-plan.md) only when M1 implementation receives its own explicit authorization:
+- [ ] **S1 — Domain schemas in `packages/shared`** (Evidence incl. safe-integer `recordedSequence`, subjects, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, schema-rejection tests) — **the only currently authorized slice**; not started
+- [!] S2 — Repository interfaces + contract-test suite skeleton — _gated: released only after S1 is reviewed and merged_
+- [!] S3 — Fixture suite v1 in `fixtures/demo-company/` — _gated on slice release_
+- [!] S4 — Temporal foundations in `packages/graph-model` — _gated on slice release_
+- [!] S5 — Reconciliation engine (`m1-v1` derivation policy) — _gated on slice release_
+- [!] S6 — Snapshot layer + in-memory stores; contract tests pass — _gated on slice release_
+- [!] S7 — Query API v1 routes + integration tests — _gated on slice release_
+- [!] S8 — Acceptance additions (if shell changes), M1 boundary re-audit, documentation closeout — _gated on slice release_
 
-- [ ] ADRs: graph/evidence representation (per [architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required))
-- [ ] Entity/Relationship/Evidence model with provenance, confidence, freshness
-- [ ] Versioning/snapshots with as-of-time queries
-- [ ] Query API v1 (inventory, search, traversal, time travel)
-- [ ] Synthetic fixture suite in `fixtures/` incl. conflict/staleness/ambiguity cases
-- [ ] No-real-systems constraint verified in CI
+M1 exit criteria remain as approved ([docs/m1-plan.md § 11](docs/m1-plan.md), [docs/milestones.md](docs/milestones.md)):
+
+- [ ] Model and query API run wholly from fixtures in CI with no external dependencies
+- [ ] Every fact in the graph is traceable to its synthetic evidence via the API
+- [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0018 Accepted 2026-07-23_
+- [ ] No-real-systems constraint verified: M1 boundary re-audit passes (S8)
 
 ## M2 — Interactive Topology Interface (gated — not authorized)
 
