@@ -91,10 +91,6 @@ importers:
         specifier: 24.13.3
         version: 24.13.3
 
-  tests/integration: {}
-
-  tests/unit: {}
-
 packages:
 
   '@asamuzakjp/css-color@5.1.11':
