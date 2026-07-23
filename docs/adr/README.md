@@ -26,12 +26,15 @@ Binding decisions are made only through human-approved ADRs ([GUARDRAILS.md § 1
 
 ### Accepted (M1 planning decisions — approved 2026-07-23)
 
-| ADR                                                   | Decision                                                                            | Status   |
-| ----------------------------------------------------- | ----------------------------------------------------------------------------------- | -------- |
-| [0014](0014-core-topology-domain-model.md)            | Core topology domain model — stable subjects, content-addressed assertion revisions | Accepted |
-| [0015](0015-deterministic-identity-reconciliation.md) | Identity reconciliation — rules-first, deterministic, conflict-preserving           | Accepted |
-| [0016](0016-temporal-graph-and-snapshots.md)          | Temporal graph and snapshots — bitemporal records, derived snapshots, exact replay  | Accepted |
-| [0017](0017-m1-query-api-surface.md)                  | M1 query API surface — purpose-built, bounded, evidence-linked REST contract        | Accepted |
-| [0018](0018-m1-storage-strategy.md)                   | M1 storage strategy — retain fixture-backed in-memory storage behind the interfaces | Accepted |
+| ADR                                                   | Decision                                                                             | Status                        |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------- |
+| [0014](0014-core-topology-domain-model.md)            | Core topology domain model — stable subjects, content-addressed assertion revisions  | Accepted; amended by ADR-0019 |
+| [0015](0015-deterministic-identity-reconciliation.md) | Identity reconciliation — rules-first, deterministic, conflict-preserving            | Accepted; amended by ADR-0019 |
+| [0016](0016-temporal-graph-and-snapshots.md)          | Temporal graph and snapshots — bitemporal records, derived snapshots, exact replay   | Accepted                      |
+| [0017](0017-m1-query-api-surface.md)                  | M1 query API surface — purpose-built, bounded, evidence-linked REST contract         | Accepted                      |
+| [0018](0018-m1-storage-strategy.md)                   | M1 storage strategy — retain fixture-backed in-memory storage behind the interfaces  | Accepted                      |
+| [0019](0019-subject-identity-and-assertion-claims.md) | Subjects carry identity only; canonical claims own type/endpoints (amends 0014/0015) | Accepted                      |
 
 **Approval note (2026-07-23):** ADRs 0014–0018 were accepted by human review as the **M1 architecture baseline**, alongside approval of [docs/m1-plan.md](../m1-plan.md). Acceptance settles the M1 planning decisions only — **it does not authorize M1 implementation**, which requires its own separate, explicit human authorization per [docs/milestones.md](../milestones.md).
+
+**Approval note (2026-07-23, ADR-0019):** ADR-0019's identity-only subject decision was **accepted by human review**, resolving the internal contradiction between ADR-0014's typed-subject clauses and ADR-0015's coexisting-conflicting-claims requirement. It amends **only** those identified clauses (metadata-only amendment notices on ADR-0014/0015; their accepted decision text is preserved). Acceptance **unblocks Slice S1** — it does not authorize S2–S8 or M2+, which remain gated as before.

@@ -1,9 +1,11 @@
 # ADR-0015: Deterministic Identity Reconciliation — Rules-First, Conflict-Preserving, Replayable
 
-**Status:** Accepted
+**Status:** Accepted; amended by [ADR-0019](0019-subject-identity-and-assertion-claims.md)
 **Date:** 2026-07-23
 
 > **Approval note (2026-07-23):** Accepted by human review as part of the **M1 architecture baseline**. Acceptance settles the M1 reconciliation design only — it does **not** authorize implementation. M1 implementation requires a separate, explicit human authorization ([docs/milestones.md](../milestones.md)).
+
+> **Amendment notice (2026-07-23):** [ADR-0019](0019-subject-identity-and-assertion-claims.md) (Accepted) amends this ADR's dependent typed-subject wording only: where the text below assumes type is a subject-level fact (e.g., the conflict example of two sources asserting different types for one entity), type now lives in the GraphAssertion's canonical claim per ADR-0019. The conflict semantics themselves — coexisting incompatible claims, per-claim confidence, no winner — are unchanged and strengthened. The decision text below is **preserved verbatim as accepted**; all other decisions stand unchanged.
 
 ## Context
 
