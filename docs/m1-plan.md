@@ -3,7 +3,7 @@
 **Status:** Approved — the M1 implementation baseline (approved 2026-07-23)
 **Date:** 2026-07-23
 
-> **APPROVAL IS NOT IMPLEMENTATION AUTHORIZATION.** This plan is approved as the M1 implementation baseline and ADRs 0014–0018 are Accepted (2026-07-23) — but **M1 implementation remains NOT authorized**. Approval settles _what_ M1 will be; a separate, explicit human authorization decides _when_ work may begin. No domain code, fixtures, schemas, API routes, tests, or migrations may be written until that authorization is recorded in [TASKS.md](../TASKS.md) and [docs/milestones.md](milestones.md).
+> **M1 IMPLEMENTATION AUTHORIZED (2026-07-23), SLICE-GATED.** This plan is approved as the M1 implementation baseline, ADRs 0014–0018 are Accepted, and a human explicitly authorized M1 implementation on 2026-07-23 — recorded in [TASKS.md](../TASKS.md) and [docs/milestones.md](milestones.md). The authorization permits executing **this plan, one slice at a time**: work is slice-driven and independently reviewed, **only Slice S1 is currently authorized**, and each of S2–S8 remains unauthorized until its preceding slice is reviewed, merged, and the next slice is explicitly released. M2 and later milestones remain unauthorized.
 
 ## 1. Objective and Visible Outcome
 
@@ -139,6 +139,6 @@ Approvals required, in order — none is implied by any other:
 - [x] ADR-0015 reviewed → Accepted — _2026-07-23, joint consistency review with 0016_.
 - [x] ADR-0017 reviewed → Accepted — _2026-07-23_.
 - [x] ADR-0018 reviewed → Accepted — _2026-07-23_.
-- [ ] **M1 implementation explicitly authorized** — a separate human decision after the above; recorded in TASKS.md and docs/milestones.md when made. **Not yet given.**
+- [x] **M1 implementation explicitly authorized** — _given 2026-07-23; recorded in TASKS.md and docs/milestones.md. Execution is slice-gated: S1 only, with S2–S8 each released explicitly after the preceding slice is reviewed and merged._
 - [ ] (During implementation) Zod dependency introduction justified at PR per GUARDRAILS.md § 2.
 - [ ] (At close) M1 boundary re-audit reviewed; M1 exit criteria checked in docs/milestones.md; M2 remains gated pending its own authorization.
