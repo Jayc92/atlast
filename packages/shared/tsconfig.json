@@ -6,8 +6,14 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "verbatimModuleSyntax": true,
+    // Relative imports use real .ts extensions; this package is noEmit
+    // (consumed as TypeScript source inside the workspace, run by Vitest),
+    // so the extension is never rewritten — same convention as apps/web.
+    "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": []
+    // Vitest's type declarations reference Node globals, so the pinned
+    // @types/node (same version as apps/api) is required for typecheck.
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"]
 }
