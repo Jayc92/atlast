@@ -3,9 +3,11 @@
 **Status:** Approved — the M1 implementation baseline (approved 2026-07-23)
 **Date:** 2026-07-23
 
-> **M1 IMPLEMENTATION AUTHORIZED (2026-07-23), SLICE-GATED.** This plan is approved as the M1 implementation baseline, ADRs 0014–0019 are Accepted (0014/0015 as amended by ADR-0019, below), and a human explicitly authorized M1 implementation on 2026-07-23 — recorded in [TASKS.md](../TASKS.md) and [docs/milestones.md](milestones.md). The authorization permits executing **this plan, one slice at a time**: work is slice-driven and independently reviewed, **only Slice S1 is currently authorized**, and each of S2–S8 remains unauthorized until its preceding slice is reviewed, merged, and the next slice is explicitly released. M2 and later milestones remain unauthorized.
+> **M1 IMPLEMENTATION AUTHORIZED (2026-07-23), SLICE-GATED.** This plan is approved as the M1 implementation baseline, ADRs 0014–0019 are Accepted (0014/0015 as amended by ADR-0019, below), and a human explicitly authorized M1 implementation on 2026-07-23 — recorded in [TASKS.md](../TASKS.md) and [docs/milestones.md](milestones.md). The authorization permits executing **this plan, one slice at a time**: work is slice-driven and independently reviewed, and each slice remains unauthorized until its preceding slice is reviewed, merged, and the next slice is explicitly released. M2 and later milestones remain unauthorized.
 >
-> **Architecture amendment (2026-07-23): [ADR-0019](adr/0019-subject-identity-and-assertion-claims.md) Accepted.** ADR-0019 resolved an internal contradiction between ADR-0014's typed-subject clauses and ADR-0015's coexisting-conflicting-claims requirement: **S1 implements ADR-0014 as amended by ADR-0019** — identity-only subjects (`schemaVersion`, `identifier`, `subjectKind`) with type and endpoints in the assertion's canonical claim, and S1 limited to schema validation (endpoint existence checking belongs to the S2 repository contract, proven by S6, per ADR-0019 § 4). Its acceptance unblocked S1 and changed **no slice gate**: S1 remains the only authorized slice; S2–S8 and M2+ remain gated exactly as above.
+> **Slice status (2026-07-29): S1 complete; S2 released — the only active authorized slice.** S1 (domain schemas) was human-reviewed and merged through PR #7 on 2026-07-29. S2 was explicitly released the same day: async repository interfaces in `packages/shared` carrying the full M1 repository contract — reads pinned by (asOf, horizon, derivationVersion), bounded collection reads and traversal, Evidence lookup and evidence-chain contracts, subject and GraphAssertion revision reads, conflict and ambiguity retrieval, and the relationship endpoint referential-integrity obligations (ADR-0019 § 4) — plus the reusable, storage-agnostic contract-test suite skeleton. **S2 does not authorize** an in-memory or database repository implementation (S6), fixture creation (S3), canonical serialization or hashing (S4/S6), temporal algorithms (S4), reconciliation (S5), API routes (S7), frontend changes, or any S3–S8 or M2+ work; **S3–S8 remain gated** on their own explicit per-slice releases.
+>
+> **Architecture amendment (2026-07-23): [ADR-0019](adr/0019-subject-identity-and-assertion-claims.md) Accepted.** ADR-0019 resolved an internal contradiction between ADR-0014's typed-subject clauses and ADR-0015's coexisting-conflicting-claims requirement: **S1 implements ADR-0014 as amended by ADR-0019** — identity-only subjects (`schemaVersion`, `identifier`, `subjectKind`) with type and endpoints in the assertion's canonical claim, and S1 limited to schema validation (endpoint existence checking belongs to the S2 repository contract, proven by S6, per ADR-0019 § 4). Its acceptance unblocked S1 and changed **no slice gate**: S1 stayed the only authorized slice at that time (current slice status in the note above), and M2+ remained gated.
 
 ## 1. Objective and Visible Outcome
 
@@ -30,7 +32,7 @@ Build the core domain — Entity, Relationship, Evidence, provenance, confidence
 - No UI beyond the existing M0 shell (graph exploration UI is M2; the shell's health check is unchanged).
 - No overlays (M3), no impact queries (M4), no connectors or real systems (M5), no predictive AI (post-M5).
 - No authentication (separate ADR required before any non-loopback exposure; M1 stays under the localhost exemption in [GUARDRAILS.md § 1.4](../GUARDRAILS.md#14-security)).
-- No database, no migrations, no new runtime dependencies beyond those the accepted ADRs already name — Zod is the one anticipated addition, named by accepted ADR-0005; introducing it still requires the justification-at-PR rule.
+- No database, no migrations, no new runtime dependencies beyond those the accepted ADRs already name — Zod is the one anticipated addition, named by accepted ADR-0005; it was introduced in S1 under the justification-at-PR rule (PR #7, 2026-07-29).
 - No human annotation mechanism, no manual topology editing (permanent non-goal).
 
 ## 3. ADR Dependency Order
@@ -141,6 +143,6 @@ Approvals required, in order — none is implied by any other:
 - [x] ADR-0015 reviewed → Accepted — _2026-07-23, joint consistency review with 0016_.
 - [x] ADR-0017 reviewed → Accepted — _2026-07-23_.
 - [x] ADR-0018 reviewed → Accepted — _2026-07-23_.
-- [x] **M1 implementation explicitly authorized** — _given 2026-07-23; recorded in TASKS.md and docs/milestones.md. Execution is slice-gated: S1 only, with S2–S8 each released explicitly after the preceding slice is reviewed and merged._
-- [ ] (During implementation) Zod dependency introduction justified at PR per GUARDRAILS.md § 2.
+- [x] **M1 implementation explicitly authorized** — _given 2026-07-23; recorded in TASKS.md and docs/milestones.md. Execution is slice-gated, each slice released explicitly after the preceding slice is reviewed and merged: S1 (domain schemas) is complete — human-reviewed and merged through PR #7 on 2026-07-29 — and **S2 (released 2026-07-29) is the only active authorized slice**; S3–S8 remain gated._
+- [x] (During implementation) Zod dependency introduction justified at PR per GUARDRAILS.md § 2 — _justified and merged through PR #7 on 2026-07-29 (Zod 4.4.3, exact-pinned in `packages/shared`)._
 - [ ] (At close) M1 boundary re-audit reviewed; M1 exit criteria checked in docs/milestones.md; M2 remains gated pending its own authorization.
