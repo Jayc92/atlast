@@ -1,6 +1,6 @@
 # Atlast — Milestones
 
-**Status:** Current — approved 2026-07-22 with the documentation set. Milestones are gated by exit criteria, not dates; a milestone is done when its criteria hold, and **each milestone requires explicit authorization**. M0 completed 2026-07-22; **completion of M0 does not authorize M1** — M1 remains gated on its own explicit authorization.
+**Status:** Current — approved 2026-07-22 with the documentation set. Milestones are gated by exit criteria, not dates; a milestone is done when its criteria hold, and **each milestone requires explicit authorization**. M0 completed 2026-07-22. **M1 implementation was explicitly authorized 2026-07-23 and is active**, executing slice-gated: Slice S2 is currently the only authorized slice (S1 complete; S3–S8 gated — see the M1 section below). **M2 and later milestones remain unauthorized**, each gated on its own explicit authorization.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
@@ -35,7 +35,7 @@
 - [x] Monorepo builds; `scripts/verify.sh` runs lint, format, type check, tests, build, and browser acceptance checks and passes in CI — _final `main` GitHub Actions run at commit `783e95c` succeeded 2026-07-22 ([run 29977876658](https://github.com/Jayc92/atlast/actions/runs/29977876658)); details in [TASKS.md](../TASKS.md)._
 - [x] Nothing in the repository connects to, or holds credentials for, any external system — _verified by the [M0 synthetic boundary audit](audits/m0-synthetic-boundary-audit.md), including its closure revalidation at `783e95c`._
 
-**Authorization note:** approval of the documentation authorized **M0 Phase B only**, and **completion of M0 does not authorize M1** — M1 work may begin only on its own explicit authorization.
+**Authorization note:** approval of the documentation authorized **M0 Phase B only**, and **completion of M0 did not authorize M1** — M1 work required its own explicit authorization, which was given separately on 2026-07-23 (see the M1 section below).
 
 ---
 
@@ -43,7 +43,7 @@
 
 ## M1 — Synthetic Topology Model (implementation authorized 2026-07-23 — active)
 
-> **Authorization status:** the M1 plan ([docs/m1-plan.md](m1-plan.md)) was approved 2026-07-23 as the M1 implementation baseline, ADRs [0014](adr/0014-core-topology-domain-model.md)–[0019](adr/0019-subject-identity-and-assertion-claims.md) are Accepted ([ADR-0019](adr/0019-subject-identity-and-assertion-claims.md) amends ADR-0014 and ADR-0015: identity-only subjects, with type and endpoints in assertion claims), and **M1 implementation was explicitly authorized by human decision on 2026-07-23**. Execution is **slice-gated** per the plan: work proceeds one independently reviewed slice at a time, **only Slice S1 is currently authorized**, and each of S2–S8 is released explicitly after its preceding slice is reviewed and merged. **M2 and later milestones remain unauthorized**, each requiring its own explicit authorization at M1 close.
+> **Authorization status:** the M1 plan ([docs/m1-plan.md](m1-plan.md)) was approved 2026-07-23 as the M1 implementation baseline, ADRs [0014](adr/0014-core-topology-domain-model.md)–[0019](adr/0019-subject-identity-and-assertion-claims.md) are Accepted ([ADR-0019](adr/0019-subject-identity-and-assertion-claims.md) amends ADR-0014 and ADR-0015: identity-only subjects, with type and endpoints in assertion claims), and **M1 implementation was explicitly authorized by human decision on 2026-07-23**. Execution is **slice-gated** per the plan: work proceeds one independently reviewed slice at a time, each slice released explicitly after its predecessor is reviewed and merged. **Slice S1 (domain schemas) is complete — merged through PR #7 on 2026-07-29. Slice S2 (repository interfaces + storage-agnostic contract-test suite skeleton) was released 2026-07-29 and is the only active authorized slice; S3–S8 remain gated** on their own explicit releases, and S2 authorizes no repository implementation, fixtures, serialization/hashing, temporal algorithms, reconciliation, API routes, or frontend work (scope detail in [TASKS.md](../TASKS.md)). **M2 and later milestones remain unauthorized**, each requiring its own explicit authorization at M1 close.
 
 **Goal:** The core domain — entities, relationships, evidence, provenance, confidence, freshness, snapshots — modeled and queryable, driven entirely by synthetic fixtures.
 
