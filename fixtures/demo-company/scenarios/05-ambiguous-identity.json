@@ -1,0 +1,38 @@
+[
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/config-index/0007",
+    "observedAt": "2026-02-10T14:00:00.000Z",
+    "recordedAt": "2026-02-10T14:02:00.000Z",
+    "recordedSequence": 7,
+    "sourceScopedIdentity": {
+      "source": "config-index",
+      "sourceNativeId": "ledger-api"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "configurationFamily": "financial-demo"
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/service-directory/0008",
+    "observedAt": "2026-02-10T14:01:00.000Z",
+    "recordedAt": "2026-02-10T14:03:00.000Z",
+    "recordedSequence": 8,
+    "sourceScopedIdentity": {
+      "source": "service-directory",
+      "sourceNativeId": "ledger"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "directoryGroup": "accounting-demo"
+    }
+  }
+]

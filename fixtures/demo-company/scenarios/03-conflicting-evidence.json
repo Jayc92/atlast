@@ -1,0 +1,38 @@
+[
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/asset-index/0004",
+    "observedAt": "2026-01-12T10:00:00.000Z",
+    "recordedAt": "2026-01-12T10:05:00.000Z",
+    "recordedSequence": 4,
+    "sourceScopedIdentity": {
+      "source": "asset-index",
+      "sourceNativeId": "svc-orders"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "inventoryClass": "application"
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/runtime-scan/0005",
+    "observedAt": "2026-01-12T10:00:00.000Z",
+    "recordedAt": "2026-01-12T10:05:00.000Z",
+    "recordedSequence": 5,
+    "sourceScopedIdentity": {
+      "source": "runtime-scan",
+      "sourceNativeId": "orders-service"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "database"
+    },
+    "detail": {
+      "inventoryClass": "stateful"
+    }
+  }
+]

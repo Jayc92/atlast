@@ -1,0 +1,18 @@
+[
+  {
+    "schemaVersion": "atlast-domain-v2",
+    "identifier": "atlast:evidence:demo-company/invalid/unknown-version",
+    "observedAt": "2026-05-04T00:00:00.000Z",
+    "recordedAt": "2026-05-04T00:01:00.000Z",
+    "recordedSequence": 104,
+    "sourceScopedIdentity": {
+      "source": "invalid-seed",
+      "sourceNativeId": "unknown-version"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {}
+  }
+]

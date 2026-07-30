@@ -1,0 +1,40 @@
+[
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/deployment-inventory/0001",
+    "observedAt": "2026-01-10T09:00:00.000Z",
+    "recordedAt": "2026-01-10T09:05:00.000Z",
+    "recordedSequence": 1,
+    "sourceScopedIdentity": {
+      "source": "deployment-inventory",
+      "sourceNativeId": "svc-checkout"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "environment": "demo",
+      "replicaCount": 3
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/service-registry/0002",
+    "observedAt": "2026-01-10T09:00:00.000Z",
+    "recordedAt": "2026-01-10T09:06:00.000Z",
+    "recordedSequence": 2,
+    "sourceScopedIdentity": {
+      "source": "service-registry",
+      "sourceNativeId": "Checkout Service"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "catalogGroup": "storefront",
+      "lifecycle": "active"
+    }
+  }
+]

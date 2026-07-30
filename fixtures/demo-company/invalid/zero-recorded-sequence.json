@@ -1,0 +1,18 @@
+[
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/invalid/zero-sequence",
+    "observedAt": "2026-05-02T00:00:00.000Z",
+    "recordedAt": "2026-05-02T00:01:00.000Z",
+    "recordedSequence": 0,
+    "sourceScopedIdentity": {
+      "source": "invalid-seed",
+      "sourceNativeId": "zero-sequence"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {}
+  }
+]

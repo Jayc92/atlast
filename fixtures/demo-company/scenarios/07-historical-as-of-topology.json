@@ -1,0 +1,152 @@
+[
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/architecture-feed/0014",
+    "observedAt": "2026-04-01T08:00:00.000Z",
+    "recordedAt": "2026-04-01T08:01:00.000Z",
+    "recordedSequence": 14,
+    "sourceScopedIdentity": {
+      "source": "architecture-feed",
+      "sourceNativeId": "web"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "topologyStage": 1
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/architecture-feed/0015",
+    "observedAt": "2026-04-01T08:00:00.000Z",
+    "recordedAt": "2026-04-01T08:01:00.000Z",
+    "recordedSequence": 15,
+    "sourceScopedIdentity": {
+      "source": "architecture-feed",
+      "sourceNativeId": "api"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "topologyStage": 1
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/architecture-feed/0016",
+    "observedAt": "2026-04-01T08:05:00.000Z",
+    "recordedAt": "2026-04-01T08:06:00.000Z",
+    "recordedSequence": 16,
+    "sourceScopedIdentity": {
+      "source": "architecture-feed",
+      "sourceNativeId": "web-calls-api"
+    },
+    "observation": {
+      "observationKind": "relationship",
+      "relationshipType": "calls",
+      "sourceEntityIdentity": {
+        "source": "architecture-feed",
+        "sourceNativeId": "web"
+      },
+      "targetEntityIdentity": {
+        "source": "architecture-feed",
+        "sourceNativeId": "api"
+      }
+    },
+    "detail": {
+      "topologyStage": 1
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/architecture-feed/0017",
+    "observedAt": "2026-04-10T08:00:00.000Z",
+    "recordedAt": "2026-04-10T08:01:00.000Z",
+    "recordedSequence": 17,
+    "sourceScopedIdentity": {
+      "source": "architecture-feed",
+      "sourceNativeId": "worker"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "topologyStage": 2
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/architecture-feed/0018",
+    "observedAt": "2026-04-10T08:05:00.000Z",
+    "recordedAt": "2026-04-10T08:06:00.000Z",
+    "recordedSequence": 18,
+    "sourceScopedIdentity": {
+      "source": "architecture-feed",
+      "sourceNativeId": "api-publishes-worker"
+    },
+    "observation": {
+      "observationKind": "relationship",
+      "relationshipType": "publishes-to",
+      "sourceEntityIdentity": {
+        "source": "architecture-feed",
+        "sourceNativeId": "api"
+      },
+      "targetEntityIdentity": {
+        "source": "architecture-feed",
+        "sourceNativeId": "worker"
+      }
+    },
+    "detail": {
+      "topologyStage": 2
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/architecture-feed/0019",
+    "observedAt": "2026-04-20T08:00:00.000Z",
+    "recordedAt": "2026-04-20T08:01:00.000Z",
+    "recordedSequence": 19,
+    "sourceScopedIdentity": {
+      "source": "architecture-feed",
+      "sourceNativeId": "archive"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "database"
+    },
+    "detail": {
+      "topologyStage": 3
+    }
+  },
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/architecture-feed/0020",
+    "observedAt": "2026-04-20T08:05:00.000Z",
+    "recordedAt": "2026-04-20T08:06:00.000Z",
+    "recordedSequence": 20,
+    "sourceScopedIdentity": {
+      "source": "architecture-feed",
+      "sourceNativeId": "worker-writes-archive"
+    },
+    "observation": {
+      "observationKind": "relationship",
+      "relationshipType": "writes-to",
+      "sourceEntityIdentity": {
+        "source": "architecture-feed",
+        "sourceNativeId": "worker"
+      },
+      "targetEntityIdentity": {
+        "source": "architecture-feed",
+        "sourceNativeId": "archive"
+      }
+    },
+    "detail": {
+      "topologyStage": 3
+    }
+  }
+]
