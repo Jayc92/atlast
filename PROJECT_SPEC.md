@@ -1,8 +1,8 @@
 # Atlast — Project Specification
 
-**Version:** 0.2.0 (pre-implementation)
-**Date:** 2026-07-21
-**Status:** Draft — pending human approval. This document defines intent before implementation; architectural positions referenced here are drafts requiring later ADRs, not final decisions.
+**Version:** 0.2.1
+**Date:** 2026-07-21 (metadata corrected 2026-07-30)
+**Status:** Approved — the product baseline, approved by human review 2026-07-22 with the documentation set. M0 is complete and M1 is active and slice-gated ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md)); no slice or milestone is authorized by this document. Implementation details are governed by the accepted ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining in this document; the vision, goals, principles, scope, and non-goals below are the approved product baseline.
 
 ---
 
