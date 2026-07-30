@@ -1,10 +1,18 @@
 /**
- * Package boundary for `@atlast/shared`: the M1 Slice S1 domain schemas —
- * the Zod single source of truth for every domain shape (ADR-0005), per
- * ADR-0014 as amended by ADR-0019, with temporal fields per ADR-0016.
+ * Package boundary for `@atlast/shared`: the M1 contract surface — the Zod
+ * single source of truth for every domain shape (ADR-0005), per ADR-0014 as
+ * amended by ADR-0019, with temporal fields per ADR-0016; plus the S2
+ * repository contract: the async EvidenceStore/TopologyGraphStore
+ * interfaces (ADR-0012/0018), their read-contract and read-result schemas
+ * with the exact ADR-0017 bounds — inventory and search semantics per
+ * ADR-0017 as amended by ADR-0020 (entity-only inventory with the optional
+ * claim-level entityType filter; identifier-only search with
+ * locale-independent normalization) — and the storage-agnostic
+ * contract-test suite skeleton an implementation registers in S6.
  *
- * S1 exports schema validation only. Repository interfaces (S2), canonical
- * serialization and hashing (S4/S6), and reconciliation (S5) arrive with
+ * This package exports contracts only — no storage, reconciliation,
+ * serialization, or hashing. Canonical serialization/hashing (S4/S6),
+ * reconciliation (S5), and the repository implementation (S6) arrive with
  * their own slices once each is explicitly released.
  */
 export {
@@ -84,3 +92,75 @@ export {
   type RuleTraceEntry,
   type ValidityInterval,
 } from "./assertions.ts";
+export {
+  DEFAULT_PAGE_LIMIT,
+  MAXIMUM_PAGE_LIMIT,
+  MAXIMUM_SEARCH_QUERY_LENGTH,
+  MAXIMUM_TRAVERSAL_DEPTH,
+  MAXIMUM_TRAVERSAL_RESULT_BUDGET,
+  MINIMUM_SEARCH_QUERY_LENGTH,
+  MINIMUM_TRAVERSAL_DEPTH,
+  entityInventoryFilterSchema,
+  freshnessSchema,
+  normalizeSearchQuery,
+  pageRequestSchema,
+  pageResultMetadataSchema,
+  paginationCursorSchema,
+  readModeSchema,
+  resolvedReadMetadataSchema,
+  searchQuerySchema,
+  snapshotIdentitySchema,
+  traversalDirectionSchema,
+  traversalRequestBoundsSchema,
+  traversalResultMetadataSchema,
+  type EntityInventoryFilter,
+  type Freshness,
+  type PageRequest,
+  type PageResultMetadata,
+  type PaginationCursor,
+  type ReadMode,
+  type ResolvedReadMetadata,
+  type SearchQuery,
+  type SnapshotIdentity,
+  type TraversalDirection,
+  type TraversalRequestBounds,
+  type TraversalResultMetadata,
+} from "./read-contract.ts";
+export {
+  assertionDetailResultSchema,
+  assertionReadResultSchema,
+  entityPageSchema,
+  entityReadResultSchema,
+  evidenceChainResultSchema,
+  evidencePageSchema,
+  snapshotSummarySchema,
+  subjectDetailResultSchema,
+  subjectPageSchema,
+  subjectReadResultSchema,
+  traversalResultSchema,
+  type AssertionDetailResult,
+  type AssertionReadResult,
+  type EntityPage,
+  type EntityReadResult,
+  type EvidenceChainResult,
+  type EvidencePage,
+  type SnapshotSummary,
+  type SubjectDetailResult,
+  type SubjectPage,
+  type SubjectReadResult,
+  type TraversalResult,
+} from "./read-results.ts";
+export type {
+  EvidenceStore,
+  SubjectIdentifier,
+  TopologyGraphStore,
+} from "./repositories.ts";
+export {
+  ContractViolation,
+  registerRepositoryContractSuite,
+  repositoryContractCases,
+  type ContractCaseContext,
+  type ContractSuiteTestApi,
+  type RepositoryContractCase,
+  type RepositoryFactory,
+} from "./contract-suite.ts";
