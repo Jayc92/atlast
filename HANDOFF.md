@@ -7,9 +7,9 @@ The canonical, model-neutral resume document for this project. A replacement con
 ## 1. Document Control
 
 - **Last updated:** 2026-07-30
-- **Checkpoint name:** `m1-s2-repository-contracts-merged`
-- **Last merged product checkpoint commit:** `4bb5b1b774c02c8f12325233589f6b58aa608307` (`feat: add M1 repository contract surface (#10)`). This documentation itself lands through a later documentation PR, so the tip of `main` will move past this SHA — always read the actual tip from Git, not from this file.
-- **Latest merged product PR:** [#10](https://github.com/Jayc92/atlast/pull/10) — M1 Slice S2 (repository interfaces + storage-agnostic contract-test suite skeleton), human-approved 2026-07-29, merged with GitHub Actions `verify` passing.
+- **Checkpoint name:** `m1-s3-fixture-suite-authorized`
+- **Last merged checkpoint commit:** `a7a997de5678fac0231a45d92d4aebe3905a88e5` (`docs: establish canonical project handoff checkpoint (#11)`) — the S2 checkpoint/HANDOFF protocol, merged through [PR #11](https://github.com/Jayc92/atlast/pull/11). The last merged **product** change remains `4bb5b1b774c02c8f12325233589f6b58aa608307` ([PR #10](https://github.com/Jayc92/atlast/pull/10) — M1 Slice S2, human-approved 2026-07-29, merged with GitHub Actions `verify` passing).
+- **This S3 authorization itself lands through a later documentation PR**, so the tip of `main` will move past the SHA above; this document does not attempt to predict that PR's squash-merge SHA — always read the actual tip from Git, not from this file.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves every previous checkpoint version. Do not append old checkpoints to this file — retrieve them with `git log -- HANDOFF.md`.
 - **Precedence:** the repository source-of-truth documents ([PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), [docs/m1-plan.md](docs/m1-plan.md), the accepted ADRs in [docs/adr/](docs/adr/README.md), [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md)) **override this document wherever they conflict**. HANDOFF.md summarizes; it never supersedes.
 
@@ -47,7 +47,7 @@ The canonical, model-neutral resume document for this project. A replacement con
   - [docs/audits/](docs/audits/m0-synthetic-boundary-audit.md) — boundary audits
   - `packages/shared` — the merged S1 domain schemas and S2 repository contract surface
   - `apps/api`, `apps/web`, `tests/acceptance`, `scripts/` — the M0 foundation
-  - `fixtures/` — empty until S3 is released
+  - `fixtures/` — empty until the S3 implementation lands (S3 authorized 2026-07-30, effective on merge of the authorization PR)
 
 This document contains **no credentials, tokens, machine secrets, or private employer data**, and none may ever be added to it.
 
@@ -59,23 +59,23 @@ Factual state at this checkpoint:
 - **M1 is active and slice-gated** (implementation authorized 2026-07-23; one independently reviewed slice at a time).
 - **S1 is complete** — human-reviewed and merged through PR #7 (2026-07-29).
 - **S2 is complete** — human-approved 2026-07-29 and merged through PR #10.
-- **No implementation slice is currently active.**
-- **S3 is next but remains gated and unauthorized** until a separate, explicit human release recorded in TASKS.md.
-- **S4–S8 remain gated**, each on the preceding slice's merge and its own explicit release.
+- **The S2 checkpoint/HANDOFF protocol merged through PR #11** at `a7a997d` (2026-07-30).
+- **S3 was explicitly human-authorized by Joseph Carfagno on 2026-07-30.** The authorization is effective for implementation **only after the documentation PR recording it merges to `main` and `main` is synchronized locally** — no S3 file may be created before that. Once merged, **S3 is the only active authorized implementation slice.**
+- **S4–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release.
 - **M2–M5 remain unauthorized**, each gated on its own explicit human authorization.
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
 
-| Slice | Purpose                                                                                                                                                                       | Status                       |
-| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| S1    | Domain schemas in `packages/shared`: Evidence, identity-only subjects, claim union, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, rejection tests | Complete — merged via PR #7  |
-| S2    | Async repository interfaces (full M1 read contract) in `packages/shared` + storage-agnostic contract-test suite skeleton                                                      | Complete — merged via PR #10 |
-| S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Gated — next, unreleased     |
-| S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Gated                        |
-| S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Gated                        |
-| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Gated                        |
-| S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Gated                        |
-| S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                        |
+| Slice | Purpose                                                                                                                                                                       | Status                                                             |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| S1    | Domain schemas in `packages/shared`: Evidence, identity-only subjects, claim union, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, rejection tests | Complete — merged via PR #7                                        |
+| S2    | Async repository interfaces (full M1 read contract) in `packages/shared` + storage-agnostic contract-test suite skeleton                                                      | Complete — merged via PR #10                                       |
+| S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Authorized 2026-07-30 — effective on merge of the authorization PR |
+| S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Gated                                                              |
+| S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Gated                                                              |
+| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Gated                                                              |
+| S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Gated                                                              |
+| S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                                                              |
 
 **Milestone purposes** ([docs/milestones.md](docs/milestones.md)):
 
@@ -104,20 +104,36 @@ What actually exists in the repository through this checkpoint:
 
 ## 6. Current Git State (at this checkpoint)
 
-Facts that hold both before and after the documentation PR introducing this file merges:
+Facts that hold both before and after the documentation PR recording this authorization merges:
 
-- **PR #10 (commit `4bb5b1b774c02c8f12325233589f6b58aa608307`) is the last merged product checkpoint** — the most recent merge that changed product code or contracts.
-- **HANDOFF.md is the checkpoint artifact being introduced by the current documentation PR.** Until that PR merges, this file exists only on its documentation branch; after it merges, the tip of `main` is that merge's own SHA, which this artifact does not attempt to predict.
-- No implementation branch is active, and no implementation slice is released; any open branches are documentation branches for this checkpoint.
+- **PR #11 (commit `a7a997de5678fac0231a45d92d4aebe3905a88e5`) is the last merged checkpoint before this authorization** — it introduced HANDOFF.md and the checkpoint protocol. **PR #10 (commit `4bb5b1b774c02c8f12325233589f6b58aa608307`) remains the last merged product change.**
+- **This S3 authorization is the checkpoint update being introduced by the current documentation PR.** Until that PR merges, the authorization exists only on its documentation branch and S3 implementation may not begin; after it merges, the tip of `main` is that merge's own SHA, which this artifact does not attempt to predict.
+- No implementation branch is active and no S3 files exist yet; any open branches are documentation branches for this authorization.
 
 **A replacement conductor MUST inspect the actual Git state (`git status`, `git log --oneline --decorate -10`, `git remote -v`) and trust Git over any recorded prose — here or anywhere else.** A future handoff MUST replace this section with the state actually observed at its checkpoint, never copy Git facts forward.
 
-## 7. Next Authorized Decision
+## 7. Current Authorized Work
 
-- **The next decision is whether to release Slice S3.** It is a human decision, recorded in TASKS.md; nothing else may follow from this document.
-- **S3 scope:** the synthetic fixture suite in `fixtures/demo-company/` — the seven scenarios and the edge cases cataloged in [docs/m1-plan.md § 6](docs/m1-plan.md#6-synthetic-fixture-scenario-catalog) (corroboration, late corroboration as revision, conflict, staleness, ambiguity, relationship appearance/disappearance, historical as-of shapes, plus the ordering/rejection edge cases), expressed as validated Evidence files with declared timestamps. Fixtures are pipeline **inputs**, never pre-reconciled graph state.
-- S3 must supply the seed scenarios the S2 contract suite's loud preconditions demand (conflicting-type entity, relationship claims, multi-entity topologies).
-- **S3 implementation is NOT authorized by this handoff document.** A human must explicitly release S3 first.
+**Slice S3 — synthetic fixture suite v1 — was explicitly human-authorized by Joseph Carfagno on 2026-07-30**, recorded here and in [TASKS.md](TASKS.md). The authorization is effective for implementation **only after the documentation PR recording it merges to `main` and `main` is synchronized locally**; once merged, S3 is the only active authorized implementation slice.
+
+**Authorized S3 scope** (per [docs/m1-plan.md](docs/m1-plan.md) §§ 4, 5, 6, and 8):
+
+- Validated synthetic Evidence fixtures under `fixtures/demo-company/`.
+- Scenario documentation and a deterministic fixture catalog/manifest.
+- The seven approved scenarios ([docs/m1-plan.md § 6](docs/m1-plan.md#6-synthetic-fixture-scenario-catalog)): (1) corroborating evidence; (2) late corroboration as a new revision seed; (3) conflicting evidence; (4) stale evidence; (5) ambiguous identity; (6) relationship appearance and disappearance; (7) historical/as-of topology changes.
+- The approved edge cases: equal `recordedAt` with distinct `recordedSequence`; late-old-observation Evidence; equal-`observedAt` ordering through `recordedSequence`; duplicate and non-positive `recordedSequence` rejection; unknown `schemaVersion` rejection; derivation-version pinning seeds; half-open interval-boundary seeds.
+- Every valid fixture must parse through the existing S1 Evidence schemas; fixtures use declared timestamps and deterministic, unique `recordedSequence` values; fixtures remain pipeline **inputs**, never pre-reconciled graph state.
+- The catalog must provide the non-vacuous seeds the S2 contract suite's loud preconditions demand: conflicting entity-type claims, relationship claims, and multi-entity topologies.
+- One narrowly scoped fixture-validation test may be added under `packages/shared/src/` **only** to validate the fixture catalog with existing schemas — no production behavior, reconciliation, temporal computation, or storage.
+- Scenario documentation must distinguish fixture **facts** from future **expected reconciliation outcomes**, which are not executable until later slices (S5/S6).
+
+**S3 implementation path boundary** — after the authorization PR merges, the S3 implementation may change only:
+
+- `fixtures/demo-company/**`
+- one narrowly scoped fixture-validation test under `packages/shared/src/`
+- `TASKS.md` for factual S3 progress reporting
+
+Any additional path requires separate human approval before editing.
 
 **The checkpoint/slice cycle, in order:**
 
@@ -127,25 +143,32 @@ Facts that hold both before and after the documentation PR introducing this file
 
 1. the preceding PR is merged;
 2. `main` is synchronized with `origin/main` and the working tree is clean;
-3. verification status (local `verify.sh` and GitHub CI) is recorded;
+3. verification status (local `scripts/verify.sh` and GitHub CI) is recorded;
 4. HANDOFF.md reflects the merged repository state;
 5. the next slice receives explicit human authorization recorded in TASKS.md.
 
-## 8. Prohibited Next Work
+## 8. Prohibited Work
 
-Until separately and explicitly authorized:
+**Before the S3 authorization PR merges:** no S3 implementation of any kind, including "preparatory" fixture drafting.
 
-- No S3 implementation (including "preparatory" fixture drafting).
-- No S4–S8 work: no repository implementations, serialization/hashing, temporal algorithms, reconciliation, snapshot computation, or API routes.
-- No M2+ work: no exploration UI, overlays, impact simulation, or connectors.
-- No connection to real systems and no employer data — synthetic data only through M4.
-- No credentials, tokens, or secrets anywhere (code, fixtures, docs, examples).
-- No deployments.
-- No dependency or lockfile changes.
-- No API or frontend expansion beyond the existing M0 shells.
-- No autonomous production behavior of any kind.
+**After the S3 authorization PR merges, all work outside the § 7 S3 scope and path boundary remains prohibited.** S3 does NOT authorize:
 
-Standing prohibitions regardless of slice: never weaken `scripts/verify.sh` (protected verification contract, ADR-0013); never edit accepted ADRs (supersede or amend via a new ADR); never bypass the query-API-only read path; never implement anything contradicting [PROJECT_SPEC.md § 7 Non-Goals](PROJECT_SPEC.md#7-non-goals--what-atlast-will-not-become).
+- Changes to existing S1 schemas or S2 repository contracts.
+- Production source changes under `packages/shared/src/` (the one narrowly scoped fixture-validation test is the sole exception).
+- Repository or storage implementations.
+- Canonical serialization or hashing.
+- Temporal algorithms or validity computation.
+- Reconciliation or confidence computation.
+- Snapshot generation.
+- API routes.
+- Frontend changes.
+- Connector work.
+- New dependencies or lockfile changes.
+- Real systems, employer data, credentials, or proprietary names — synthetic, fictional data only.
+- S4–S8 or M2+ work.
+- Deployment or external publication.
+
+Standing prohibitions regardless of slice: never weaken `scripts/verify.sh` (protected verification contract, ADR-0013); never edit accepted ADRs (supersede or amend via a new ADR); never bypass the query-API-only read path; never implement anything contradicting [PROJECT_SPEC.md § 7 Non-Goals](PROJECT_SPEC.md#7-non-goals--what-atlast-will-not-become); no autonomous production behavior of any kind.
 
 ## 9. Verification and Resume Commands
 
@@ -194,6 +217,12 @@ Operating rules, non-negotiable:
 - Preserve the slice and milestone gates exactly as documented. Work proceeds
   one explicitly released slice at a time; only the human releases slices or
   milestones. Do not authorize, imply, or begin gated work.
+- Current slice state: S1 and S2 are complete and merged. S3 (synthetic
+  fixture suite v1, scope and path boundary in HANDOFF.md § 7) was
+  human-authorized 2026-07-30 and, once the PR recording that authorization
+  has merged to main, is the SOLE active authorized implementation slice.
+  If that authorization PR has not merged, no implementation slice is active.
+  S4–S8 and M2+ remain gated regardless.
 - Review implementation output independently against the accepted ADRs and
   GUARDRAILS.md before recommending human approval.
 - Assign one bounded task at a time, with explicit scope, prohibited actions,
