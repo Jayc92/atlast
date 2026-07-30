@@ -1,9 +1,11 @@
 # ADR-0017: M1 Query API Surface — Purpose-Built, Bounded, Evidence-Linked REST Contract
 
-**Status:** Accepted
+**Status:** Accepted; amended by [ADR-0020](0020-m1-inventory-and-search-semantics.md)
 **Date:** 2026-07-23
 
 > **Approval note (2026-07-23):** Accepted by human review as part of the **M1 architecture baseline**. Acceptance settles the M1 query-API design only — it does **not** authorize implementation. M1 implementation requires a separate, explicit human authorization ([docs/milestones.md](../milestones.md)).
+
+> **Amendment notice (2026-07-29):** [ADR-0020](0020-m1-inventory-and-search-semantics.md) (**Accepted** 2026-07-29) amends **only** two wording items in this ADR's query-family table, which S2 human review found contradict the accepted domain model (ADR-0014 as amended by ADR-0019): the Inventory purpose "filter by type and status" (type is a claim-level fact with defined conflict semantics — the amended reading is an optional `entityType` filter over visible assertion claims, match-by-any-claim under conflict; no "status" concept exists in M1) and the Search purpose "identifiers and names" (M1 defines no name claim; search matches complete canonical subject identifiers only). The decision text below is **preserved verbatim as accepted**; every other decision in this ADR stands unchanged. ADR-0020 is the sole normative source for the amended wording.
 
 ## Context
 
