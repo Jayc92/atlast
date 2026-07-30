@@ -1,0 +1,20 @@
+[
+  {
+    "schemaVersion": "atlast-domain-v1",
+    "identifier": "atlast:evidence:demo-company/asset-catalog/0006",
+    "observedAt": "2026-02-01T00:00:00.000Z",
+    "recordedAt": "2026-02-01T00:01:00.000Z",
+    "recordedSequence": 6,
+    "sourceScopedIdentity": {
+      "source": "asset-catalog",
+      "sourceNativeId": "svc-notifications"
+    },
+    "observation": {
+      "observationKind": "entity",
+      "entityType": "service"
+    },
+    "detail": {
+      "ownerGroup": "messaging-demo"
+    }
+  }
+]
