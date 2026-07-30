@@ -2,7 +2,7 @@
   "name": "@atlast/shared",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared domain schemas and types (Zod single source of truth per ADR-0005) — M1 S1 domain schemas per ADR-0014 as amended by ADR-0019.",
+  "description": "Shared M1 contract surface (Zod single source of truth per ADR-0005): S1 domain schemas per ADR-0014 as amended by ADR-0019, plus S2 repository interfaces (EvidenceStore/TopologyGraphStore per ADR-0012/0018), read-contract bounds per ADR-0017, and the storage-agnostic contract-test suite skeleton.",
   "type": "module",
   "scripts": {
     "typecheck": "tsc --project tsconfig.json",
