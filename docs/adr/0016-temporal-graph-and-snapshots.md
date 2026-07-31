@@ -1,9 +1,11 @@
 # ADR-0016: Temporal Graph and Snapshots — Bitemporal Records, Derived Snapshots, Deterministic Replay
 
-**Status:** Accepted
+**Status:** Accepted; amended by [ADR-0021](0021-jcs-canonicalization-clarifications.md)
 **Date:** 2026-07-23
 
 > **Approval note (2026-07-23):** Accepted by human review as part of the **M1 architecture baseline**. Acceptance settles the M1 temporal design only — it does **not** authorize implementation. M1 implementation requires a separate, explicit human authorization ([docs/milestones.md](../milestones.md)).
+
+> **Amendment notice (2026-07-31):** [ADR-0021](0021-jcs-canonicalization-clarifications.md) (Accepted) amends this ADR's canonical-serialization clauses. ADR-0021 controls where this ADR says JCS object keys are sorted "by Unicode code point" — **property names are sorted as arrays of raw UTF-16 code units** per RFC 8785 § 3.2.3 — and where this ADR globally says "`null` never appears in canonical serialization" — **generic JCS preserves explicit `null`**, while absent optional domain fields remain omitted by payload builders (an Atlast payload rule, not a serializer rule). The decision text below is **preserved verbatim as accepted** — where those clauses differ, ADR-0021 controls. Every other decision in this ADR — the bitemporal axes, `recordedSequence`, horizons, validity, replay, and snapshot semantics — remains in force unchanged.
 
 ## Context
 
