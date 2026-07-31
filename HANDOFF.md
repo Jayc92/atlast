@@ -7,9 +7,10 @@ The canonical, model-neutral resume document for this project. A replacement con
 ## 1. Document Control
 
 - **Last updated:** 2026-07-30
-- **Checkpoint name:** `m1-s3-fixture-suite-authorized`
-- **Last merged checkpoint commit:** `a7a997de5678fac0231a45d92d4aebe3905a88e5` (`docs: establish canonical project handoff checkpoint (#11)`) — the S2 checkpoint/HANDOFF protocol, merged through [PR #11](https://github.com/Jayc92/atlast/pull/11). The last merged **product** change remains `4bb5b1b774c02c8f12325233589f6b58aa608307` ([PR #10](https://github.com/Jayc92/atlast/pull/10) — M1 Slice S2, human-approved 2026-07-29, merged with GitHub Actions `verify` passing).
-- **This S3 authorization itself lands through a later documentation PR**, so the tip of `main` will move past the SHA above; this document does not attempt to predict that PR's squash-merge SHA — always read the actual tip from Git, not from this file.
+- **Checkpoint name:** `m1-s3-fixture-suite-merged`
+- **Latest merged product commit:** `003bcccb2ea08bf0d03469a560b02d8ada5e4295` (`feat: add M1 synthetic fixture catalog (#13)`) — M1 Slice S3, independently reviewed and approved, merged through [PR #13](https://github.com/Jayc92/atlast/pull/13) on 2026-07-30 with GitHub Actions `verify` passing. That product state is what this checkpoint captures. The previous checkpoint document merged through [PR #11](https://github.com/Jayc92/atlast/pull/11) at `a7a997d` (historical context only).
+- **This document update is the checkpoint record.** It lands through its own documentation PR; that PR's eventual merge commit will become the latest merged checkpoint commit, and its SHA is intentionally not predicted here — always read the actual tip from Git, not from this file.
+- **Branch state at this checkpoint:** `main` synchronized with `origin/main`, clean working tree.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves every previous checkpoint version. Do not append old checkpoints to this file — retrieve them with `git log -- HANDOFF.md`.
 - **Precedence:** the repository source-of-truth documents ([PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), [docs/m1-plan.md](docs/m1-plan.md), the accepted ADRs in [docs/adr/](docs/adr/README.md), [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md)) **override this document wherever they conflict**. HANDOFF.md summarizes; it never supersedes.
 
@@ -45,9 +46,9 @@ The canonical, model-neutral resume document for this project. A replacement con
   - [docs/m1-plan.md](docs/m1-plan.md) — the approved M1 implementation baseline (slices S1–S8, fixture catalog, journeys)
   - [docs/adr/](docs/adr/README.md) — accepted ADRs 0001–0020 (index with amendment notes)
   - [docs/audits/](docs/audits/m0-synthetic-boundary-audit.md) — boundary audits
-  - `packages/shared` — the merged S1 domain schemas and S2 repository contract surface
+  - `packages/shared` — the merged S1 domain schemas, S2 repository contract surface, and the S3 fixture-catalog validation suite
   - `apps/api`, `apps/web`, `tests/acceptance`, `scripts/` — the M0 foundation
-  - `fixtures/` — empty until the S3 implementation lands (S3 authorized 2026-07-30, effective on merge of the authorization PR)
+  - `fixtures/demo-company/` — the merged S3 synthetic fixture catalog ([fixtures/demo-company/README.md](fixtures/demo-company/README.md) documents the scenarios)
 
 This document contains **no credentials, tokens, machine secrets, or private employer data**, and none may ever be added to it.
 
@@ -60,22 +61,23 @@ Factual state at this checkpoint:
 - **S1 is complete** — human-reviewed and merged through PR #7 (2026-07-29).
 - **S2 is complete** — human-approved 2026-07-29 and merged through PR #10.
 - **The S2 checkpoint/HANDOFF protocol merged through PR #11** at `a7a997d` (2026-07-30).
-- **S3 was explicitly human-authorized by Joseph Carfagno on 2026-07-30.** The authorization is effective for implementation **only after the documentation PR recording it merges to `main` and `main` is synchronized locally** — no S3 file may be created before that. Once merged, **S3 is the only active authorized implementation slice.**
+- **S3 is complete** — independently reviewed and approved, merged through PR #13 at `003bccc` on 2026-07-30 with GitHub Actions `verify` passing.
+- **No implementation slice is currently active.** Closing S3 does not authorize S4.
 - **S4–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release.
 - **M2–M5 remain unauthorized**, each gated on its own explicit human authorization.
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
 
-| Slice | Purpose                                                                                                                                                                       | Status                                                             |
-| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| S1    | Domain schemas in `packages/shared`: Evidence, identity-only subjects, claim union, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, rejection tests | Complete — merged via PR #7                                        |
-| S2    | Async repository interfaces (full M1 read contract) in `packages/shared` + storage-agnostic contract-test suite skeleton                                                      | Complete — merged via PR #10                                       |
-| S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Authorized 2026-07-30 — effective on merge of the authorization PR |
-| S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Gated                                                              |
-| S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Gated                                                              |
-| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Gated                                                              |
-| S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Gated                                                              |
-| S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                                                              |
+| Slice | Purpose                                                                                                                                                                       | Status                       |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| S1    | Domain schemas in `packages/shared`: Evidence, identity-only subjects, claim union, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, rejection tests | Complete — merged via PR #7  |
+| S2    | Async repository interfaces (full M1 read contract) in `packages/shared` + storage-agnostic contract-test suite skeleton                                                      | Complete — merged via PR #10 |
+| S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Complete — merged via PR #13 |
+| S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Gated                        |
+| S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Gated                        |
+| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Gated                        |
+| S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Gated                        |
+| S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                        |
 
 **Milestone purposes** ([docs/milestones.md](docs/milestones.md)):
 
@@ -98,42 +100,38 @@ What actually exists in the repository through this checkpoint:
 - **S1 (merged PR #7):** Zod domain schemas + inferred types in `packages/shared` implementing ADR-0014 as amended by ADR-0019 — the identity-only subject model (subjects carry exactly `schemaVersion`, `identifier`, `subjectKind`; entity type and relationship endpoints live in the assertion's canonical claim), Evidence, content-addressed GraphAssertion revisions, identifiers, `schemaVersion` rejection, rejection-first tests.
 - **S2 (merged PR #10):** async `EvidenceStore`/`TopologyGraphStore` repository interfaces in `packages/shared` with strict read contracts (no unbounded or partially pinned read is expressible); reads pinned by (asOf, horizon, derivationVersion); complete resolved metadata plus `schemaVersion` structurally on every graph-read result family including `SnapshotSummary`; subject/assertion binding (no result pairs a subject with an assertion about a different subject); entity-only inventory with the match-by-any-visible-claim `entityType` filter; identifier-only search with locale-independent ASCII normalization; the relationship endpoint referential-integrity obligation (ADR-0019 § 4 — defined in S2, proven by the implementing slice); and the reusable, storage-agnostic contract-test suite skeleton.
 - **ADR-0020 (accepted 2026-07-29):** resolved two ADR-0017 wording contradictions found in S2 review — entity-only inventory with a claim-level `entityType` filter (no "status" concept), and identifier-only search (no name claim exists in M1).
-- **Final S2 verification evidence:** 297 shared-package tests passing in 11 files, 23 storage-agnostic contract cases, complete `scripts/verify.sh` pass, and passing GitHub Actions CI (`verify`) on PR #10.
+- **S3 (merged PR #13, 2026-07-30):** one deterministic manifest-driven fixture catalog in `fixtures/demo-company/` covering the seven approved synthetic scenarios of [docs/m1-plan.md § 6](docs/m1-plan.md#6-synthetic-fixture-scenario-catalog) with 20 valid Evidence records and four deliberately invalid fixtures; strict manifest and file-declaration validation (unknown keys and undeclared files rejected); exact ordering, temporal, horizon, as-of, interval-boundary, and derivation-version seeds; Relationship endpoint-integrity validation; and recursive protection against precomputed derived graph output (fixtures remain pipeline inputs, never pre-reconciled graph state). Scenario documentation in [fixtures/demo-company/README.md](fixtures/demo-company/README.md) distinguishes fixture facts from future expected reconciliation outcomes (executable in S5/S6).
+- **Final S3 verification evidence:** 311 shared-package tests passing in 12 files, complete unmodified `scripts/verify.sh` pass, and passing GitHub Actions CI (`verify`) on PR #13. S3 changed no dependencies, lockfiles, production schemas, repository contracts, graph algorithms, reconciliation, storage implementation, API behavior, frontend behavior, connectors, real-system access, or S4+ work.
 
-**What does NOT exist yet** — do not let any document or prompt claim otherwise: no repository implementation (in-memory or otherwise), no fixtures, no canonical serialization or hashing, no temporal algorithms, no reconciliation engine, no snapshot computation, no query API routes beyond `GET /health`, and no topology UI. The contract suite's behavioral cases first execute in S6.
+**What does NOT exist yet** — do not let any document or prompt claim otherwise: no repository implementation (in-memory or otherwise), no canonical serialization or hashing, no temporal algorithms, no reconciliation engine, no snapshot computation, no query API routes beyond `GET /health`, and no topology UI. The contract suite's behavioral cases first execute in S6.
 
 ## 6. Current Git State (at this checkpoint)
 
-Facts that hold both before and after the documentation PR recording this authorization merges:
+Facts observed at this checkpoint:
 
-- **PR #11 (commit `a7a997de5678fac0231a45d92d4aebe3905a88e5`) is the last merged checkpoint before this authorization** — it introduced HANDOFF.md and the checkpoint protocol. **PR #10 (commit `4bb5b1b774c02c8f12325233589f6b58aa608307`) remains the last merged product change.**
-- **This S3 authorization is the checkpoint update being introduced by the current documentation PR.** Until that PR merges, the authorization exists only on its documentation branch and S3 implementation may not begin; after it merges, the tip of `main` is that merge's own SHA, which this artifact does not attempt to predict.
-- No implementation branch is active and no S3 files exist yet; any open branches are documentation branches for this authorization.
+- **PR #13 (commit `003bcccb2ea08bf0d03469a560b02d8ada5e4295`) is the latest merged product change** — M1 Slice S3, merged to `main` on 2026-07-30 with GitHub Actions `verify` passing. It is the product state this checkpoint captures. The previous checkpoint document merged through PR #11 at `a7a997d` (historical context only).
+- **This documentation update is the checkpoint record itself.** It lands through its own later documentation PR; only when that PR merges does its merge commit become the latest merged checkpoint commit. The tip of `main` will therefore move past the SHA above, and this artifact intentionally does not predict that PR's squash-merge SHA.
+- At the checkpoint, `main` is synchronized with `origin/main` and the working tree is clean.
+- No implementation branch is active; any open branches are documentation branches for this checkpoint. S4 remains unauthorized.
 
 **A replacement conductor MUST inspect the actual Git state (`git status`, `git log --oneline --decorate -10`, `git remote -v`) and trust Git over any recorded prose — here or anywhere else.** A future handoff MUST replace this section with the state actually observed at its checkpoint, never copy Git facts forward.
 
 ## 7. Current Authorized Work
 
-**Slice S3 — synthetic fixture suite v1 — was explicitly human-authorized by Joseph Carfagno on 2026-07-30**, recorded here and in [TASKS.md](TASKS.md). The authorization is effective for implementation **only after the documentation PR recording it merges to `main` and `main` is synchronized locally**; once merged, S3 is the only active authorized implementation slice.
+**No implementation slice is currently active.** S3 — synthetic fixture suite v1 — is complete: independently reviewed and approved, merged through PR #13 at `003bccc` on 2026-07-30 with GitHub Actions `verify` passing. **Closing S3 does not authorize S4** — S4 (temporal foundations in `packages/graph-model`) and every later slice remain gated on their own explicit human release recorded in [TASKS.md](TASKS.md).
 
-**Authorized S3 scope** (per [docs/m1-plan.md](docs/m1-plan.md) §§ 4, 5, 6, and 8):
+**What S3 delivered** (scope per [docs/m1-plan.md](docs/m1-plan.md) §§ 4, 5, 6, and 8; details in [fixtures/demo-company/README.md](fixtures/demo-company/README.md)):
 
-- Validated synthetic Evidence fixtures under `fixtures/demo-company/`.
-- Scenario documentation and a deterministic fixture catalog/manifest.
-- The seven approved scenarios ([docs/m1-plan.md § 6](docs/m1-plan.md#6-synthetic-fixture-scenario-catalog)): (1) corroborating evidence; (2) late corroboration as a new revision seed; (3) conflicting evidence; (4) stale evidence; (5) ambiguous identity; (6) relationship appearance and disappearance; (7) historical/as-of topology changes.
-- The approved edge cases: equal `recordedAt` with distinct `recordedSequence`; late-old-observation Evidence; equal-`observedAt` ordering through `recordedSequence`; duplicate and non-positive `recordedSequence` rejection; unknown `schemaVersion` rejection; derivation-version pinning seeds; half-open interval-boundary seeds.
-- Every valid fixture must parse through the existing S1 Evidence schemas; fixtures use declared timestamps and deterministic, unique `recordedSequence` values; fixtures remain pipeline **inputs**, never pre-reconciled graph state.
-- The catalog must provide the non-vacuous seeds the S2 contract suite's loud preconditions demand: conflicting entity-type claims, relationship claims, and multi-entity topologies.
-- One narrowly scoped fixture-validation test may be added under `packages/shared/src/` **only** to validate the fixture catalog with existing schemas — no production behavior, reconciliation, temporal computation, or storage.
-- Scenario documentation must distinguish fixture **facts** from future **expected reconciliation outcomes**, which are not executable until later slices (S5/S6).
+- One deterministic manifest-driven fixture catalog under `fixtures/demo-company/`.
+- The seven approved synthetic scenarios ([docs/m1-plan.md § 6](docs/m1-plan.md#6-synthetic-fixture-scenario-catalog)): (1) corroborating evidence; (2) late corroboration as a new revision seed; (3) conflicting evidence; (4) stale evidence; (5) ambiguous identity; (6) relationship appearance and disappearance; (7) historical/as-of topology changes.
+- 20 valid Evidence records parsing through the existing S1 schemas, with declared timestamps and globally unique `recordedSequence` values, and four deliberately invalid fixtures proving loud schema rejection.
+- Strict manifest and file-declaration validation: unknown catalog keys and undeclared files in `scenarios/` or `invalid/` are rejected.
+- Exact ordering, temporal, horizon, as-of, interval-boundary, and derivation-version seeds covering the approved edge cases (equal `recordedAt` with distinct `recordedSequence`; late-old-observation Evidence; equal-`observedAt` ordering through `recordedSequence`; duplicate and non-positive `recordedSequence` rejection; unknown `schemaVersion` rejection; derivation-version pinning; half-open interval boundaries).
+- Relationship endpoint-integrity validation and recursive protection against precomputed derived graph output — fixtures remain pipeline **inputs**, never pre-reconciled graph state.
+- The non-vacuous seeds the S2 contract suite's loud preconditions demand: conflicting entity-type claims, relationship claims, and multi-entity topologies.
+- One fixture-catalog validation suite under `packages/shared/src/` using only existing schemas, and scenario documentation distinguishing fixture **facts** from future **expected reconciliation outcomes** (not executable until S5/S6).
 
-**S3 implementation path boundary** — after the authorization PR merges, the S3 implementation may change only:
-
-- `fixtures/demo-company/**`
-- one narrowly scoped fixture-validation test under `packages/shared/src/`
-- `TASKS.md` for factual S3 progress reporting
-
-Any additional path requires separate human approval before editing.
+**Permitted work right now:** maintenance and corrections of the merged M0 foundation, S1/S2 contract surface, and S3 fixture catalog; maintenance of the approved planning and checkpoint documentation. Nothing beyond that until the human explicitly releases the next slice.
 
 **The checkpoint/slice cycle, in order:**
 
@@ -149,12 +147,9 @@ Any additional path requires separate human approval before editing.
 
 ## 8. Prohibited Work
 
-**Before the S3 authorization PR merges:** no S3 implementation of any kind, including "preparatory" fixture drafting.
+**No implementation slice is active, so all implementation work is prohibited until the human explicitly releases the next slice.** In particular, the closed S3 checkpoint does NOT authorize:
 
-**After the S3 authorization PR merges, all work outside the § 7 S3 scope and path boundary remains prohibited.** S3 does NOT authorize:
-
-- Changes to existing S1 schemas or S2 repository contracts.
-- Production source changes under `packages/shared/src/` (the one narrowly scoped fixture-validation test is the sole exception).
+- Changes to existing S1 schemas, S2 repository contracts, or the merged S3 fixture catalog beyond maintenance corrections.
 - Repository or storage implementations.
 - Canonical serialization or hashing.
 - Temporal algorithms or validity computation.
@@ -217,12 +212,10 @@ Operating rules, non-negotiable:
 - Preserve the slice and milestone gates exactly as documented. Work proceeds
   one explicitly released slice at a time; only the human releases slices or
   milestones. Do not authorize, imply, or begin gated work.
-- Current slice state: S1 and S2 are complete and merged. S3 (synthetic
-  fixture suite v1, scope and path boundary in HANDOFF.md § 7) was
-  human-authorized 2026-07-30 and, once the PR recording that authorization
-  has merged to main, is the SOLE active authorized implementation slice.
-  If that authorization PR has not merged, no implementation slice is active.
-  S4–S8 and M2+ remain gated regardless.
+- Current slice state: S1, S2, and S3 are complete and merged (S3 merged
+  through PR #13 on 2026-07-30). NO implementation slice is currently
+  active — closing S3 did not authorize S4. S4–S8 and M2+ remain gated,
+  each on its own explicit human release recorded in TASKS.md.
 - Review implementation output independently against the accepted ADRs and
   GUARDRAILS.md before recommending human approval.
 - Assign one bounded task at a time, with explicit scope, prohibited actions,
@@ -244,7 +237,7 @@ code until the human confirms your understanding and explicitly releases work.
 ## 12. Open Risks
 
 - **Trustworthy graph correctness is the product risk.** One confidently wrong answer costs more trust than many right ones earn; every honesty mechanism (provenance, confidence, freshness, visible conflict) exists to mitigate it and must survive every slice.
-- **Fixtures must exercise non-vacuous contract cases.** The S2 contract suite fails loudly when a seed lacks a required scenario (conflicting-type entity, relationship claims, multi-entity cursors). S3's fixture catalog must supply those scenarios, or S6's contract run will (correctly) fail on seed adequacy rather than behavior.
-- **Temporal and reconciliation complexity remains ahead.** S4–S6 implement the hardest parts — canonical serialization, content addressing, the `m1-v1` derivation policy, snapshot replay — against already-fixed contracts; contract-to-implementation mismatches will surface there.
-- **No usable topology product exists until later M1 slices.** Through S2 the repository contains contracts and shells only; expectation management matters when demonstrating progress.
+- **Fixtures must keep exercising non-vacuous contract cases.** The S2 contract suite fails loudly when a seed lacks a required scenario (conflicting-type entity, relationship claims, multi-entity cursors). The merged S3 catalog supplies those scenarios with per-scenario adequacy checks; any future fixture maintenance must preserve that adequacy, or S6's contract run will (correctly) fail on seed adequacy rather than behavior.
+- **Temporal and reconciliation complexity remains ahead.** S4–S6 implement the hardest parts — canonical serialization, content addressing, the `m1-v1` derivation policy, snapshot replay — against already-fixed contracts and the now-merged fixture seeds; contract-to-implementation mismatches will surface there.
+- **No usable topology product exists until later M1 slices.** Through S3 the repository contains contracts, shells, and fixture data only; expectation management matters when demonstrating progress.
 - **Same-model coder/reviewer independence risk.** If Claude Chat conducts while Claude Code implements, both roles share a model family and may share blind spots; the human review gate is the compensating control and should be strictest exactly then.
