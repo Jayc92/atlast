@@ -6,8 +6,22 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "verbatimModuleSyntax": true,
+    // Relative imports use real .ts extensions; this package is noEmit
+    // (consumed as TypeScript source inside the workspace, run by Vitest),
+    // so the extension is never rewritten — same convention as
+    // packages/shared.
+    "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": []
+    // node:crypto and Vitest's declarations need Node globals, so the
+    // pinned @types/node (same version as packages/shared) is required.
+    "types": ["node"],
+    // @atlast/shared is consumed as TypeScript source inside the workspace
+    // (it publishes no build output or entry-point fields), so the package
+    // name is mapped to its source index for type resolution; the matching
+    // runtime alias lives in vitest.config.ts.
+    "paths": {
+      "@atlast/shared": ["../shared/src/index.ts"]
+    }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "vitest.config.ts"]
 }

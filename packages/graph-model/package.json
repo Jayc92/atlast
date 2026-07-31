@@ -2,9 +2,17 @@
   "name": "@atlast/graph-model",
   "version": "0.0.0",
   "private": true,
-  "description": "Topology graph model behind repository interfaces (ADR-0012) — implementation gated on M1 authorization.",
+  "description": "Topology graph model behind repository interfaces (ADR-0012): S4 temporal foundations — Evidence total order and horizon selection, validity-interval membership, RFC 8785 canonical serialization, collection ordering, and SHA-256 digests per ADR-0016 as amended by ADR-0021. Reconciliation (S5) and snapshots/storage (S6) are gated on their own slice releases.",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --project tsconfig.json"
+    "typecheck": "tsc --project tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@atlast/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "vitest": "4.1.10"
   }
 }
