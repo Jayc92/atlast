@@ -6,10 +6,11 @@ The canonical, model-neutral resume document for this project. A replacement con
 
 ## 1. Document Control
 
-- **Last updated:** 2026-07-31
-- **Checkpoint name:** `m1-s4-temporal-foundations-merged`
-- **Latest merged product commit:** `63bdfab7f9e7ae070794e43304bdb8ec0fab66bc` (`feat: add M1 temporal foundations (#16)`) — M1 Slice S4, independently reviewed, remediated, and approved, merged through [PR #16](https://github.com/Jayc92/atlast/pull/16) on 2026-07-31 with GitHub Actions `verify` passing (local `./scripts/verify.sh` passed before merge). That product state is what this checkpoint captures. S4 was authorized and ADR-0021 accepted through [PR #15](https://github.com/Jayc92/atlast/pull/15) at `98d2abf`; the previous checkpoint document merged through PR #14 at `1eca85f` (historical context only).
-- **This document update is the checkpoint record.** This S4 closeout lands through its own future documentation PR whose squash-merge SHA is intentionally not predicted here; that PR's eventual merge commit becomes the latest merged checkpoint commit — always read the actual tip from Git, not from this file.
+- **Last updated:** 2026-08-05
+- **Checkpoint name:** `m1-s5-reconciliation-authorized`
+- **Latest merged checkpoint commit:** `d5677a3f1db24ffb0f8a228cb9c7cae68b7ecac1` (`docs: close M1 implementation slice S4 (#17)`) — the S4 closeout checkpoint, merged through [PR #17](https://github.com/Jayc92/atlast/pull/17) on 2026-07-31 with GitHub Actions `verify` passing.
+- **Latest merged product commit:** `63bdfab7f9e7ae070794e43304bdb8ec0fab66bc` (`feat: add M1 temporal foundations (#16)`) — M1 Slice S4, independently reviewed, remediated, and approved, merged through [PR #16](https://github.com/Jayc92/atlast/pull/16) on 2026-07-31 with GitHub Actions `verify` passing (local `./scripts/verify.sh` passed before merge). S4 was authorized and ADR-0021 accepted through [PR #15](https://github.com/Jayc92/atlast/pull/15) at `98d2abf`.
+- **This document update records the S5 authorization packet:** ADR-0022 explicitly accepted by Joseph Carfagno on 2026-08-05 after independent review, releasing S5 as the only released implementation slice, effective only after this record merges to `main` and `main` is synchronized locally. It lands through its own future documentation PR whose squash-merge SHA is intentionally not predicted here — always read the actual tip from Git, not from this file.
 - **Branch state at this checkpoint:** `main` synchronized with `origin/main`, clean working tree.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves every previous checkpoint version. Do not append old checkpoints to this file — retrieve them with `git log -- HANDOFF.md`.
 - **Precedence:** the repository source-of-truth documents ([PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), [docs/m1-plan.md](docs/m1-plan.md), the accepted ADRs in [docs/adr/](docs/adr/README.md), [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md)) **override this document wherever they conflict**. HANDOFF.md summarizes; it never supersedes.
@@ -44,7 +45,7 @@ The canonical, model-neutral resume document for this project. A replacement con
   - [docs/architecture.md](docs/architecture.md) — architecture philosophy and conceptual design
   - [docs/milestones.md](docs/milestones.md) — authorized milestone sequence M0–M5 with exit criteria
   - [docs/m1-plan.md](docs/m1-plan.md) — the approved M1 implementation baseline (slices S1–S8, fixture catalog, journeys)
-  - [docs/adr/](docs/adr/README.md) — accepted ADRs 0001–0021 (index with amendment notes)
+  - [docs/adr/](docs/adr/README.md) — accepted ADRs 0001–0022 (index with amendment notes)
   - [docs/audits/](docs/audits/m0-synthetic-boundary-audit.md) — boundary audits
   - `packages/shared` — the merged S1 domain schemas, S2 repository contract surface, and the S3 fixture-catalog validation suite
   - `packages/graph-model` — the merged S4 temporal foundations (Evidence ordering, horizon selection, validity membership, RFC 8785 canonical serialization, collection ordering, SHA-256 digests)
@@ -64,22 +65,22 @@ Factual state at this checkpoint:
 - **The S2 checkpoint/HANDOFF protocol merged through PR #11** at `a7a997d` (2026-07-30).
 - **S3 is complete** — independently reviewed and approved, merged through PR #13 at `003bccc` on 2026-07-30 with GitHub Actions `verify` passing; its closeout checkpoint merged through PR #14 at `1eca85f` on 2026-07-31.
 - **S4 is complete** — authorized through PR #15 (with ADR-0021 accepted through the same PR), implemented, independently reviewed and remediated before approval, and merged through PR #16 at `63bdfab` on 2026-07-31 with GitHub Actions `verify` passing.
-- **No implementation slice is currently active.** Closing S4 does not authorize S5.
-- **S5–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release.
+- **S5 is released:** Joseph Carfagno authorized S5 in principle on 2026-07-31 and **explicitly accepted [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) — the binding `m1-v1` reconciliation specification — on 2026-08-05 after independent review**, clearing the pre-release blocker. **S5 is the only released implementation slice**, with implementation **effective only after this acceptance record merges to `main` and `main` is synchronized locally with a clean working tree** — no S5 file may be created before that; until then no implementation slice is active. No S5 implementation exists yet, and the release does not imply approval of future S5 output: implementation, independent review, passing local verification, PR/CI, merge, and checkpoint closeout all remain required.
+- **S6–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release. No S6 storage, snapshots, repository implementation, query/API, frontend, connector, infrastructure, or dependency work is authorized.
 - **M2–M5 remain unauthorized**, each gated on its own explicit human authorization.
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
 
-| Slice | Purpose                                                                                                                                                                       | Status                       |
-| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| S1    | Domain schemas in `packages/shared`: Evidence, identity-only subjects, claim union, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, rejection tests | Complete — merged via PR #7  |
-| S2    | Async repository interfaces (full M1 read contract) in `packages/shared` + storage-agnostic contract-test suite skeleton                                                      | Complete — merged via PR #10 |
-| S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Complete — merged via PR #13 |
-| S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Complete — merged via PR #16 |
-| S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Gated                        |
-| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Gated                        |
-| S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Gated                        |
-| S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                        |
+| Slice | Purpose                                                                                                                                                                       | Status                                                                        |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| S1    | Domain schemas in `packages/shared`: Evidence, identity-only subjects, claim union, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, rejection tests | Complete — merged via PR #7                                                   |
+| S2    | Async repository interfaces (full M1 read contract) in `packages/shared` + storage-agnostic contract-test suite skeleton                                                      | Complete — merged via PR #10                                                  |
+| S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Complete — merged via PR #13                                                  |
+| S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Complete — merged via PR #16                                                  |
+| S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Authorized (ADR-0022 accepted 2026-08-05) — effective on merge of this record |
+| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Gated                                                                         |
+| S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Gated                                                                         |
+| S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                                                                         |
 
 **Milestone purposes** ([docs/milestones.md](docs/milestones.md)):
 
@@ -125,7 +126,15 @@ Facts observed at this checkpoint:
 
 ## 7. Current Authorized Work
 
-**No implementation slice is currently active.** S4 — temporal foundations in `packages/graph-model` — is complete: authorized through PR #15 (ADR-0021 accepted through the same PR), implemented within its authorized boundary, independently reviewed and remediated before approval, and merged through PR #16 at `63bdfab` on 2026-07-31 with GitHub Actions `verify` passing and local `./scripts/verify.sh` passing before merge. **Closing S4 does not authorize S5** — S5 (reconciliation engine, derivation policy `m1-v1`) and every later slice remain gated on their own explicit human release recorded in [TASKS.md](TASKS.md).
+**Slice S5 — reconciliation engine (`m1-v1`) in `packages/graph-model` — is the only released implementation slice.** Joseph Carfagno authorized it in principle on 2026-07-31 and **explicitly accepted [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) — the binding `m1-v1` reconciliation specification — on 2026-08-05 after independent review**, clearing the pre-release blocker. The release is effective for implementation **only after this acceptance record merges to `main` and `main` is synchronized locally with a clean working tree** — no S5 file may be created before that; until then no implementation slice is active. No S5 implementation exists yet, and the release does not imply approval of future S5 output: implementation, independent review, passing local `scripts/verify.sh`, PR/CI, merge, and checkpoint closeout all remain required.
+
+**S5 implementation boundary — exactly accepted ADR-0022 §§ 1–14, nothing more:**
+
+- **Authorized paths (ADR-0022 § 14):** `packages/graph-model/src/**` and `TASKS.md` (factual S5 progress only). **No package-manifest or lockfile change; no new dependency of any kind.**
+- **Authorized content:** the `m1-v1` derivation-policy document (§ 1); identity normalization and type-free stable identifier construction (§§ 2–3); aliases and ambiguity with no dangling near-match references (§§ 4–5); event-time standing-claim reconciliation (§§ 6–7); standing-source-filtered provenance (§ 7); confidence and conflict derivation (§§ 7–8); assertion validity derivation and complete revision history (§ 9); schema-valid rule traces (§ 10); content-addressed GraphAssertion construction through the S4 primitives (§ 11); the pure reconciliation function (§ 12); the freshness classification helper (§ 13); and focused tests proving the ADR-0022 invariants.
+- **S5 must NOT implement:** changes to `packages/shared` or any S1/S2 contract; fixture JSON; repository or storage implementations; snapshot construction, snapshot payload builders, replay, or checksums-on-snapshots; query/API routes; frontend behavior; connectors; infrastructure; authentication or deployment; real-system access; or any S6–S8 or M2+ work.
+
+**S4 (context) is complete:** authorized through PR #15 (ADR-0021 accepted through the same PR), implemented within its authorized boundary, independently reviewed and remediated before approval, and merged through PR #16 at `63bdfab` on 2026-07-31 with GitHub Actions `verify` passing and local `./scripts/verify.sh` passing before merge.
 
 **What S4 delivered** (details in [TASKS.md](TASKS.md) and `packages/graph-model/src/`):
 
@@ -138,9 +147,9 @@ Facts observed at this checkpoint:
 - Lowercase-hexadecimal SHA-256 canonical digest primitives over Node.js built-ins.
 - 82 focused tests in 5 files: official RFC 8785 vectors (including the exact § 3.2.3 seven-property sorting fixture), boundary, determinism, purity, and caller-non-mutation proofs.
 
-**Permitted work right now:** maintenance and corrections of the merged M0 foundation, S1/S2 contract surface, S3 fixture catalog, and S4 temporal foundations; maintenance of the approved planning and checkpoint documentation. Nothing beyond that until the human explicitly releases the next slice.
+**Permitted work besides the (merge-gated) S5 scope:** maintenance and corrections of the merged M0 foundation, S1/S2 contract surface, S3 fixture catalog, and S4 temporal foundations; maintenance of the approved planning and checkpoint documentation.
 
-**Next decision:** whether Joseph Carfagno explicitly authorizes S5 (reconciliation engine in `packages/graph-model` — derivation policy `m1-v1`: matching, corroboration, confidence, conflict, ambiguity, rule traces). That release is his alone to give; nothing in this checkpoint anticipates or implies it.
+**Next-agent preflight** (run before acting on this checkpoint): `git status` (clean tree required), `git log --oneline --decorate -10` (confirm this acceptance record has merged to `main` and `main` is synchronized with `origin/main` — if it has not merged, S5 is not yet effective and no S5 file may be created), then read [TASKS.md](TASKS.md) and accepted [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) in full before any S5 work. The S5 boundary above is exhaustive; any path or content outside it requires separate human approval.
 
 **The checkpoint/slice cycle, in order:**
 
@@ -156,20 +165,20 @@ Facts observed at this checkpoint:
 
 ## 8. Prohibited Work
 
-**No implementation slice is active, so all implementation work is prohibited until the human explicitly releases the next slice.** In particular, the closed S4 checkpoint does NOT authorize:
+**Before this S5 acceptance record merges to `main`:** no S5 implementation of any kind, including "preparatory" policy or reconciliation drafting.
+
+**After it merges, all work outside the § 7 S5 scope and path boundary remains prohibited.** S5 does NOT authorize:
 
 - Changes to existing S1 schemas, S2 repository contracts, the merged S3 fixture catalog, or the merged S4 temporal foundations beyond maintenance corrections.
-- Repository or storage implementations.
-- Reconciliation, identity matching, or confidence/freshness computation.
-- Derivation policy `m1-v1`, GraphAssertion derivation, or GraphAssertion payload builders.
-- Validity-interval derivation (the merged S4 interval helpers evaluate membership only).
-- Snapshot construction, snapshot payload builders, replay, or checksums-on-snapshots.
-- API routes.
+- Repository or storage implementations (S6).
+- Snapshot construction, snapshot payload builders, replay, or checksums-on-snapshots (S6).
+- Referential-integrity enforcement (S2-defined, S6-proven).
+- API routes (S7).
 - Frontend changes.
-- Connector work.
+- Connector or infrastructure work.
 - New third-party dependencies, version upgrades, or lockfile changes.
 - Real systems, employer data, credentials, or proprietary names — synthetic, fictional data only.
-- S5–S8 or M2+ work.
+- S6–S8 or M2+ work.
 - Deployment or external publication.
 
 Standing prohibitions regardless of slice: never weaken `scripts/verify.sh` (protected verification contract, ADR-0013); never edit accepted ADRs (supersede or amend via a new ADR); never bypass the query-API-only read path; never implement anything contradicting [PROJECT_SPEC.md § 7 Non-Goals](PROJECT_SPEC.md#7-non-goals--what-atlast-will-not-become); no autonomous production behavior of any kind.
@@ -223,11 +232,16 @@ Operating rules, non-negotiable:
   milestones. Do not authorize, imply, or begin gated work.
 - Current slice state: S1–S4 are complete and merged (S4 merged through
   PR #16 at 63bdfab on 2026-07-31, after independent review and
-  remediation; its authorization and ADR-0021 acceptance merged through
-  PR #15). NO implementation slice is currently active — closing S4 did
-  not authorize S5. S5–S8 and M2+ remain gated, each on its own explicit
-  human release recorded in TASKS.md. The next decision belongs to the
-  human alone: whether to authorize S5 (reconciliation engine, m1-v1).
+  remediation; the S4 closeout checkpoint through PR #17 at d5677a3).
+  S5 (reconciliation engine, m1-v1 — scope and path boundary in
+  HANDOFF.md § 7 and accepted ADR-0022 § 14) was human-authorized
+  2026-07-31 with ADR-0022 explicitly accepted on 2026-08-05 as the
+  binding m1-v1 specification, and, once the record of that acceptance
+  has merged to main, is the SOLE released implementation slice. If
+  that acceptance record has not merged, no implementation slice is
+  active and no S5 file may exist. S6–S8 and M2+ remain gated
+  regardless, each on its own explicit human release recorded in
+  TASKS.md.
 - Review implementation output independently against the accepted ADRs and
   GUARDRAILS.md before recommending human approval.
 - Assign one bounded task at a time, with explicit scope, prohibited actions,
