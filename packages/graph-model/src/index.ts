@@ -1,15 +1,14 @@
 /**
- * Package boundary for `@atlast/graph-model`: the S4 temporal foundations —
- * deterministic, pure, non-mutating primitives per ADR-0016 as amended by
- * accepted ADR-0021.
+ * Package boundary for `@atlast/graph-model`: the S4 temporal foundations
+ * (deterministic, pure, non-mutating primitives per ADR-0016 as amended by
+ * accepted ADR-0021) plus the S5 reconciliation engine (the binding `m1-v1`
+ * contract per accepted ADR-0022) — the deeply frozen derivation policy,
+ * identity normalization and stable identifier construction, event-time
+ * standing-claim reconciliation with content-addressed GraphAssertion
+ * revision history, and the query-time freshness classifier.
  *
- * S4 exports primitives only: Evidence total ordering and horizon
- * selection, half-open validity-interval membership evaluation, RFC 8785
- * canonical serialization through the S1 JSON-value boundary, collection-
- * ordering helpers, and SHA-256 canonical digests. Reconciliation (S5),
- * GraphAssertion derivation and payload builders (S5), snapshot
- * construction/replay and repository implementations (S6), and API routes
- * (S7) arrive with their own explicitly released slices.
+ * Snapshot construction/replay and repository implementations (S6) and API
+ * routes (S7) arrive with their own explicitly released slices.
  */
 export { compareUtf16CodeUnits } from "./utf16-comparator.ts";
 export {
@@ -29,3 +28,19 @@ export {
   sha256HexOfBytes,
   sha256HexOfCanonicalJson,
 } from "./canonical-digest.ts";
+export {
+  M1_V1_DERIVATION_POLICY,
+  type AliasEntry,
+  type M1V1DerivationPolicy,
+} from "./derivation-policy.ts";
+export {
+  buildEntityIdentifier,
+  buildRelationshipIdentifier,
+  IdentityNormalizationError,
+  normalizeIdentityKey,
+} from "./identity-normalization.ts";
+export { classifyFreshness } from "./freshness.ts";
+export {
+  reconcileEvidenceAtHorizon,
+  type ReconciliationResult,
+} from "./reconciliation.ts";
