@@ -1,11 +1,13 @@
 # ADR-0015: Deterministic Identity Reconciliation — Rules-First, Conflict-Preserving, Replayable
 
-**Status:** Accepted; amended by [ADR-0019](0019-subject-identity-and-assertion-claims.md)
+**Status:** Accepted; amended by [ADR-0019](0019-subject-identity-and-assertion-claims.md) and [ADR-0022](0022-m1-reconciliation-policy-and-assertion-derivation.md)
 **Date:** 2026-07-23
 
 > **Approval note (2026-07-23):** Accepted by human review as part of the **M1 architecture baseline**. Acceptance settles the M1 reconciliation design only — it does **not** authorize implementation. M1 implementation requires a separate, explicit human authorization ([docs/milestones.md](../milestones.md)).
 
 > **Amendment notice (2026-07-23):** [ADR-0019](0019-subject-identity-and-assertion-claims.md) (Accepted) amends this ADR's dependent typed-subject wording only: where the text below assumes type is a subject-level fact (e.g., the conflict example of two sources asserting different types for one entity), type now lives in the GraphAssertion's canonical claim per ADR-0019. The conflict semantics themselves — coexisting incompatible claims, per-claim confidence, no winner — are unchanged and strengthened. The decision text below is **preserved verbatim as accepted**; all other decisions stand unchanged.
+
+> **Amendment notice (2026-08-05):** [ADR-0022](0022-m1-reconciliation-policy-and-assertion-derivation.md) (Accepted) is the **binding completion of the `m1-v1` reconciliation policy**: it specifies the implementation details this ADR deliberately stated abstractly — the exact policy-document shape and constants, normalization step semantics, alias data, ambiguity rules, event-time standing-claim reconciliation with standing-source-filtered provenance, validity-interval derivation, the rule-trace vocabulary, and the content-addressing payload — **without replacing any of this ADR's accepted reconciliation principles** (rules-first determinism, corroboration-driven confidence, coexisting conflicts, flagged ambiguity, idempotent replay). The decision text below is **preserved verbatim as accepted**; where an implementation detail is needed, ADR-0022 controls.
 
 ## Context
 
