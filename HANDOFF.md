@@ -45,7 +45,7 @@ The canonical, model-neutral resume document for this project. A replacement con
   - [docs/architecture.md](docs/architecture.md) — architecture philosophy and conceptual design
   - [docs/milestones.md](docs/milestones.md) — authorized milestone sequence M0–M5 with exit criteria
   - [docs/m1-plan.md](docs/m1-plan.md) — the approved M1 implementation baseline (slices S1–S8, fixture catalog, journeys)
-  - [docs/adr/](docs/adr/README.md) — accepted ADRs 0001–0022 (index with amendment notes)
+  - [docs/adr/](docs/adr/README.md) — accepted ADRs 0001–0023 (index with amendment notes)
   - [docs/audits/](docs/audits/m0-synthetic-boundary-audit.md) — boundary audits
   - `packages/shared` — the merged S1 domain schemas, S2 repository contract surface, and the S3 fixture-catalog validation suite
   - `packages/graph-model` — the merged S4 temporal foundations (Evidence ordering, horizon selection, validity membership, RFC 8785 canonical serialization, collection ordering, SHA-256 digests) and the merged S5 reconciliation engine (the `m1-v1` derivation policy, identity normalization, event-time reconciliation, freshness classification)
@@ -66,7 +66,8 @@ Factual state at this checkpoint:
 - **S3 is complete** — independently reviewed and approved, merged through PR #13 at `003bccc` on 2026-07-30 with GitHub Actions `verify` passing; its closeout checkpoint merged through PR #14 at `1eca85f` on 2026-07-31.
 - **S4 is complete** — authorized through PR #15 (with ADR-0021 accepted through the same PR), implemented, independently reviewed and remediated before approval, and merged through PR #16 at `63bdfab` on 2026-07-31 with GitHub Actions `verify` passing.
 - **S5 is complete and closed** — human-authorized in principle 2026-07-31, released by Joseph Carfagno's explicit acceptance of [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) (the binding `m1-v1` reconciliation specification) on 2026-08-05 after independent review (acceptance record merged through PR #18 at `f50f0d7`), implemented under accepted ADR-0022, independently reviewed with **no blocking findings** (the reviewer reran `./scripts/verify.sh` successfully), and merged through PR #19 at `0923e9c` on 2026-08-05 with GitHub Actions `verify` passing. **No implementation slice is currently active.** Closing S5 does not authorize S6.
-- **S6–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release. No S6 storage, snapshots, repository implementation, query/API, frontend, connector, infrastructure, or dependency work is authorized. **The next permitted action is an S6 pre-release architecture and authorization review — not S6 implementation.**
+- **The S6 pre-release architecture and authorization review is complete** — [ADR-0023](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) was explicitly accepted by Joseph Carfagno on 2026-08-05 after three independent-review correction passes, settling all nine identified S6 design gaps (and amending ADR-0016/0018/0019 via metadata-only notices). **Acceptance does not authorize S6 implementation.**
+- **S6–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release. No S6 storage, snapshots, repository implementation, query/API, frontend, connector, infrastructure, or dependency work is authorized. **The next permitted action is a separate, explicit S6 authorization decision recorded in TASKS.md — not S6 implementation.**
 - **M2–M5 remain unauthorized**, each gated on its own explicit human authorization.
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
@@ -128,9 +129,9 @@ Facts observed at this checkpoint:
 
 ## 7. Current Authorized Work
 
-**No implementation slice is currently active.** Slice S5 — the reconciliation engine (`m1-v1`) in `packages/graph-model` — is complete and closed: human-authorized in principle 2026-07-31, released by Joseph Carfagno's explicit acceptance of [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) — the binding `m1-v1` reconciliation specification — on 2026-08-05 after independent review (acceptance record merged through PR #18 at `f50f0d7`), implemented under accepted ADR-0022 within its § 14 boundary, independently reviewed with **no blocking findings** (the independent reviewer reran `./scripts/verify.sh` successfully), and merged through PR #19 at `0923e9c` on 2026-08-05 with GitHub Actions `verify` passing. **Closing S5 does not authorize S6.**
+**No implementation slice is currently active.** Slice S5 — the reconciliation engine (`m1-v1`) in `packages/graph-model` — is complete and closed: human-authorized in principle 2026-07-31, released by Joseph Carfagno's explicit acceptance of [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) — the binding `m1-v1` reconciliation specification — on 2026-08-05 after independent review (acceptance record merged through PR #18 at `f50f0d7`), implemented under accepted ADR-0022 within its § 14 boundary, independently reviewed with **no blocking findings** (the independent reviewer reran `./scripts/verify.sh` successfully), and merged through PR #19 at `0923e9c` on 2026-08-05 with GitHub Actions `verify` passing. **Closing S5 did not authorize S6.**
 
-**The next permitted action is an S6 pre-release architecture and authorization review — not S6 implementation.** S6 (snapshot layer + in-memory stores implementing the S2 interfaces) remains gated until it receives its own explicit human release recorded in [TASKS.md](TASKS.md); S7–S8 and M2+ remain gated behind their own releases.
+**The S6 pre-release architecture and authorization review is complete:** [ADR-0023](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) — the S6 review packet auditing the eighteen assigned S6-readiness behaviors — was **explicitly accepted by Joseph Carfagno on 2026-08-05 after three independent-review correction passes**, settling all nine identified S6 design gaps (clock injection and cursorless "latest" resolution; graph/Evidence cursor-bound continuation reads; unsupported-`derivationVersion` rejection with the `m1-v2` seed's proof obligation; the snapshot content-addressing payload; checksum construction with complete semantic horizon validity and empty-snapshot semantics; identity-scoped referential-integrity enforcement; caller-input protection and returned-value isolation; `appendEvidence` batch atomicity with the exact shared-schema boundary; and the repository error taxonomy with closed `code`/`reason` literals and exact property contracts). With acceptance, ADR-0023 amends ADR-0016, ADR-0018, and ADR-0019 via metadata-only notices. **Acceptance does not authorize S6 implementation — the next permitted action is a separate, explicit S6 authorization decision recorded in [TASKS.md](TASKS.md), not implementation.** S6 (snapshot layer + in-memory stores implementing the S2 interfaces) remains gated until it receives its own explicit human release; S7–S8 and M2+ remain gated behind their own releases.
 
 **S5 (context) is complete. What S5 delivered** (details in [TASKS.md](TASKS.md) and `packages/graph-model/src/`):
 
@@ -167,7 +168,7 @@ Facts observed at this checkpoint:
 
 **S5 is closed and no implementation slice is active — all implementation work is prohibited until the next slice is explicitly released.** In particular, the following remain unauthorized:
 
-- S6 implementation of any kind, including "preparatory" snapshot or store drafting — the next permitted action is an S6 pre-release architecture and authorization review only.
+- S6 implementation of any kind, including "preparatory" snapshot or store drafting — the S6 pre-release architecture review is complete (ADR-0023 accepted 2026-08-05), but the next permitted action is a separate, explicit S6 authorization decision only.
 - Changes to existing S1 schemas, S2 repository contracts, the merged S3 fixture catalog, the merged S4 temporal foundations, or the merged S5 reconciliation engine beyond maintenance corrections.
 - Repository or storage implementations (S6).
 - Snapshot construction, snapshot payload builders, replay, or checksums-on-snapshots (S6).
@@ -234,10 +235,13 @@ Operating rules, non-negotiable:
   2026-08-05 after independent review with no blocking findings; its
   authorization packet — the ADR-0022 acceptance record — through
   PR #18 at f50f0d7). NO implementation slice is currently active:
-  closing S5 did not authorize S6. The next permitted action is an
-  S6 pre-release architecture and authorization review, not S6
-  implementation. S6–S8 and M2+ remain gated, each on its own
-  explicit human release recorded in TASKS.md.
+  closing S5 did not authorize S6. The S6 pre-release architecture
+  review is complete — ADR-0023 was accepted 2026-08-05, settling
+  all nine identified S6 design gaps — but its acceptance does not
+  authorize S6 implementation. The next permitted action is a
+  separate, explicit S6 authorization decision, not implementation.
+  S6–S8 and M2+ remain gated, each on its own explicit human
+  release recorded in TASKS.md.
 - Review implementation output independently against the accepted ADRs and
   GUARDRAILS.md before recommending human approval.
 - Assign one bounded task at a time, with explicit scope, prohibited actions,

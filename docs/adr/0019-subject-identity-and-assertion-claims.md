@@ -1,9 +1,11 @@
 # ADR-0019: Subject Identity and Assertion Claims — Subjects Carry Identity Only; the Canonical Claim Owns Type and Endpoints
 
-**Status:** Accepted — amends ADR-0014 and ADR-0015
+**Status:** Accepted — amends ADR-0014 and ADR-0015; amended by [ADR-0023](0023-m1-snapshot-and-in-memory-store-semantics.md)
 **Date:** 2026-07-23
 
 > **Approval note (2026-07-23):** The **identity-only subject decision was approved by human review**. ADR-0019 amends **only** the identified subject/type clauses of ADR-0014 and their dependent wording in ADR-0015 (scope in § "Relationship to ADR-0014 and ADR-0015" below); every other accepted decision stands. **Acceptance unblocks Slice S1** ([TASKS.md](../../TASKS.md)) — it does **not** authorize S2–S8, which remain gated on per-slice release after the preceding slice is reviewed and merged, nor M2 and later milestones, which remain gated on their own explicit authorizations.
+
+> **Amendment notice (2026-08-05):** [ADR-0023](0023-m1-snapshot-and-in-memory-store-semantics.md) (Accepted) completes, without altering, this ADR's § 4 referential-integrity obligation ("S2 defines, S6 proves") by specifying its **identity-scoped enforcement mechanics**: the implementing store evaluates every visible relationship claim's endpoints against the complete resolved `(asOf, horizon, derivationVersion)` identity; a violation rejects every graph read at that exact resolved identity with a structured `ReferentialIntegrityError`, never silently excludes the offending revision, and never poisons a different `asOf`, `derivationVersion`, or later horizon whose own facts are sound. This ADR's accepted decision text below is **preserved verbatim**.
 
 ## Context
 

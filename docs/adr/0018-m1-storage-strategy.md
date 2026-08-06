@@ -1,9 +1,11 @@
 # ADR-0018: M1 Storage Strategy — Retain Fixture-Backed In-Memory Storage Behind the Repository Interfaces
 
-**Status:** Accepted
+**Status:** Accepted; amended by [ADR-0023](0023-m1-snapshot-and-in-memory-store-semantics.md)
 **Date:** 2026-07-23
 
 > **Approval note (2026-07-23):** Accepted by human review as part of the **M1 architecture baseline**; this is the storage decision ADR-0012 made mandatory for M1. Acceptance settles the M1 storage choice only — it does **not** authorize implementation. M1 implementation requires a separate, explicit human authorization ([docs/milestones.md](../milestones.md)).
+
+> **Amendment notice (2026-08-05):** [ADR-0023](0023-m1-snapshot-and-in-memory-store-semantics.md) (Accepted) completes, without altering, the in-memory strategy this ADR chose, specifying the storage-implementation details it did not: **injected-clock resolution** for cursorless `latest` reads (no wall-clock access in `packages/graph-model`; the production clock is an S7 composition-root concern), **graph/Evidence cursor continuation semantics** (two cursor kinds with authoritative bindings; `latest` continuations never re-resolve the clock or watermark; Evidence continuations stay on the cursor-bound horizon), **`appendEvidence` batch atomicity** (all-or-nothing, with the exact shared-schema `ZodError` versus repository-invariant `EvidenceAppendError` boundary), **input/output isolation** (caller-owned Evidence is deep-copied and never frozen or mutated; store-owned state is deep-frozen; returned structures cannot mutate store state), and the **repository error taxonomy** (closed error classes with literal `code`/`reason` fields and exact `readonly` property contracts). This ADR's accepted decision text below is **preserved verbatim**.
 
 ## Context
 
