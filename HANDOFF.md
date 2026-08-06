@@ -7,10 +7,10 @@ The canonical, model-neutral resume document for this project. A replacement con
 ## 1. Document Control
 
 - **Last updated:** 2026-08-05
-- **Checkpoint name:** `m1-s5-reconciliation-engine-merged`
-- **Latest merged checkpoint commit:** `f50f0d789da390cf4e8884a9ea1574f571936ce6` (`docs: accept ADR-0022 and authorize M1 slice S5 (#18)`) — the S5 authorization packet (ADR-0022 acceptance record), merged through [PR #18](https://github.com/Jayc92/atlast/pull/18) on 2026-08-05 with GitHub Actions `verify` passing.
+- **Checkpoint name:** `m1-s6-authorized`
+- **Latest merged checkpoint commit:** `70df8c23a7d5ae5ccb48c6fa3903bd37e3a775c9` (`docs: accept ADR-0023 snapshot and storage semantics (#21)`) — the ADR-0023 acceptance record, merged through [PR #21](https://github.com/Jayc92/atlast/pull/21) on 2026-08-05 with GitHub Actions `verify` passing.
 - **Latest merged product commit:** `0923e9c20bc0c75094eb54e160a4eb39ab2c9828` (`feat: add M1 reconciliation engine (#19)`) — M1 Slice S5, implemented under accepted [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md), independently reviewed with **no blocking findings** (the independent reviewer reran the complete `./scripts/verify.sh` successfully), and merged through [PR #19](https://github.com/Jayc92/atlast/pull/19) on 2026-08-05 with GitHub Actions `verify` passing.
-- **This document update records the S5 closeout:** Slice S5 is complete and closed. It lands through its own future documentation PR whose squash-merge SHA is intentionally not predicted here — always read the actual tip from Git, not from this file.
+- **This document update records the explicit S6 authorization:** Joseph Carfagno explicitly authorized M1 Slice S6 on 2026-08-05 ([TASKS.md](TASKS.md) records the decision). The authorization is **effective only after this documentation PR merges to `main` and `main` is synchronized locally with a clean working tree**; the record lands through its own documentation PR whose squash-merge SHA is intentionally not predicted here — always read the actual tip from Git, not from this file.
 - **Branch state at this checkpoint:** `main` synchronized with `origin/main`, clean working tree.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves every previous checkpoint version. Do not append old checkpoints to this file — retrieve them with `git log -- HANDOFF.md`.
 - **Precedence:** the repository source-of-truth documents ([PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), [docs/m1-plan.md](docs/m1-plan.md), the accepted ADRs in [docs/adr/](docs/adr/README.md), [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md)) **override this document wherever they conflict**. HANDOFF.md summarizes; it never supersedes.
@@ -65,9 +65,10 @@ Factual state at this checkpoint:
 - **The S2 checkpoint/HANDOFF protocol merged through PR #11** at `a7a997d` (2026-07-30).
 - **S3 is complete** — independently reviewed and approved, merged through PR #13 at `003bccc` on 2026-07-30 with GitHub Actions `verify` passing; its closeout checkpoint merged through PR #14 at `1eca85f` on 2026-07-31.
 - **S4 is complete** — authorized through PR #15 (with ADR-0021 accepted through the same PR), implemented, independently reviewed and remediated before approval, and merged through PR #16 at `63bdfab` on 2026-07-31 with GitHub Actions `verify` passing.
-- **S5 is complete and closed** — human-authorized in principle 2026-07-31, released by Joseph Carfagno's explicit acceptance of [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) (the binding `m1-v1` reconciliation specification) on 2026-08-05 after independent review (acceptance record merged through PR #18 at `f50f0d7`), implemented under accepted ADR-0022, independently reviewed with **no blocking findings** (the reviewer reran `./scripts/verify.sh` successfully), and merged through PR #19 at `0923e9c` on 2026-08-05 with GitHub Actions `verify` passing. **No implementation slice is currently active.** Closing S5 does not authorize S6.
-- **The S6 pre-release architecture and authorization review is complete** — [ADR-0023](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) was explicitly accepted by Joseph Carfagno on 2026-08-05 after three independent-review correction passes, settling all nine identified S6 design gaps (and amending ADR-0016/0018/0019 via metadata-only notices). **Acceptance does not authorize S6 implementation.**
-- **S6–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release. No S6 storage, snapshots, repository implementation, query/API, frontend, connector, infrastructure, or dependency work is authorized. **The next permitted action is a separate, explicit S6 authorization decision recorded in TASKS.md — not S6 implementation.**
+- **S5 is complete and closed** — human-authorized in principle 2026-07-31, released by Joseph Carfagno's explicit acceptance of [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) (the binding `m1-v1` reconciliation specification) on 2026-08-05 after independent review (acceptance record merged through PR #18 at `f50f0d7`), implemented under accepted ADR-0022, independently reviewed with **no blocking findings** (the reviewer reran `./scripts/verify.sh` successfully), and merged through PR #19 at `0923e9c` on 2026-08-05 with GitHub Actions `verify` passing.
+- **The S6 pre-release architecture and authorization review is complete** — [ADR-0023](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) was explicitly accepted by Joseph Carfagno on 2026-08-05 after three independent-review correction passes, settling all nine identified S6 design gaps (and amending ADR-0016/0018/0019 via metadata-only notices). Acceptance did not itself authorize S6 implementation; **ADR-0023 is the binding S6 clarification and remains Accepted, unchanged**.
+- **S6 is explicitly authorized and is the only active authorized implementation slice** — Joseph Carfagno made the separate, explicit S6 authorization decision on 2026-08-05, recorded in [TASKS.md](TASKS.md). The authorization is **effective only after the documentation PR recording it merges to `main` and `main` is synchronized locally with a clean working tree**. It **does not approve future S6 implementation output** — that output still requires implementation under accepted ADR-0023, independent review, passing verification, PR approval, and merge. S6 is not implemented, reviewed, approved, complete, or merged.
+- **S7–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release. No S7 query/API, S8 closeout, frontend, connector, infrastructure, or dependency work is authorized.
 - **M2–M5 remain unauthorized**, each gated on its own explicit human authorization.
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
@@ -79,7 +80,7 @@ Factual state at this checkpoint:
 | S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Complete — merged via PR #13 |
 | S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Complete — merged via PR #16 |
 | S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Complete — merged via PR #19 |
-| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Gated                        |
+| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Authorized 2026-08-05        |
 | S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Gated                        |
 | S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                        |
 
@@ -120,18 +121,33 @@ What actually exists in the repository through this checkpoint:
 
 Facts observed at this checkpoint:
 
-- **PR #19 (commit `0923e9c20bc0c75094eb54e160a4eb39ab2c9828`) is the latest merged product change** — M1 Slice S5, merged to `main` on 2026-08-05 with GitHub Actions `verify` passing. It is the product state this checkpoint captures. S5's authorization and ADR-0022's acceptance merged through PR #18 at `f50f0d7`; the previous checkpoint document merged through PR #17 at `d5677a3` (historical context only).
-- **This S5 closeout documentation is the checkpoint record itself.** It lands through its own later documentation PR; only when that PR merges does its merge commit become the latest merged checkpoint commit. The tip of `main` will therefore move past the SHA above, and this artifact intentionally does not predict that PR's squash-merge SHA.
+- **PR #19 (commit `0923e9c20bc0c75094eb54e160a4eb39ab2c9828`) is the latest merged product change** — M1 Slice S5, merged to `main` on 2026-08-05 with GitHub Actions `verify` passing. It is the product state this checkpoint captures. The ADR-0023 acceptance record merged through PR #21 at `70df8c2` (the latest merged checkpoint commit); the S5 closeout checkpoint merged through PR #20 at `afb2359`, S5's authorization packet through PR #18 at `f50f0d7` (historical context only).
+- **This S6 authorization documentation is the checkpoint record itself.** It lands through its own documentation PR; only when that PR merges does its merge commit become the latest merged checkpoint commit — and only then does the S6 authorization become effective. The tip of `main` will therefore move past the SHA above, and this artifact intentionally does not predict that PR's squash-merge SHA.
 - At the checkpoint, `main` is synchronized with `origin/main` and the working tree is clean.
-- No implementation branch is active; any open branches are documentation branches for this checkpoint. Closing S5 does not authorize S6.
+- No implementation branch is active yet; any open branches are documentation branches for this checkpoint. S6 implementation may begin only after this authorization PR merges and `main` is synchronized with a clean working tree.
 
 **A replacement conductor MUST inspect the actual Git state (`git status`, `git log --oneline --decorate -10`, `git remote -v`) and trust Git over any recorded prose — here or anywhere else.** A future handoff MUST replace this section with the state actually observed at its checkpoint, never copy Git facts forward.
 
 ## 7. Current Authorized Work
 
-**No implementation slice is currently active.** Slice S5 — the reconciliation engine (`m1-v1`) in `packages/graph-model` — is complete and closed: human-authorized in principle 2026-07-31, released by Joseph Carfagno's explicit acceptance of [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) — the binding `m1-v1` reconciliation specification — on 2026-08-05 after independent review (acceptance record merged through PR #18 at `f50f0d7`), implemented under accepted ADR-0022 within its § 14 boundary, independently reviewed with **no blocking findings** (the independent reviewer reran `./scripts/verify.sh` successfully), and merged through PR #19 at `0923e9c` on 2026-08-05 with GitHub Actions `verify` passing. **Closing S5 did not authorize S6.**
+**Slice S6 — the snapshot layer and in-memory stores in `packages/graph-model` — is the only active authorized implementation slice.** Joseph Carfagno **explicitly authorized S6 on 2026-08-05** in a separate authorization decision recorded in [TASKS.md](TASKS.md), following — and distinct from — his acceptance of [ADR-0023](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) the same day. **The authorization is effective only after the documentation PR recording it merges to `main` and `main` is synchronized locally with a clean working tree** — no S6 implementation file may be created before that. **Authorization does not approve future S6 implementation output**: that output still requires implementation under accepted ADR-0023, independent review, passing local `./scripts/verify.sh` verification, PR approval with GitHub Actions `verify` passing, and merge. S6 is not implemented, reviewed, approved, complete, or merged.
 
-**The S6 pre-release architecture and authorization review is complete:** [ADR-0023](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) — the S6 review packet auditing the eighteen assigned S6-readiness behaviors — was **explicitly accepted by Joseph Carfagno on 2026-08-05 after three independent-review correction passes**, settling all nine identified S6 design gaps (clock injection and cursorless "latest" resolution; graph/Evidence cursor-bound continuation reads; unsupported-`derivationVersion` rejection with the `m1-v2` seed's proof obligation; the snapshot content-addressing payload; checksum construction with complete semantic horizon validity and empty-snapshot semantics; identity-scoped referential-integrity enforcement; caller-input protection and returned-value isolation; `appendEvidence` batch atomicity with the exact shared-schema boundary; and the repository error taxonomy with closed `code`/`reason` literals and exact property contracts). With acceptance, ADR-0023 amends ADR-0016, ADR-0018, and ADR-0019 via metadata-only notices. **Acceptance does not authorize S6 implementation — the next permitted action is a separate, explicit S6 authorization decision recorded in [TASKS.md](TASKS.md), not implementation.** S6 (snapshot layer + in-memory stores implementing the S2 interfaces) remains gated until it receives its own explicit human release; S7–S8 and M2+ remain gated behind their own releases.
+**The S6 design baseline:** [ADR-0023](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) — the S6 review packet auditing the eighteen assigned S6-readiness behaviors — was **explicitly accepted by Joseph Carfagno on 2026-08-05 after three independent-review correction passes**, settling all nine identified S6 design gaps (clock injection and cursorless "latest" resolution; graph/Evidence cursor-bound continuation reads; unsupported-`derivationVersion` rejection with the `m1-v2` seed's proof obligation; the snapshot content-addressing payload; checksum construction with complete semantic horizon validity and empty-snapshot semantics; identity-scoped referential-integrity enforcement; caller-input protection and returned-value isolation; `appendEvidence` batch atomicity with the exact shared-schema boundary; and the repository error taxonomy with closed `code`/`reason` literals and exact property contracts). With acceptance, ADR-0023 amends ADR-0016, ADR-0018, and ADR-0019 via metadata-only notices. **ADR-0023 is the binding S6 clarification and remains Accepted, unchanged** — architecture acceptance (2026-08-05) and implementation authorization (also 2026-08-05, but a separate decision) are distinct gates, both now passed for S6.
+
+**Authorized S6 implementation scope** (per [ADR-0023 § 10](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) and [docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)) — `packages/graph-model/src/**` only:
+
+- Snapshot construction.
+- Snapshot identity, payload, and checksum construction.
+- In-memory `EvidenceStore` and `TopologyGraphStore` implementations.
+- The required injected `Clock` type and derivation-version lookup.
+- Graph and Evidence cursor binding and continuation validation.
+- Identity-scoped relationship referential-integrity enforcement.
+- The repository error taxonomy from ADR-0023 § 9.
+- Registration of the existing S2 repository contract suite using an injected fixture loader.
+- Colocated focused tests.
+- Plus TASKS.md, solely for factual S6 progress reporting.
+
+**S6 must NOT change or implement:** `packages/shared` or any S1/S2 schema, type, interface, or contract; `fixtures/demo-company/**`; any package manifest or lockfile; any new dependency or dependency upgrade; `apps/api` or S7 query/API behavior; `apps/web` or frontend behavior; connectors, authentication, infrastructure, deployment, or real-system access; `m1-v2` or any second derivation policy; `scripts/verify.sh` or `scripts/bootstrap.sh`; or any S7, S8, M2, or later work. **S1–S5 remain complete; S7–S8 and M2+ remain gated behind their own explicit releases.**
 
 **S5 (context) is complete. What S5 delivered** (details in [TASKS.md](TASKS.md) and `packages/graph-model/src/`):
 
@@ -148,9 +164,9 @@ Facts observed at this checkpoint:
 - The query-time freshness classification helper (negative age rejected).
 - 129 graph-model tests passing in total, 47 of them focused S5 tests proving the ADR-0022 invariants.
 
-**Permitted work now:** maintenance and corrections of the merged M0 foundation, S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, and S5 reconciliation engine; maintenance of the approved planning and checkpoint documentation. Nothing else — no S6–S8 or M2+ work of any kind, including "preparatory" implementation.
+**Permitted work now:** the authorized S6 implementation scope above (effective only once this authorization PR merges and `main` is synchronized with a clean working tree); maintenance and corrections of the merged M0 foundation, S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, and S5 reconciliation engine; maintenance of the approved planning and checkpoint documentation. Nothing else — no S7–S8 or M2+ work of any kind, including "preparatory" implementation.
 
-**Next-agent preflight** (run before acting on this checkpoint): `git status` (clean tree required), `git log --oneline --decorate -10` (confirm position against this document), then read [TASKS.md](TASKS.md) before any work. Any implementation slice work requires an explicit human release recorded in TASKS.md first; none is in effect.
+**Next-agent preflight** (run before acting on this checkpoint): `git status` (clean tree required), `git log --oneline --decorate -10` (confirm position against this document — the S6 authorization is effective only if the PR recording it has merged to `main`), then read [TASKS.md](TASKS.md) before any work. S6 is the only implementation slice with an explicit human release recorded in TASKS.md; S7–S8 have none.
 
 **The checkpoint/slice cycle, in order:**
 
@@ -166,19 +182,17 @@ Facts observed at this checkpoint:
 
 ## 8. Prohibited Work
 
-**S5 is closed and no implementation slice is active — all implementation work is prohibited until the next slice is explicitly released.** In particular, the following remain unauthorized:
+**S6 is the only authorized implementation slice** (effective only after this authorization PR merges and `main` is synchronized with a clean working tree — no S6 file may be created before that). Everything else remains prohibited, in particular:
 
-- S6 implementation of any kind, including "preparatory" snapshot or store drafting — the S6 pre-release architecture review is complete (ADR-0023 accepted 2026-08-05), but the next permitted action is a separate, explicit S6 authorization decision only.
+- Any S6 implementation before the authorization PR recording this decision has merged to `main` and `main` is synchronized locally with a clean working tree.
+- Any S6 work outside the authorized scope in § 7 — including changes to `packages/shared` (the frozen S1/S2 contract), `fixtures/demo-company/**`, package manifests or lockfiles, `apps/api`, `apps/web`, `scripts/verify.sh`, `scripts/bootstrap.sh`, and any `m1-v2` or second derivation policy.
 - Changes to existing S1 schemas, S2 repository contracts, the merged S3 fixture catalog, the merged S4 temporal foundations, or the merged S5 reconciliation engine beyond maintenance corrections.
-- Repository or storage implementations (S6).
-- Snapshot construction, snapshot payload builders, replay, or checksums-on-snapshots (S6).
-- Referential-integrity enforcement (S2-defined, S6-proven).
 - API routes (S7).
 - Frontend changes.
 - Connector or infrastructure work.
 - New third-party dependencies, version upgrades, or lockfile changes.
 - Real systems, employer data, credentials, or proprietary names — synthetic, fictional data only.
-- S6–S8 or M2+ work.
+- S7–S8 or M2+ work.
 - Deployment or external publication.
 
 Standing prohibitions regardless of slice: never weaken `scripts/verify.sh` (protected verification contract, ADR-0013); never edit accepted ADRs (supersede or amend via a new ADR); never bypass the query-API-only read path; never implement anything contradicting [PROJECT_SPEC.md § 7 Non-Goals](PROJECT_SPEC.md#7-non-goals--what-atlast-will-not-become); no autonomous production behavior of any kind.
@@ -232,15 +246,19 @@ Operating rules, non-negotiable:
   milestones. Do not authorize, imply, or begin gated work.
 - Current slice state: S1–S5 are complete and merged (S5, the m1-v1
   reconciliation engine, merged through PR #19 at 0923e9c on
-  2026-08-05 after independent review with no blocking findings; its
-  authorization packet — the ADR-0022 acceptance record — through
-  PR #18 at f50f0d7). NO implementation slice is currently active:
-  closing S5 did not authorize S6. The S6 pre-release architecture
-  review is complete — ADR-0023 was accepted 2026-08-05, settling
-  all nine identified S6 design gaps — but its acceptance does not
-  authorize S6 implementation. The next permitted action is a
-  separate, explicit S6 authorization decision, not implementation.
-  S6–S8 and M2+ remain gated, each on its own explicit human
+  2026-08-05 after independent review with no blocking findings).
+  The S6 pre-release architecture review is complete — ADR-0023 was
+  accepted 2026-08-05, settling all nine identified S6 design gaps,
+  and remains the binding S6 clarification. Separately from that
+  acceptance, Joseph Carfagno explicitly authorized Slice S6 on
+  2026-08-05 (recorded in TASKS.md): S6 is the only active
+  authorized implementation slice, effective only after the
+  documentation PR recording the authorization merged to main with
+  main synchronized locally and a clean working tree — verify that
+  merge in Git before treating S6 as releasable. The authorization
+  does not approve S6 implementation output, which still requires
+  independent review, verification, PR approval, and merge.
+  S7–S8 and M2+ remain gated, each on its own explicit human
   release recorded in TASKS.md.
 - Review implementation output independently against the accepted ADRs and
   GUARDRAILS.md before recommending human approval.
