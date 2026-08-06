@@ -1,9 +1,11 @@
 # ADR-0016: Temporal Graph and Snapshots — Bitemporal Records, Derived Snapshots, Deterministic Replay
 
-**Status:** Accepted; amended by [ADR-0021](0021-jcs-canonicalization-clarifications.md)
+**Status:** Accepted; amended by [ADR-0021](0021-jcs-canonicalization-clarifications.md) and [ADR-0023](0023-m1-snapshot-and-in-memory-store-semantics.md)
 **Date:** 2026-07-23
 
 > **Approval note (2026-07-23):** Accepted by human review as part of the **M1 architecture baseline**. Acceptance settles the M1 temporal design only — it does **not** authorize implementation. M1 implementation requires a separate, explicit human authorization ([docs/milestones.md](../milestones.md)).
+
+> **Amendment notice (2026-08-05):** [ADR-0023](0023-m1-snapshot-and-in-memory-store-semantics.md) (Accepted) completes, without altering, this ADR's snapshot clauses: the **exact snapshot content-addressing payload and checksum construction** (the canonical `{derivationVersion, asOf, horizon, visibleAssertionIdentifiers}` payload digested through the S4 primitives, with subject count computed alongside but never hashed) and **complete semantic horizon validity** (an empty Evidence store has no valid graph-read horizon; a pinned horizon is valid exactly when `firstRecordedSequence ≤ horizon ≤ currentWatermark`, with loud rejection below and above that range — a future horizon is never silently served as the watermark, preserving this ADR's pinned-replay guarantee). This ADR's accepted decision text below is **preserved verbatim**; ADR-0023 specifies what this ADR described in general form.
 
 > **Amendment notice (2026-07-31):** [ADR-0021](0021-jcs-canonicalization-clarifications.md) (Accepted) amends this ADR's canonical-serialization clauses. ADR-0021 controls where this ADR says JCS object keys are sorted "by Unicode code point" — **property names are sorted as arrays of raw UTF-16 code units** per RFC 8785 § 3.2.3 — and where this ADR globally says "`null` never appears in canonical serialization" — **generic JCS preserves explicit `null`**, while absent optional domain fields remain omitted by payload builders (an Atlast payload rule, not a serializer rule). The decision text below is **preserved verbatim as accepted** — where those clauses differ, ADR-0021 controls. Every other decision in this ADR — the bitemporal axes, `recordedSequence`, horizons, validity, replay, and snapshot semantics — remains in force unchanged.
 
