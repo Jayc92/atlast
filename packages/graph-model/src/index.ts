@@ -5,10 +5,16 @@
  * contract per accepted ADR-0022) — the deeply frozen derivation policy,
  * identity normalization and stable identifier construction, event-time
  * standing-claim reconciliation with content-addressed GraphAssertion
- * revision history, and the query-time freshness classifier.
+ * revision history, and the query-time freshness classifier — plus the S6-A
+ * pure repository and snapshot foundations (accepted ADR-0023 §§ 1–5, 9):
+ * the injected `Clock` type, the derivation-version lookup, the repository
+ * error taxonomy, graph/Evidence cursor payload encoding, and the pure
+ * snapshot-checksum builder.
  *
- * Snapshot construction/replay and repository implementations (S6) and API
- * routes (S7) arrive with their own explicitly released slices.
+ * The in-memory `EvidenceStore`/`TopologyGraphStore` implementations,
+ * cursor-bound request-binding comparison, referential-integrity
+ * enforcement, and contract-suite registration (S6-B onward) and API routes
+ * (S7) arrive with their own explicitly released slices.
  */
 export { compareUtf16CodeUnits } from "./utf16-comparator.ts";
 export {
@@ -44,3 +50,37 @@ export {
   reconcileEvidenceAtHorizon,
   type ReconciliationResult,
 } from "./reconciliation.ts";
+export { assertValidClockReading, type Clock } from "./clock.ts";
+export {
+  ACTIVE_DERIVATION_VERSION,
+  resolveDerivationPolicy,
+} from "./derivation-version-lookup.ts";
+export {
+  EvidenceAppendError,
+  InvalidReadCoordinateError,
+  ReferentialIntegrityError,
+  UnknownIdentifierError,
+  type CursorKind,
+  type CursorMismatchField,
+  type EndpointRole,
+  type EvidenceAppendErrorParams,
+  type EvidenceAppendErrorReason,
+  type IdentifierKind,
+  type InvalidReadCoordinateErrorParams,
+  type InvalidReadCoordinateReason,
+  type ReferentialIntegrityErrorParams,
+  type UnknownIdentifierErrorParams,
+} from "./repository-errors.ts";
+export {
+  decodeEvidenceCursor,
+  decodeGraphCursor,
+  encodeEvidenceCursor,
+  encodeGraphCursor,
+  type EvidenceCursorPayload,
+  type GraphCursorOperation,
+  type GraphCursorPayload,
+} from "./cursor-payload.ts";
+export {
+  buildSnapshotChecksum,
+  type SnapshotChecksumInput,
+} from "./snapshot-checksum.ts";
