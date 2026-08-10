@@ -15,10 +15,15 @@
  * atomic, schema-validated append; the current watermark; identifier
  * lookup; and cursor-bound, horizon-pinned Evidence listing.
  *
+ * plus the S6-C1 pure snapshot-construction core (accepted ADR-0023 §§ 4–6,
+ * 9): composing reconciliation, validity-membership filtering,
+ * derivation-version resolution, semantic horizon validity, identity-scoped
+ * referential-integrity enforcement, and the checksum builder into one pure
+ * function producing repository-internal snapshot state.
+ *
  * The in-memory `TopologyGraphStore` implementation, graph cursor-bound
- * request-binding comparison, referential-integrity enforcement, snapshot
- * construction, and contract-suite registration (S6-C onward) and API
- * routes (S7) arrive with their own explicitly released slices.
+ * request-binding comparison, and contract-suite registration (S6-C2/S6-D)
+ * and API routes (S7) arrive with their own explicitly released slices.
  */
 export { compareUtf16CodeUnits } from "./utf16-comparator.ts";
 export {
@@ -89,3 +94,8 @@ export {
   type SnapshotChecksumInput,
 } from "./snapshot-checksum.ts";
 export { InMemoryEvidenceStore } from "./evidence-store.ts";
+export {
+  buildSnapshot,
+  type Snapshot,
+  type SnapshotSubjectView,
+} from "./snapshot-construction.ts";
