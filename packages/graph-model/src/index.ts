@@ -11,10 +11,14 @@
  * error taxonomy, graph/Evidence cursor payload encoding, and the pure
  * snapshot-checksum builder.
  *
- * The in-memory `EvidenceStore`/`TopologyGraphStore` implementations,
- * cursor-bound request-binding comparison, referential-integrity
- * enforcement, and contract-suite registration (S6-B onward) and API routes
- * (S7) arrive with their own explicitly released slices.
+ * plus the S6-B in-memory `EvidenceStore` (accepted ADR-0023 §§ 1–2, 5, 7–9):
+ * atomic, schema-validated append; the current watermark; identifier
+ * lookup; and cursor-bound, horizon-pinned Evidence listing.
+ *
+ * The in-memory `TopologyGraphStore` implementation, graph cursor-bound
+ * request-binding comparison, referential-integrity enforcement, snapshot
+ * construction, and contract-suite registration (S6-C onward) and API
+ * routes (S7) arrive with their own explicitly released slices.
  */
 export { compareUtf16CodeUnits } from "./utf16-comparator.ts";
 export {
@@ -84,3 +88,4 @@ export {
   buildSnapshotChecksum,
   type SnapshotChecksumInput,
 } from "./snapshot-checksum.ts";
+export { InMemoryEvidenceStore } from "./evidence-store.ts";
