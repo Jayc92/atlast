@@ -2,24 +2,46 @@
  * Pure snapshot construction (S6-C1, accepted ADR-0023 §§ 4–6, 9): compose
  * the S5 reconciliation engine, the S4 validity-membership primitive, the
  * S6-A derivation-version lookup, and the S6-A snapshot-checksum builder
- * into one pure function that produces the internal immutable snapshot
- * state a future `TopologyGraphStore` reads from.
+ * into pure functions that produce the internal immutable snapshot state a
+ * future `TopologyGraphStore` reads from.
  *
- * This module builds only the fully-resolved, referentially-sound state at
- * one exact `(asOf, horizon, derivationVersion)` identity, given the
- * complete retained Evidence a store holds (not a horizon-prefiltered
- * subset — `reconcileEvidenceAtHorizon` itself selects by horizon). It does
- * not implement any `TopologyGraphStore` query method, `latest`-mode
- * `Clock` resolution, graph cursor binding, or contract-suite registration
- * — those are later S6-C/S6-D work. The returned shape deliberately carries
- * no query-time API envelope or freshness decoration; it is repository-
- * internal state, not a `SubjectDetailResult`/`EntityPage`/etc. shape.
+ * Two entry points exist, because two different callers hold two different
+ * shapes of Evidence:
+ *
+ * - `buildSnapshot(evidenceRecords, identity)` — the complete-input builder.
+ *   Takes the **entire** retained Evidence collection a store holds (not a
+ *   horizon-prefiltered subset) and enforces the full ADR-0023 § 5 semantic
+ *   horizon-validity rule (`EMPTY_EVIDENCE_STORE`,
+ *   `HORIZON_BEFORE_FIRST_EVIDENCE`, `HORIZON_AFTER_CURRENT_WATERMARK`)
+ *   against it, computing `firstRecordedSequence`/`currentWatermark`
+ *   directly from the given records.
+ * - `buildSnapshotFromHorizonSelectedEvidence(horizonSelectedEvidence,
+ *   identity)` — the pre-selected-input builder, for a caller (the S6-C2a
+ *   snapshot resolver) that has already obtained Evidence bounded to
+ *   exactly `identity.horizon` through `EvidenceStore.listEvidence`, whose
+ *   own internal semantic-horizon check has already validated that horizon
+ *   against the store's complete bounds. This function does **not**
+ *   recompute or re-validate `firstRecordedSequence`/`currentWatermark`
+ *   from its (deliberately partial) input — doing so would incorrectly
+ *   reject a horizon that lies between retained sequences, since the
+ *   horizon-selected subset's own maximum `recordedSequence` is not
+ *   necessarily the store's true watermark. Both functions otherwise share
+ *   every remaining step: derivation-version resolution, reconciliation,
+ *   validity filtering, referential integrity, subject derivation,
+ *   checksum construction, and output freezing.
+ *
+ * Neither function implements any `TopologyGraphStore` query method,
+ * `latest`-mode `Clock` resolution, graph cursor binding, or
+ * contract-suite registration — those are later S6-C/S6-D work. The
+ * returned shape deliberately carries no query-time API envelope or
+ * freshness decoration; it is repository-internal state, not a
+ * `SubjectDetailResult`/`EntityPage`/etc. shape.
  *
  * Pure by construction: no `Clock`, no store instance state, no cache, no
  * I/O, no randomness, and no code path calls `Date.now()` or argument-less
  * `new Date()`. The caller's `evidenceRecords` array and its records are
- * never mutated or frozen — only the newly derived `Snapshot` this function
- * returns is deep-frozen.
+ * never mutated or frozen — only the newly derived `Snapshot` either
+ * function returns is deep-frozen.
  */
 import {
   snapshotIdentitySchema,
@@ -29,6 +51,7 @@ import {
   type SnapshotIdentity,
 } from "@atlast/shared";
 import { sortByIdentifier } from "./collection-order.ts";
+import type { M1V1DerivationPolicy } from "./derivation-policy.ts";
 import { resolveDerivationPolicy } from "./derivation-version-lookup.ts";
 import { reconcileEvidenceAtHorizon } from "./reconciliation.ts";
 import {
@@ -214,36 +237,18 @@ function deriveVisibleSubjectViews(
 }
 
 /**
- * Build the immutable snapshot at one exact resolved identity, from the
- * complete retained Evidence a store holds (ADR-0023 §§ 4–6):
- *
- * 1. Validate `identity` through the shared `snapshotIdentitySchema`.
- * 2. Resolve `derivationVersion` to its policy (`resolveDerivationPolicy`);
- *    an unsupported token rejects loudly, never silently substituting the
- *    active policy.
- * 3. Enforce semantic horizon validity against the retained Evidence.
- * 4. Call `reconcileEvidenceAtHorizon` exactly once with the resolved
- *    policy to obtain the complete revision history at that horizon.
- * 5. Filter to assertions visible at `identity.asOf`
- *    (`isTimestampWithinValidity`).
- * 6. Derive visible subjects exactly from the visible assertion set.
- * 7. Enforce identity-scoped referential integrity over the visible
- *    relationship assertions.
- * 8. Build the ADR-0023 § 4 checksum from exactly
- *    `{ derivationVersion, asOf, horizon, visibleAssertionIdentifiers }`.
- * 9. Report `subjectCount` as the distinct visible-subject count, beside —
- *    never inside — the checksum payload.
+ * The shared core of both entry points, run against an already-validated
+ * resolved identity and an already-resolved policy: reconcile, filter to
+ * visible assertions, enforce referential integrity, derive visible
+ * subjects, and build the checksum. Neither semantic horizon validity nor
+ * derivation-version resolution happens here — each caller performs those
+ * differently (§ see module docstring) before reaching this point.
  */
-export function buildSnapshot(
+function constructSnapshot(
   evidenceRecords: readonly Evidence[],
-  identity: SnapshotIdentity,
+  resolvedIdentity: SnapshotIdentity,
+  policy: M1V1DerivationPolicy,
 ): Snapshot {
-  const resolvedIdentity = snapshotIdentitySchema.parse(identity);
-
-  const policy = resolveDerivationPolicy(resolvedIdentity.derivationVersion);
-
-  assertSemanticallyValidHorizon(evidenceRecords, resolvedIdentity.horizon);
-
   const reconciliationResult = reconcileEvidenceAtHorizon(
     evidenceRecords,
     resolvedIdentity.horizon,
@@ -277,4 +282,75 @@ export function buildSnapshot(
     subjectCount: subjects.length,
     subjects,
   });
+}
+
+/**
+ * Build the immutable snapshot at one exact resolved identity, from the
+ * complete retained Evidence a store holds (ADR-0023 §§ 4–6):
+ *
+ * 1. Validate `identity` through the shared `snapshotIdentitySchema`.
+ * 2. Resolve `derivationVersion` to its policy (`resolveDerivationPolicy`);
+ *    an unsupported token rejects loudly, never silently substituting the
+ *    active policy.
+ * 3. Enforce semantic horizon validity against the complete retained
+ *    Evidence (`firstRecordedSequence`/`currentWatermark` computed directly
+ *    from `evidenceRecords`).
+ * 4. Call `reconcileEvidenceAtHorizon` exactly once with the resolved
+ *    policy to obtain the complete revision history at that horizon.
+ * 5. Filter to assertions visible at `identity.asOf`
+ *    (`isTimestampWithinValidity`).
+ * 6. Derive visible subjects exactly from the visible assertion set.
+ * 7. Enforce identity-scoped referential integrity over the visible
+ *    relationship assertions.
+ * 8. Build the ADR-0023 § 4 checksum from exactly
+ *    `{ derivationVersion, asOf, horizon, visibleAssertionIdentifiers }`.
+ * 9. Report `subjectCount` as the distinct visible-subject count, beside —
+ *    never inside — the checksum payload.
+ */
+export function buildSnapshot(
+  evidenceRecords: readonly Evidence[],
+  identity: SnapshotIdentity,
+): Snapshot {
+  const resolvedIdentity = snapshotIdentitySchema.parse(identity);
+  const policy = resolveDerivationPolicy(resolvedIdentity.derivationVersion);
+  assertSemanticallyValidHorizon(evidenceRecords, resolvedIdentity.horizon);
+  return constructSnapshot(evidenceRecords, resolvedIdentity, policy);
+}
+
+/**
+ * **Package-internal.** Not exported from `./index.ts`, and not part of
+ * `@atlast/graph-model`'s public surface — imported directly by
+ * `./snapshot-resolver.ts` only. This function deliberately bypasses the
+ * semantic-horizon validation `buildSnapshot` performs, so it is unsafe to
+ * call with Evidence a caller has not already obtained through a
+ * horizon-validating path.
+ *
+ * Build the immutable snapshot at one exact resolved identity, from
+ * Evidence a caller has **already** obtained bounded to exactly
+ * `identity.horizon` via `EvidenceStore.listEvidence(identity.horizon, …)`
+ * — the frozen `EvidenceStore` interface's own `listEvidence` method,
+ * whose internal semantic-horizon check has already validated that horizon
+ * against the store's complete bounds (ADR-0023 § 5), is the only
+ * caller-side precondition that makes calling this function safe.
+ *
+ * This function performs every remaining step `buildSnapshot` performs
+ * (derivation-version resolution, reconciliation, validity filtering,
+ * referential integrity, subject derivation, checksum construction,
+ * freezing) but **never** re-derives or re-validates semantic horizon
+ * bounds from `horizonSelectedEvidence` itself — that input is, by
+ * construction, only the subset at or below the horizon, so computing
+ * `firstRecordedSequence`/`currentWatermark` from it would not reflect the
+ * store's true bounds and could wrongly reject a horizon that legitimately
+ * lies between retained sequences. Callers that hold the complete retained
+ * collection, or that have not already validated the horizon through
+ * `EvidenceStore.listEvidence`, must use the public `buildSnapshot`
+ * instead.
+ */
+export function buildSnapshotFromHorizonSelectedEvidence(
+  horizonSelectedEvidence: readonly Evidence[],
+  identity: SnapshotIdentity,
+): Snapshot {
+  const resolvedIdentity = snapshotIdentitySchema.parse(identity);
+  const policy = resolveDerivationPolicy(resolvedIdentity.derivationVersion);
+  return constructSnapshot(horizonSelectedEvidence, resolvedIdentity, policy);
 }

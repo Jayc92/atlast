@@ -21,8 +21,13 @@
  * referential-integrity enforcement, and the checksum builder into one pure
  * function producing repository-internal snapshot state.
  *
+ * plus the S6-C2a snapshot resolver (accepted ADR-0023 §§ 1, 5): resolving
+ * cursorless-`latest`, pinned, and cursor-authoritative requests into
+ * cached, immutable snapshots via bounded `EvidenceStore.listEvidence`
+ * paging and the package-internal horizon-selected snapshot builder.
+ *
  * The in-memory `TopologyGraphStore` implementation, graph cursor-bound
- * request-binding comparison, and contract-suite registration (S6-C2/S6-D)
+ * request-binding comparison, and contract-suite registration (S6-C2b+/S6-D)
  * and API routes (S7) arrive with their own explicitly released slices.
  */
 export { compareUtf16CodeUnits } from "./utf16-comparator.ts";
@@ -99,3 +104,4 @@ export {
   type Snapshot,
   type SnapshotSubjectView,
 } from "./snapshot-construction.ts";
+export { SnapshotResolver } from "./snapshot-resolver.ts";
