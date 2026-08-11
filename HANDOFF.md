@@ -67,21 +67,22 @@ Factual state at this checkpoint:
 - **S5 is complete and closed** — human-authorized in principle 2026-07-31, released by Joseph Carfagno's explicit acceptance of [ADR-0022](docs/adr/0022-m1-reconciliation-policy-and-assertion-derivation.md) (the binding `m1-v1` reconciliation specification) on 2026-08-05 after independent review (acceptance record merged through PR #18 at `f50f0d7`), implemented under accepted ADR-0022, independently reviewed with **no blocking findings** (the reviewer reran `./scripts/verify.sh` successfully), and merged through PR #19 at `0923e9c` on 2026-08-05 with GitHub Actions `verify` passing.
 - **The S6 pre-release architecture and authorization review is complete** — [ADR-0023](docs/adr/0023-m1-snapshot-and-in-memory-store-semantics.md) was explicitly accepted by Joseph Carfagno on 2026-08-05 after three independent-review correction passes, settling all nine identified S6 design gaps (and amending ADR-0016/0018/0019 via metadata-only notices). **ADR-0023 is the binding S6 clarification and remains Accepted, unchanged**.
 - **S6 is complete** — Joseph Carfagno explicitly authorized S6 on 2026-08-05, recorded in [TASKS.md](TASKS.md); S6 was implemented under accepted ADR-0023, independently reviewed, and merged to `main` through [PR #23](https://github.com/Jayc92/atlast/pull/23) at `9bf7f09` on 2026-08-10 with GitHub Actions `verify` passing. **No implementation slice is currently active — closing S6 does not authorize S7.**
-- **S7–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release. No S7 query/API, S8 closeout, frontend, connector, infrastructure, or dependency work is authorized.
+- **The S7 pre-release architecture and contract review is complete** — [ADR-0024](docs/adr/0024-m1-query-api-runtime-contract.md) was explicitly accepted by Joseph Carfagno on 2026-08-11, after the S7 pre-release review and three independent correction passes, settling fifteen genuine, implementation-critical HTTP-boundary and build-boundary gaps (and amending ADR-0017/0020 via metadata-only notices). **ADR-0024 is the binding S7 runtime contract and remains Accepted, unchanged. Acceptance settles the S7 design only — it does not authorize S7 implementation.**
+- **S7–S8 remain gated and unauthorized**, each on the preceding slice's merge and its own explicit release. No S7 query/API, S8 closeout, frontend, connector, infrastructure, or dependency work is authorized. **No implementation slice is currently active.**
 - **M2–M5 remain unauthorized**, each gated on its own explicit human authorization.
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
 
-| Slice | Purpose                                                                                                                                                                       | Status                       |
-| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| S1    | Domain schemas in `packages/shared`: Evidence, identity-only subjects, claim union, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, rejection tests | Complete — merged via PR #7  |
-| S2    | Async repository interfaces (full M1 read contract) in `packages/shared` + storage-agnostic contract-test suite skeleton                                                      | Complete — merged via PR #10 |
-| S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Complete — merged via PR #13 |
-| S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Complete — merged via PR #16 |
-| S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Complete — merged via PR #19 |
-| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Complete — merged via PR #23 |
-| S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Gated                        |
-| S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                        |
+| Slice | Purpose                                                                                                                                                                       | Status                                                       |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| S1    | Domain schemas in `packages/shared`: Evidence, identity-only subjects, claim union, content-addressed GraphAssertion revisions, identifiers, `schemaVersion`, rejection tests | Complete — merged via PR #7                                  |
+| S2    | Async repository interfaces (full M1 read contract) in `packages/shared` + storage-agnostic contract-test suite skeleton                                                      | Complete — merged via PR #10                                 |
+| S3    | Fixture suite v1 in `fixtures/demo-company/`: the § 6 scenario catalog as validated Evidence files with declared timestamps                                                   | Complete — merged via PR #13                                 |
+| S4    | Temporal foundations in `packages/graph-model`: Evidence total order, validity intervals, canonical serialization                                                             | Complete — merged via PR #16                                 |
+| S5    | Reconciliation engine in `packages/graph-model`: derivation policy `m1-v1` — matching, corroboration, confidence, conflict, ambiguity, rule traces                            | Complete — merged via PR #19                                 |
+| S6    | Snapshot layer + in-memory stores implementing the S2 interfaces; the contract suite passes end-to-end                                                                        | Complete — merged via PR #23                                 |
+| S7    | Query API v1 routes in `apps/api` with integration tests as executable specification                                                                                          | Design accepted (ADR-0024, 2026-08-11); implementation gated |
+| S8    | Acceptance additions (only if the shell changes), M1 boundary re-audit, documentation closeout                                                                                | Gated                                                        |
 
 **Milestone purposes** ([docs/milestones.md](docs/milestones.md)):
 
@@ -149,6 +150,8 @@ Facts observed at this checkpoint:
 
 **S6 stayed within its authorized scope** (`packages/graph-model/src/**` plus `TASKS.md`): no change to `packages/shared`, `fixtures/demo-company/**`, package manifests or lockfiles, `apps/api`, `apps/web`, `scripts/verify.sh`, `scripts/bootstrap.sh`, `m1-v2` or any second derivation policy, or any S7, S8, M2, or later work.
 
+**The S7 architecture and runtime contract is now settled — [ADR-0024](docs/adr/0024-m1-query-api-runtime-contract.md), Accepted 2026-08-11.** ADR-0024 closes fifteen HTTP-boundary and build-boundary gaps left open by accepted ADR-0017 (as amended by ADR-0020): the exact route inventory and per-route parameters, request coercion, the closed error-response contract, cursor-transport policy, asynchronous application initialization, the direct workspace dependencies `apps/api` will require, and the production-valid build strategy for `packages/shared`/`packages/graph-model`. With acceptance, ADR-0024 amends ADR-0017 and ADR-0020 via metadata-only notices (their accepted decision text preserved verbatim). **This settles the S7 design only — it does not authorize S7 implementation.** No implementation slice is currently active; S7 still requires its own separate, explicit human release recorded in [TASKS.md](TASKS.md).
+
 **Permitted work now:** maintenance and corrections of the merged M0 foundation and the merged S1–S6 slices; maintenance of the approved planning and checkpoint documentation. Nothing else — no S7–S8 or M2+ work of any kind, including "preparatory" implementation, until the human explicitly releases the next slice.
 
 **Next-agent preflight** (run before acting on this checkpoint): `git status` (clean tree required), `git log --oneline --decorate -10` (confirm position against this document — S6's merge commit `9bf7f09` should be at or behind the tip of `main`), then read [TASKS.md](TASKS.md) before any work. No implementation slice currently has an explicit human release recorded in TASKS.md; S7–S8 remain gated.
@@ -169,7 +172,7 @@ This checkpoint satisfies conditions 1–4 for S6's close. Condition 5 (the next
 
 ## 8. Prohibited Work
 
-**No implementation slice is currently authorized.** S7 in particular is not authorized by S6's completion or merge. Everything beyond maintenance of the merged M0–S6 foundation and approved documentation remains prohibited, in particular:
+**No implementation slice is currently authorized.** S7 in particular is not authorized by S6's completion or merge, nor by ADR-0024's acceptance — accepting the S7 design settles the contract S7 must implement; it does not release S7 itself. Everything beyond maintenance of the merged M0–S6 foundation and approved documentation remains prohibited, in particular:
 
 - Any S7 implementation (query API v1 routes, HTTP error-code mapping, or a production `Clock` at the composition root) before its own separate, explicit human release recorded in TASKS.md.
 - Any S8 work (acceptance additions, M1 boundary re-audit, documentation closeout) before its own release.
@@ -233,9 +236,15 @@ Operating rules, non-negotiable:
 - Current slice state: S1–S6 are complete and merged (S6, the
   snapshot layer and in-memory repositories, merged through PR #23
   at 9bf7f09 on 2026-08-10 after independent review, implementing
-  accepted ADR-0023). No implementation slice is currently active —
-  closing S6 does not authorize S7. S7–S8 and M2+ remain gated, each
-  on its own explicit human release recorded in TASKS.md.
+  accepted ADR-0023). The S7 pre-release architecture and runtime
+  contract is separately settled — ADR-0024 was explicitly accepted
+  by Joseph Carfagno on 2026-08-11 (amending ADR-0017/0020 via
+  metadata-only notices) — but that acceptance settles the S7 design
+  only and does not authorize S7 implementation. No implementation
+  slice is currently active — closing S6 does not authorize S7, and
+  accepting ADR-0024 does not authorize S7 either. S7–S8 and M2+
+  remain gated, each on its own explicit human release recorded in
+  TASKS.md.
 - Review implementation output independently against the accepted ADRs and
   GUARDRAILS.md before recommending human approval.
 - Assign one bounded task at a time, with explicit scope, prohibited actions,
@@ -258,6 +267,6 @@ code until the human confirms your understanding and explicitly releases work.
 
 - **Trustworthy graph correctness is the product risk.** One confidently wrong answer costs more trust than many right ones earn; every honesty mechanism (provenance, confidence, freshness, visible conflict) exists to mitigate it and must survive every slice.
 - **Fixtures must keep exercising non-vacuous contract cases.** The S2 contract suite fails loudly when a seed lacks a required scenario (conflicting-type entity, relationship claims, multi-entity cursors). The merged S3 catalog supplies those scenarios with per-scenario adequacy checks, and S6's contract run (all 23 cases, unmodified) now proves this against the real in-memory implementations; any future fixture maintenance must preserve that adequacy.
-- **No usable topology product exists until later M1 slices.** Through S6 the repository contains contracts, shells, fixture data, temporal primitives, the reconciliation engine, and the snapshot/storage layer — no query routes or topology visualization; expectation management matters when demonstrating progress. Query API routes are S7's scope, not yet authorized.
-- **Workspace source-alias convention.** `packages/graph-model` consumes `@atlast/shared` as TypeScript source through a tsconfig `paths` mapping and matching Vitest alias because workspace packages expose no build entry points yet; a future reviewed change may formalize entry points, and until then new intra-workspace consumers must replicate the alias pattern.
+- **No usable topology product exists until later M1 slices.** Through S6 the repository contains contracts, shells, fixture data, temporal primitives, the reconciliation engine, and the snapshot/storage layer — no query routes or topology visualization; expectation management matters when demonstrating progress. Query API routes are S7's scope — its design is now settled by accepted ADR-0024, but implementation remains unauthorized.
+- **Workspace source-alias convention.** `packages/graph-model` consumes `@atlast/shared` as TypeScript source through a tsconfig `paths` mapping and matching Vitest alias because workspace packages expose no build entry points yet. Accepted [ADR-0024](docs/adr/0024-m1-query-api-runtime-contract.md) § 14 has now specified the production-valid package-entry-point build strategy that formalizes this (real `dist`/`main`/`types`/`exports` for `packages/shared` and `packages/graph-model`, source aliases retained for typecheck/test only) — the design question is settled, but the strategy is not yet implemented; it lands with S7.
 - **Same-model coder/reviewer independence risk.** If Claude Chat conducts while Claude Code implements, both roles share a model family and may share blind spots; the human review gate is the compensating control and should be strictest exactly then.
