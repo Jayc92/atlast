@@ -26,9 +26,13 @@
  * cached, immutable snapshots via bounded `EvidenceStore.listEvidence`
  * paging and the package-internal horizon-selected snapshot builder.
  *
- * The in-memory `TopologyGraphStore` implementation, graph cursor-bound
- * request-binding comparison, and contract-suite registration (S6-C2b+/S6-D)
- * and API routes (S7) arrive with their own explicitly released slices.
+ * plus the S6-C2b in-memory `TopologyGraphStore` (accepted ADR-0023 §§ 2, 4,
+ * 6, 9): every frozen query method composed on `SnapshotResolver`, graph
+ * cursor issuance/binding/continuation, query-time freshness, deterministic
+ * ordering, bounded traversal, and Evidence-chain construction.
+ *
+ * Contract-suite registration (S6-D) and API routes (S7) arrive with their
+ * own explicitly released slices.
  */
 export { compareUtf16CodeUnits } from "./utf16-comparator.ts";
 export {
@@ -105,3 +109,4 @@ export {
   type SnapshotSubjectView,
 } from "./snapshot-construction.ts";
 export { SnapshotResolver } from "./snapshot-resolver.ts";
+export { InMemoryTopologyGraphStore } from "./topology-graph-store.ts";
