@@ -4,9 +4,18 @@
   "private": true,
   "description": "Topology graph model behind repository interfaces (ADR-0012): S4 temporal foundations — Evidence total order and horizon selection, validity-interval membership, RFC 8785 canonical serialization, collection ordering, and SHA-256 digests per ADR-0016 as amended by ADR-0021. Reconciliation (S5) and snapshots/storage (S6) are gated on their own slice releases.",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "typecheck": "tsc --project tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build": "tsc --project tsconfig.build.json"
   },
   "dependencies": {
     "@atlast/shared": "workspace:*"

@@ -164,3 +164,19 @@ export {
   type RepositoryContractCase,
   type RepositoryFactory,
 } from "./contract-suite.ts";
+export {
+  cursorMismatchFieldSchema,
+  errorResponseSchema,
+  evidenceDetailResultSchema,
+  invalidReadCoordinateDetailsSchema,
+  snapshotDetailResultSchema,
+  snapshotSummaryDataSchema,
+  unknownIdentifierDetailsSchema,
+  type CursorMismatchField,
+  type ErrorResponse,
+  type EvidenceDetailResult,
+  type InvalidReadCoordinateDetails,
+  type SnapshotDetailResult,
+  type SnapshotSummaryData,
+  type UnknownIdentifierDetails,
+} from "./http-contract.ts";

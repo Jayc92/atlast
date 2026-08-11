@@ -29,6 +29,12 @@ importers:
 
   apps/api:
     dependencies:
+      '@atlast/graph-model':
+        specifier: workspace:*
+        version: link:../../packages/graph-model
+      '@atlast/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       fastify:
         specifier: 5.10.0
         version: 5.10.0
