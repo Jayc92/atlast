@@ -1,9 +1,11 @@
 # ADR-0022: M1 Reconciliation Policy and Assertion Derivation — the Complete `m1-v1` Contract
 
-**Status:** Accepted — closes the S5 implementation gaps of ADR-0015 (no accepted decision text changes)
+**Status:** Accepted — closes the S5 implementation gaps of ADR-0015 (no accepted decision text changes); amended by ADR-0025
 **Date:** 2026-07-31
 
 > **Approval note (2026-08-05):** **Explicitly accepted by Joseph Carfagno on 2026-08-05 after independent review.** This ADR is the **binding `m1-v1` reconciliation specification** — the executable contract the S5 implementation and its review are measured against. **Acceptance authorizes M1 Slice S5 only**, within the § 14 boundary; **S5 becomes effective only after this documentation record merges to `main` and `main` is synchronized locally with a clean working tree** — no S5 file may be created before that. Acceptance does not imply approval of future S5 implementation output, which still requires implementation, independent review, passing local verification, PR/CI, merge, and checkpoint closeout. **S6–S8 and M2+ remain gated and unauthorized.** No accepted ADR's decision text is edited: ADR-0014 and ADR-0015 carry the metadata-only amendment notices described in § "Relationship to Accepted ADRs", applied with this acceptance per the ADR-0019/0020/0021 discipline.
+
+> **Amendment notice (2026-08-11):** [ADR-0025](0025-s7-source-alias-erasable-syntax-compatibility.md) (**Accepted** 2026-08-11) amends this ADR via a metadata-only notice: §§ 2–3 define `IdentityNormalizationError`'s role (thrown for every normalization failure, naming the offending Evidence identifier and failing key) without specifying the class's internal field-declaration syntax. ADR-0025 pins that syntax detail — replacing the class's two constructor parameter properties with `declare readonly` fields plus explicit constructor assignment — solely so `packages/graph-model/src/identity-normalization.ts` satisfies `apps/api`'s `erasableSyntaxOnly` compiler option (ADR-0011) once actually imported through the ADR-0024 § 14 step 5 source alias; it changes nothing about the error's semantics, message content, construction API, or the normalization algorithm this ADR defines. This ADR's decision text below is **preserved verbatim**; ADR-0025 is the sole normative source for the syntax detail it adds.
 
 ## Context
 
