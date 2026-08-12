@@ -239,7 +239,7 @@ export function reconcileEvidenceAtHorizon(
   const finishedRevisions: FinishedRevision[] = [];
 
   const draftKey = (subjectIdentifier: string, claimKey: string): string =>
-    `${subjectIdentifier} ${claimKey}`;
+    `${subjectIdentifier}\u0000${claimKey}`;
 
   /** A subject "exists in the derived state" once it has any standing claim. */
   const subjectExists = (subjectIdentifier: string): boolean => {

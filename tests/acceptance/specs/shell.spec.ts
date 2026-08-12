@@ -51,6 +51,17 @@ test("the M0 shell renders and connects to the local API", async ({ page }) => {
     page.getByRole("heading", { name: /M0 — Safe project foundation/ }),
   ).toBeVisible();
 
+  // The shell must not overclaim its own scope: M0 shows delivered, M1
+  // shows the distinct "core delivered" status (its own closeout is not
+  // yet formally complete), every later milestone still shows gated, and
+  // the M1 topology core is named as delivered behind the API — not as UI
+  // this page provides.
+  await expect(page.getByText("delivered", { exact: true })).toBeVisible();
+  await expect(page.getByText("core delivered")).toBeVisible();
+  await expect(
+    page.getByText(/The M1 synthetic topology core is delivered/),
+  ).toBeVisible();
+
   // The health indicator must reach "connected" through the real proxied
   // round trip (browser → Vite preview /api proxy → built API /health).
   // The web-first assertion auto-waits through the transient "Checking
