@@ -39,11 +39,17 @@ The client:
 
 The first successful cursorless latest graph response establishes the complete `resolvedIdentity` for the current exploration session. Every dependent inventory, detail, search, traversal, and evidence-chain graph read is pinned to that identity. Evidence lookup remains unpinned because its accepted route carries no snapshot coordinate.
 
+One exploration coordinator owns latest resolution. Panels and route children cannot initiate cursorless latest graph reads independently: concurrent consumers await the same in-flight resolution promise, and only after it validates may they issue pinned dependent reads. A navigation or explicit refresh starts a new generation; obsolete generations cannot publish identity or data.
+
 “Refresh latest” is an explicit action that performs a new latest read and adopts the new identity only after validation succeeds. A failed refresh leaves the prior result visible but clearly labeled as the previous snapshot, with the failure shown; it is never relabeled current.
 
 Every request belongs to a monotonically increasing client generation. Aborted or late responses from an obsolete generation are ignored.
 
-### 5. Correct the local proxy exactly
+### 5. Enforce the browser import boundary
+
+M2-A adds an ESLint restricted-import rule for `apps/web/src/**` that rejects imports from fixtures, `packages/graph-model`, repository implementations, and API server modules. Direct `@atlast/shared` HTTP schemas remain allowed. The rule and a directly corresponding configuration test or lint fixture must prove that a representative forbidden import fails.
+
+### 6. Correct the local proxy exactly
 
 Vite development and preview proxy rules distinguish:
 
@@ -52,7 +58,7 @@ Vite development and preview proxy rules distinguish:
 
 No catch-all rewrite strips the `/api` prefix from versioned routes. Browser acceptance must exercise a real versioned API request through the built preview server, not only the health route.
 
-### 6. Keep caching bounded and transparent
+### 7. Keep caching bounded and transparent
 
 M2 uses an in-memory request cache owned by the API-client layer; no new caching library or persistent browser database is introduced. Keys include operation, complete resolved identity, identifiers/filters/bounds, and cursor where applicable. Cache lifetime ends on page reload. The UI always exposes the snapshot identity behind cached graph data.
 
@@ -78,6 +84,8 @@ M2 uses an in-memory request cache owned by the API-client layer; no new caching
 - Runtime schema rejection tests for malformed success and error payloads.
 - Complete-pin URL parser tests: all three identity fields or none.
 - Latest-to-pinned coordination tests across multiple calls.
+- Single-flight initial/latest-resolution tests proving concurrent panels share one cursorless graph request.
 - Abort/late-response race tests.
+- Lint-boundary proof rejecting representative fixture, graph-model, repository, and API-server imports from `apps/web/src/**`.
 - Browser back/forward and copied-URL acceptance tests.
 - Built preview -> real API tests for `/api/health` and at least one `/api/v1` route.

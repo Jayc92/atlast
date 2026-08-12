@@ -59,6 +59,10 @@ Graph and structured views share one selection model. Changing views does not lo
 - Touch and keyboard controls have visible alternatives outside the canvas.
 - `prefers-reduced-motion` disables nonessential animated transitions.
 
+### 7. Set a concrete accessibility target
+
+All M2 browser routes target [WCAG 2.2 Level AA](https://www.w3.org/TR/WCAG22/). The structured topology view is the normative semantic equivalent of the graph, not a reduced fallback. Automated checks supplement but do not replace keyboard, focus, zoom/reflow, reduced-motion, contrast/non-color, and representative screen-reader verification. Any applicable Level AA failure blocks M2 closeout unless a narrower exception is explicitly reviewed and recorded.
+
 ## Consequences
 
 - The project avoids building low-level graph interaction and layout engines.
@@ -84,3 +88,4 @@ Graph and structured views share one selection model. Changing views does not lo
 - Structured/graph view equivalence tests over the same fixture response.
 - Mobile and desktop browser acceptance for the primary exploration journey.
 - Reduced-motion and non-color state tests.
+- WCAG 2.2 AA audit covering keyboard operation, focus order/visibility, semantics and names, zoom/reflow, contrast, status/error announcements, and target size, with manual evidence for behavior automation cannot establish.

@@ -39,6 +39,7 @@ The M2 exit criteria remain those in [docs/milestones.md](milestones.md):
 - Topology editing, annotations, mutation routes, or write-capable UI.
 - Ownership, names, free-text labels, generic status, or other claims M1 does not define.
 - A relationship-detail API route, assertion route, bulk-Evidence route, or query-language endpoint unless separately proposed and approved.
+- Entity-type inventory filtering in the initial M2 UI. The accepted API filter remains available, but it is not part of the M2 exit criteria or canonical URL contract and may be proposed later from measured use.
 - Reconciliation, snapshot, fixture, repository, or existing M1 query semantics changes.
 
 ## 3. Existing Contract Baseline
@@ -62,6 +63,17 @@ Every successful graph response includes `meta.resolvedIdentity`. Every subject 
 1. **Snapshot playback discovery:** the API validates a known snapshot identity but does not enumerate usable historical coordinates. The UI cannot derive a truthful timeline from fixtures or repository internals without violating the no-side-door rule. ADR-0028 therefore proposes one bounded, read-only snapshot-anchor route.
 2. **Browser proxy path:** the current Vite proxy rewrites every `/api/*` request by stripping `/api`, which supports `/api/health -> /health` but would turn `/api/v1/entities` into the nonexistent `/v1/entities`. ADR-0026 proposes an exact proxy split that preserves both health and versioned API paths.
 3. **Relationship deep links:** no relationship-detail route exists by design. A direct relationship selection must rehydrate through identifier search, require an exact identifier match, and fail honestly if absent. It must not invent a route.
+
+### ADR-0018 storage forcing-point re-evaluation
+
+ADR-0018 requires M2 planning to re-evaluate fixture-backed in-memory storage against measured interactive query patterns. The planning decision is to **retain the accepted in-memory implementation provisionally through M2**: all state remains synthetic and regenerable, every existing collection read is bounded, the repository contract suite remains storage-agnostic, and M2 introduces no durable writes or concurrency requirement that currently justifies SQLite or another engine.
+
+That conclusion is conditional rather than open-ended. M2-A through M2-E must record the fixture catalog size, retained Evidence count, result cardinalities, traversal truncation, snapshot-anchor candidate count, route latency, and peak process/browser memory for the primary desktop and mobile journeys. ADR-0028's retained-Evidence scan is an explicit measurement target. Before M2-F closeout, an independent storage review must compare those measurements with ADR-0018's change conditions and record one of two outcomes:
+
+1. retain in-memory storage for the measured M2 workload, with the evidence recorded in the M2 closeout; or
+2. propose a separate storage ADR and explicitly authorized migration slice before M2 can close.
+
+Durable non-regenerable state, fixture or interactive latency/memory exceeding comfortable local use, or measured traversal/temporal patterns materially better served by another engine trigger option 2. A storage migration is not authorized by this plan.
 
 ## 4. Primary Journeys
 
@@ -135,6 +147,8 @@ Canonical query parameters:
 
 Pagination cursors remain ephemeral request state and are not durable browser URLs. A copied URL represents the exploration coordinate, not an in-progress page walk.
 
+The accepted inventory `entityType` filter is intentionally not exposed in the initial M2 URL or primary journeys; that omission is a product-scope decision, not an API gap.
+
 ## 6. Read Consistency
 
 - The first cursorless latest response establishes a session snapshot identity.
@@ -144,6 +158,7 @@ Pagination cursors remain ephemeral request state and are not durable browser UR
 - Responses whose request generation is obsolete are ignored even if network cancellation races.
 - Cache keys include operation, complete snapshot identity, identifier/filter/bounds, and page cursor where applicable.
 - No UI code imports fixtures, `packages/graph-model`, repository implementations, or server modules.
+- M2-A adds an ESLint restricted-import boundary for `apps/web/src/**` covering fixtures, `packages/graph-model`, repository implementations, and API server modules; review prose alone is not sufficient enforcement.
 
 ## 7. Trust Presentation Rules
 
@@ -177,20 +192,20 @@ These are semantic requirements, not styling suggestions:
 - Status and errors use live regions only when an announcement is useful; routine content does not become noisy.
 - Motion respects `prefers-reduced-motion`.
 - Text, icons, patterns, and labels jointly communicate state; color never carries meaning alone.
-- Touch targets, zoom controls, and inspector actions meet the repository's accessibility expectations at the mobile acceptance viewport.
+- M2 routes target WCAG 2.2 Level AA. Touch targets, zoom controls, inspector actions, focus behavior, semantics, contrast, reflow, and status communication are verified against the applicable success criteria at the mobile and desktop acceptance viewports.
 
 ## 10. Proposed Implementation Slices
 
 These slices are planning output only. None is released by this document.
 
-| Slice | Deliverable                                                                                            | Primary paths                                                                |
-| ----- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| M2-A  | Shared browser/API contracts, validated query client, exact proxy correction, URL state foundation     | `packages/shared`, `apps/web`, directly corresponding tests/config           |
-| M2-B  | Application shell, routing, inventory, identifier search, canonical loading/empty/error states         | `apps/web/src/**`                                                            |
-| M2-C  | Traversal workspace, graph adapter/layout, structured equivalent, selection synchronization            | `apps/web/src/**`, approved dependency manifests/lockfile                    |
-| M2-D  | Entity/Relationship trust inspector, Evidence dereferencing, conflict/ambiguity/freshness presentation | `apps/web/src/**`                                                            |
-| M2-E  | Bounded snapshot-anchor API extension and history playback                                             | additive shared/API contracts and `apps/web/src/**`, exact ADR-0028 boundary |
-| M2-F  | Browser acceptance journeys, accessibility/responsive hardening, synthetic-boundary re-audit, closeout | tests, audit, factual docs                                                   |
+| Slice | Deliverable                                                                                             | Primary paths                                                                |
+| ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| M2-A  | Shared browser/API contracts, validated query client, exact proxy correction, URL state foundation      | `packages/shared`, `apps/web`, directly corresponding tests/config           |
+| M2-B  | Application shell, routing, inventory, identifier search, canonical loading/empty/error states          | `apps/web/src/**`                                                            |
+| M2-C  | Traversal workspace, graph adapter/layout, structured equivalent, selection synchronization             | `apps/web/src/**`, approved dependency manifests/lockfile                    |
+| M2-D  | Entity/Relationship trust inspector, Evidence dereferencing, conflict/ambiguity/freshness presentation  | `apps/web/src/**`                                                            |
+| M2-E  | Bounded snapshot-anchor API extension and history playback                                              | additive shared/API contracts and `apps/web/src/**`, exact ADR-0028 boundary |
+| M2-F  | Browser acceptance, accessibility/responsive hardening, ADR-0018 storage re-evaluation, audit, closeout | tests, measurements, audit, factual docs                                     |
 
 Each slice requires its own bounded implementation prompt, independent review, full verifier pass, PR/CI, merge, checkpoint update, and next-slice release.
 
@@ -209,6 +224,12 @@ Each slice requires its own bounded implementation prompt, independent review, f
 
 - Proposed snapshot-anchor route cap, truncation, ordering, identity validity, empty-store behavior, and no mutation.
 - Every returned anchor accepted by the existing snapshot-summary route.
+
+### Storage forcing-point evidence
+
+- Record retained Evidence and snapshot-anchor candidate counts, result cardinalities, traversal truncation, route latency, and peak process/browser memory for the primary journeys.
+- Re-run the storage-agnostic repository contract suite unchanged for any proposed replacement.
+- Complete an independent retain-or-migrate review against ADR-0018 before M2-F can close.
 
 ### Browser acceptance
 
@@ -242,5 +263,6 @@ Before M2-A may be released:
 - [ ] Graph rendering, layout, accessibility, and responsive strategy are settled.
 - [ ] Trust metadata and failure-state presentation are settled.
 - [ ] Snapshot playback has an API-only, bounded design.
+- [ ] ADR-0018's mandatory M2 storage re-evaluation is accepted with an explicit measurement and closeout decision gate.
 - [ ] Proposed slices and verification obligations are independently reviewed.
 - [ ] ADRs 0026–0028 and this plan are explicitly human-approved.
