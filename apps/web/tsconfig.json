@@ -18,7 +18,15 @@
     "jsx": "react-jsx",
     "useDefineForClassFields": true,
     "noEmit": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    // @atlast/shared is consumed through its real dist/main/types/exports in
+    // production builds; this alias exists for typecheck/test only, mirroring
+    // the ADR-0024 § 14 convention apps/api and packages/graph-model already
+    // use (ADR-0026 § 3). The matching runtime alias lives in vite.config.ts,
+    // scoped to the Vitest environment only — never the production build.
+    "paths": {
+      "@atlast/shared": ["../../packages/shared/src/index.ts"]
+    }
   },
   "include": ["src", "vite.config.ts"]
 }

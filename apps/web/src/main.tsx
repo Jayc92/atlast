@@ -1,11 +1,12 @@
 /**
- * Browser entry point for the Atlast web application (M0 shell per ADR-0003).
- * Mounts the client-rendered SPA; there is no routing, no state library, and
- * no data access beyond the health check — the exploration UI is M2 scope.
+ * Browser entry point for the Atlast web application (M0 shell per ADR-0003;
+ * M2-A routing foundation per ADR-0026 § 2). Mounts the client-rendered SPA
+ * behind the URL-addressable router; the foundation page itself is
+ * unchanged, and no M2-B topology feature content exists yet.
  */
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App.tsx";
+import { AppRouter } from "./router.tsx";
 import "./styles.css";
 
 const rootElement: HTMLElement | null = document.getElementById("root");
@@ -20,6 +21,6 @@ if (rootElement === null) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <AppRouter />
   </StrictMode>,
 );

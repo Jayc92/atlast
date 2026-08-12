@@ -184,3 +184,7 @@ export {
   strictDecimalQueryParameterSchema,
   strictIntegerQueryParameterSchema,
 } from "./http-query-coercion.ts";
+export {
+  healthCheckResultSchema,
+  type HealthCheckResult,
+} from "./health-contract.ts";

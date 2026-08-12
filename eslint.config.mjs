@@ -78,4 +78,56 @@ export default defineConfig(
       "no-empty": ["error", { allowEmptyCatch: false }],
     },
   },
+
+  {
+    // The M2-A browser import boundary (ADR-0026 § 5; docs/m2-plan.md § 6):
+    // apps/web must never import fixtures, packages/graph-model (including
+    // any repository implementation living inside it), or an apps/api
+    // server module — every graph read happens over the query API, never a
+    // side door. `@atlast/shared` (types and the additive HTTP schemas) is
+    // apps/web's one approved workspace dependency and is deliberately not
+    // matched by any pattern below. Enforced with the built-in
+    // `no-restricted-imports` rule — no new ESLint plugin dependency.
+    files: ["apps/web/src/**/*.ts", "apps/web/src/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@atlast/graph-model",
+              message:
+                "apps/web must never import packages/graph-model — read only through the query API (ADR-0026 § 3).",
+            },
+            {
+              name: "@atlast/api",
+              message:
+                "apps/web must never import an API server module — read only through the query API over HTTP (ADR-0026 § 3).",
+            },
+          ],
+          patterns: [
+            {
+              group: [
+                "@atlast/graph-model/*",
+                "**/packages/graph-model/**",
+                "**/graph-model/**",
+              ],
+              message:
+                "apps/web must never import packages/graph-model, or a repository implementation living inside it — read only through the query API (ADR-0026 § 3).",
+            },
+            {
+              group: ["**/fixtures/**", "**/fixtures"],
+              message:
+                "apps/web must never import fixtures — read only through the query API (ADR-0026 § 3).",
+            },
+            {
+              group: ["@atlast/api/*", "**/apps/api/**"],
+              message:
+                "apps/web must never import an API server module — read only through the query API over HTTP (ADR-0026 § 3).",
+            },
+          ],
+        },
+      ],
+    },
+  },
 );
