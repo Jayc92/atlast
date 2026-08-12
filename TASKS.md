@@ -146,7 +146,12 @@ M1 exit criteria (below) are now all checked and closed as project facts, per [d
 
 **M1 exit criteria are now all satisfied and closed as project facts. M1 is formally complete as of 2026-08-12 — checkpoint `m1-complete`, recorded in [HANDOFF.md](HANDOFF.md). No implementation slice is currently active. M2 and every later milestone remain gated and unauthorized; this closure does not imply or grant M2 authorization.**
 
-## M2 — Interactive Topology Interface (gated — not authorized)
+## M2 — Interactive Topology Interface (authorized — planning phase released)
+
+**M2 authorization (2026-08-12):** Joseph Carfagno explicitly authorized M2 in the conductor conversation after the `m1-complete` checkpoint merged through PR #32 at `cff0545`. This authorization becomes effective only after the documentation PR recording it merges to `main` and `main` is synchronized locally with a clean working tree. M2 is phase-gated: **the only initially released work is M2 planning and pre-release architecture/ADR review.** Product implementation remains gated until the resulting baseline is independently reviewed and explicitly approved. M3 and later milestones remain unauthorized.
+
+- [~] **M2-P — implementation plan and pre-release architecture review** — define the UI-only consumption boundary over the merged query API; primary exploration, search, entity-detail, provenance, and history journeys; graph rendering/layout strategy; accessibility and responsive behavior; URL/state model; loading, empty, stale, conflict, ambiguity, and failure states; snapshot/history interaction; and browser acceptance strategy. Record significant choices as ADRs and obtain independent review and explicit human approval before releasing implementation.
+- [ ] **M2 implementation slices** — not yet released; derive bounded slices from the approved M2 plan. Do not implement product behavior during M2-P.
 
 - [ ] Graph exploration UI: navigation, search, entity detail
 - [ ] Provenance/confidence/freshness view for every displayed fact
