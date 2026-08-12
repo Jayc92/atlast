@@ -1,6 +1,6 @@
 # Atlast — Milestones
 
-**Status:** Current. M0 completed 2026-07-22; M1 formally completed through PR #32 at `cff0545` on 2026-08-12. **Joseph Carfagno separately and explicitly authorized M2 on 2026-08-12.** Its authorization becomes effective only after the documentation PR recording it merges and `main` is synchronized locally with a clean working tree. M2 is phase-gated: planning and pre-release architecture/ADR review are the only initially released work; product implementation remains gated pending independent review and explicit approval of that baseline. **M3 and later milestones remain unauthorized.**
+**Status:** Current. M0 and M1 are complete. Joseph Carfagno explicitly authorized M2, and its authorization record merged through PR #33 at `b547ec2` on 2026-08-12. **Joseph explicitly approved [docs/m2-plan.md](m2-plan.md) and accepted ADRs 0026–0028 after independent review, remediation, and blocker-free re-review; the approval record is pending merge through PR #34.** M2-A remains separately gated and unreleased. No M2 product implementation or M3+ work is authorized.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
@@ -62,13 +62,13 @@
 - [x] Every fact in the graph is traceable to its synthetic evidence via the API — _proven exhaustively by `apps/api/src/routes/evidence.test.ts` (all 20 valid Evidence records dereferenced through `GET /api/v1/evidence/{evidenceId}` alone, across all seven valid fixture scenarios)._
 - [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0025, all Accepted._
 
-**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately and explicitly authorized M2 on 2026-08-12; that authorization becomes effective only after the documentation PR recording it merges to `main` and `main` is synchronized locally with a clean working tree. M2 execution is phase-gated: the first released phase is planning and architecture review only, and product implementation remains gated until that baseline is independently reviewed and approved. M3 and later milestones remain unauthorized.
+**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately and explicitly authorized M2 on 2026-08-12; that authorization record merged through PR #33 at `b547ec2`, and `main` was synchronized locally with a clean working tree. The M2 baseline is now explicitly human-approved, with PR #34 merge and clean synchronization pending. M2-A still requires its own explicit release; M3 and later milestones remain unauthorized.
 
 ---
 
 ## M2 — Interactive Topology Interface (authorized 2026-08-12 — phase-gated)
 
-> **Authorization status:** Joseph Carfagno explicitly authorized M2 on 2026-08-12. The authorization is effective only after its documentation PR merges to `main` and the local repository is synchronized with a clean working tree. The only initially released phase is an M2 implementation plan and pre-release architecture/ADR review covering the existing query API consumption boundary, information architecture and primary journeys, graph rendering and layout strategy, accessibility and responsive behavior, snapshot/history interaction, provenance/confidence/freshness presentation, and browser acceptance strategy. **No M2 product implementation is released until that planning baseline and its required ADRs are independently reviewed and human-approved.** M3 and later milestones remain gated and unauthorized.
+> **Authorization status:** M2 authorization is effective through PR #33 at `b547ec2`. [docs/m2-plan.md](m2-plan.md) and ADRs 0026–0028 were explicitly human-approved on 2026-08-12 after independent review and remediation; the approval becomes operational after PR #34 merges and `main` is synchronized cleanly. **M2-A is not released, and this approval authorizes no implementation.** M3 and later milestones remain gated and unauthorized.
 
 **Goal:** People who don't write queries can explore the graph.
 

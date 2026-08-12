@@ -41,6 +41,16 @@ Binding decisions are made only through human-approved ADRs ([GUARDRAILS.md § 1
 | [0024](0024-m1-query-api-runtime-contract.md)                     | M1 query API runtime contract — closing the S7 HTTP-boundary and build-boundary gaps (amends 0017/0020)                    | Accepted; amended by ADR-0025              |
 | [0025](0025-s7-source-alias-erasable-syntax-compatibility.md)     | S7 source-alias and erasable-syntax compatibility — narrow `IdentityNormalizationError` syntax refactor (amends 0022/0024) | Accepted                                   |
 
+### Accepted M2 baseline (not implementation authority)
+
+| ADR                                                       | Decision                                                                                               | Status   |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------- |
+| [0026](0026-m2-browser-architecture-and-api-boundary.md)  | React SPA routing, validated query-only client, coordinated snapshot reads, and exact local proxy seam | Accepted |
+| [0027](0027-m2-graph-rendering-and-accessibility.md)      | React Flow + ELK rendering/layout with a normative accessible structured topology view                 | Accepted |
+| [0028](0028-m2-snapshot-navigation-and-trust-contract.md) | Bounded snapshot-anchor API, reproducible history navigation, and mandatory trust presentation         | Accepted |
+
+**M2 approval note (2026-08-12):** Joseph Carfagno explicitly accepted ADRs 0026–0028 and approved [docs/m2-plan.md](../m2-plan.md) after an independent architecture review found one blocking and two non-blocking issues, a correction pass addressed all findings and residual observations, and focused re-review found no remaining blockers. The approval record is pending merge through PR #34 and clean synchronization of `main`. Acceptance establishes the M2 implementation baseline only: it authorizes no dependency installation, API/frontend implementation, or M2 slice. M2-A requires a separate explicit release; M3+ remain unauthorized.
+
 **Approval note (2026-07-23):** ADRs 0014–0018 were accepted by human review as the **M1 architecture baseline**, alongside approval of [docs/m1-plan.md](../m1-plan.md). Acceptance settles the M1 planning decisions only — **it does not authorize M1 implementation**, which requires its own separate, explicit human authorization per [docs/milestones.md](../milestones.md).
 
 **Approval note (2026-07-23, ADR-0019):** ADR-0019's identity-only subject decision was **accepted by human review**, resolving the internal contradiction between ADR-0014's typed-subject clauses and ADR-0015's coexisting-conflicting-claims requirement. It amends **only** those identified clauses (metadata-only amendment notices on ADR-0014/0015; their accepted decision text is preserved). Acceptance **unblocks Slice S1** — it does not authorize S2–S8 or M2+, which remain gated as before.
