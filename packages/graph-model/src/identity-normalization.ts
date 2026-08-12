@@ -20,12 +20,13 @@ const LOWERCASE_ASCII_KEY_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
  * the offending Evidence identifier so the error is actionable.
  */
 export class IdentityNormalizationError extends Error {
-  constructor(
-    message: string,
-    readonly evidenceIdentifier: string,
-    readonly failingKey: string,
-  ) {
+  declare readonly evidenceIdentifier: string;
+  declare readonly failingKey: string;
+
+  constructor(message: string, evidenceIdentifier: string, failingKey: string) {
     super(message);
+    this.evidenceIdentifier = evidenceIdentifier;
+    this.failingKey = failingKey;
     this.name = "IdentityNormalizationError";
   }
 }
