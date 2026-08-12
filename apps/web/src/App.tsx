@@ -43,30 +43,24 @@ function isExpectedHealthPayload(
 }
 
 /**
- * The three statuses this page ever shows. "delivered" is reserved for a
- * milestone whose exit criteria are formally closed (M0); M1's product
- * capability exists and is real, but S8 — M1's own closeout gate — has not
- * yet been reviewed, verified, merged, and formally closed, so M1 gets its
- * own distinct "core delivered" status rather than borrowing M0's word for
- * a milestone that is not yet formally complete (docs/milestones.md,
- * HANDOFF.md § 7). Every later milestone is "gated".
+ * The two statuses this page ever shows: a milestone is either formally
+ * complete ("delivered") or gated on its own explicit authorization
+ * ("gated") — docs/milestones.md, HANDOFF.md § 7.
  */
-type MilestoneStatus = "delivered" | "core-delivered" | "gated";
+type MilestoneStatus = "delivered" | "gated";
 
 const MILESTONE_STATUS_LABELS: Record<MilestoneStatus, string> = {
   delivered: "delivered",
-  "core-delivered": "core delivered",
   gated: "gated",
 };
 
 /**
  * The authorized milestone sequence (docs/milestones.md), displayed as
- * roadmap context only. M0 is formally delivered; M1's synthetic topology
- * core is delivered but M1 itself is not yet formally closed (S8 is still
- * an unreviewed, unmerged candidate); every later milestone is gated and
- * unbuilt. This page must never imply otherwise, and "delivered" status
- * here still means only "the model and API exist" — this page remains a
- * status shell with no graph exploration UI of its own.
+ * roadmap context only. M0 and M1 are formally delivered; every later
+ * milestone is gated and unbuilt. This page must never imply otherwise,
+ * and "delivered" status here still means only "the model and API exist"
+ * — this page remains a status shell with no graph exploration UI of its
+ * own.
  */
 const MILESTONE_ROUTE: readonly {
   id: string;
@@ -85,8 +79,8 @@ const MILESTONE_ROUTE: readonly {
     id: "M1",
     title: "Synthetic topology model",
     summary:
-      "Entities, Relationships, and Evidence with provenance, confidence, and freshness, modeled and queryable from fixtures — delivered as a query API, not yet as an exploration UI. M1 itself is not yet formally closed.",
-    status: "core-delivered",
+      "Entities, Relationships, and Evidence with provenance, confidence, and freshness, modeled and queryable from fixtures — delivered as a query API, not yet as an exploration UI.",
+    status: "delivered",
   },
   {
     id: "M2",
@@ -244,10 +238,8 @@ export function App(): ReactElement {
             The plotted route
           </h2>
           <p className="atlas-section-note">
-            Each milestone is gated on its own explicit authorization. M0 is
-            delivered; M1's synthetic topology core is delivered, though M1
-            itself is not yet formally closed; every later milestone remains
-            gated.
+            Each milestone is gated on its own explicit authorization. M0 and M1
+            are delivered; every later milestone remains gated.
           </p>
           <ol className="route-list">
             {MILESTONE_ROUTE.map((milestone) => (
@@ -292,12 +284,11 @@ export function App(): ReactElement {
             nothing beyond the local API shell.
           </p>
           <p>
-            The M1 synthetic topology core is delivered behind that API — a
-            fixture-driven model with reconciliation, versioned snapshots, and a
-            query API — but this page does not consume it: it still shows only
-            foundation status, with no graph exploration UI. That interface, and
-            every milestone after M1, remains gated on its own explicit
-            authorization.
+            M1 is delivered behind that API — a fixture-driven model with
+            reconciliation, versioned snapshots, and a query API — but this page
+            does not consume it: it still shows only foundation status, with no
+            graph exploration UI. That interface, and every milestone after M1,
+            remains gated on its own explicit authorization.
           </p>
         </section>
       </main>

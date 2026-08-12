@@ -67,7 +67,7 @@ describe("App — primary rendered content", () => {
     await screen.findByText("Local API connected");
   });
 
-  it("shows M0 as delivered, M1 as core delivered (not formally closed), and every later milestone as gated", async () => {
+  it("shows M0 and M1 as delivered and every later milestone as gated", async () => {
     stubHealthEndpoint({
       ok: true,
       jsonPayload: { status: "ok", service: "atlast-api" },
@@ -75,12 +75,9 @@ describe("App — primary rendered content", () => {
 
     render(<App />);
 
-    expect(screen.getAllByText("delivered", { exact: true })).toHaveLength(1);
-    expect(screen.getAllByText("core delivered")).toHaveLength(1);
+    expect(screen.getAllByText("delivered", { exact: true })).toHaveLength(2);
     expect(screen.getAllByText("gated")).toHaveLength(4);
-    expect(
-      screen.getByText(/The M1 synthetic topology core is delivered/),
-    ).toBeDefined();
+    expect(screen.getByText(/M1 is delivered behind that API/)).toBeDefined();
 
     await screen.findByText("Local API connected");
   });
