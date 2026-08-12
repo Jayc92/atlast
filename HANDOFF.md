@@ -7,11 +7,11 @@ The canonical, model-neutral resume document for this project. A replacement con
 ## 1. Document Control
 
 - **Last updated:** 2026-08-12
-- **Checkpoint name:** `m2-planning-authorized-pending-merge`
-- **Latest merged checkpoint commit:** `cff05457167be20b49dd9064089087d6ee66091e` (`docs: close M1 synthetic topology milestone (#32)`) — the final M1 closeout checkpoint, squash-merged through [PR #32](https://github.com/Jayc92/atlast/pull/32) on 2026-08-12 with GitHub Actions `verify` passing in 2m33s.
-- **Latest merged product commit:** the same `cff0545` — **M1 is formally complete.** M2 has now been explicitly authorized, with activation pending this authorization record's merge.
+- **Checkpoint name:** `m2-planning-candidate`
+- **Latest merged checkpoint commit:** `b547ec298124cb9864d9b4466c62d665f457aba6` (`docs: authorize M2 planning phase (#33)`) — the M2 authorization record, squash-merged through [PR #33](https://github.com/Jayc92/atlast/pull/33) on 2026-08-12 with GitHub Actions `verify` passing in 2m14s.
+- **Latest merged product commit:** `cff0545` — M1 remains the latest implemented product checkpoint and is formally complete. PR #33 changed documentation and activated M2-P planning only.
 - **This document update records the final M1 closeout**, performed after an independent post-merge revalidation directly against `0477cbd` (per [docs/audits/m0-synthetic-boundary-audit.md § 15](docs/audits/m0-synthetic-boundary-audit.md)): a fresh byte-safe NUL sweep of all 180 tracked files found none; the merged changed-file scope was independently re-derived and matches exactly what the pre-merge S8 candidate described; no real-system boundary was introduced; and the complete, unmodified `./scripts/verify.sh` passed all seven stages locally at the merge commit. **All four M1 exit criteria are now satisfied and closed as project facts** (not candidate findings) — see [TASKS.md](TASKS.md) and § 4/§ 7 below.
-- **Branch state at this checkpoint:** `docs/m2-authorization`, based on merged `main` at `cff0545`; the base working tree was clean before these documentation edits.
+- **Branch state at this checkpoint:** `docs/m2-planning`, based on merged `main` at `b547ec2`; the base working tree was clean before these planning edits.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves every previous checkpoint version. Do not append old checkpoints to this file — retrieve them with `git log -- HANDOFF.md`.
 - **Precedence:** the repository source-of-truth documents ([PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), [docs/m1-plan.md](docs/m1-plan.md), the accepted ADRs in [docs/adr/](docs/adr/README.md), [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md)) **override this document wherever they conflict**. HANDOFF.md summarizes; it never supersedes.
 
@@ -44,7 +44,8 @@ The canonical, model-neutral resume document for this project. A replacement con
   - [TASKS.md](TASKS.md) — the only place in-flight work is tracked
   - [docs/architecture.md](docs/architecture.md) — architecture philosophy and conceptual design
   - [docs/milestones.md](docs/milestones.md) — authorized milestone sequence M0–M5 with exit criteria
-  - [docs/m1-plan.md](docs/m1-plan.md) — the approved M1 implementation baseline (slices S1–S8, fixture catalog, journeys)
+  - [docs/m1-plan.md](docs/m1-plan.md) — the approved, completed M1 implementation baseline
+  - [docs/m2-plan.md](docs/m2-plan.md) — the Proposed M2 planning candidate; not implementation authority
   - [docs/adr/](docs/adr/README.md) — accepted ADRs 0001–0025 (index with amendment notes)
   - [docs/audits/](docs/audits/m0-synthetic-boundary-audit.md) — boundary audits
   - `packages/shared` — the merged S1 domain schemas, S2 repository contract surface, and the S3 fixture-catalog validation suite
@@ -73,7 +74,7 @@ Factual state at this checkpoint:
 - **S8 authorization became effective** when its authorization PR ([PR #30](https://github.com/Jayc92/atlast/pull/30)) merged to `main` at `a4c6a5d` on 2026-08-12.
 - **S8 is complete** — the M1 synthetic-boundary re-audit ([docs/audits/m0-synthetic-boundary-audit.md § 14](docs/audits/m0-synthetic-boundary-audit.md); one source-hygiene finding — an embedded NUL byte in `packages/graph-model/src/reconciliation.ts` — found and resolved under its own separate explicit narrow authorization), the exhaustive API traceability integration test in `apps/api/src/routes/evidence.test.ts`, the minimal `apps/web` shell-status correction, and factual M1 documentation closeout were all implemented, independently reviewed, verified, and **merged to `main` through [PR #31](https://github.com/Jayc92/atlast/pull/31) at `0477cbd` on 2026-08-12 with GitHub Actions `verify` passing in 2m27s.** An independent post-merge revalidation ([docs/audits/m0-synthetic-boundary-audit.md § 15](docs/audits/m0-synthetic-boundary-audit.md)) then confirmed, directly against the real merge commit: zero literal NUL bytes across all 180 tracked files, the merged changed-file scope matching exactly what was authorized, and no real-system boundary introduced.
 - **S1–S8 are now complete. M1 is formally complete as of 2026-08-12 — checkpoint `m1-complete`.**
-- **M2 was separately and explicitly authorized by Joseph Carfagno on 2026-08-12**, after M1's closeout merged through PR #32 at `cff0545`. Its authorization becomes effective only after the documentation PR recording it merges and `main` is synchronized locally with a clean working tree. M2 is phase-gated: planning and pre-release architecture/ADR review are the only initially released work; product implementation remains gated pending independent review and explicit approval of that baseline. **M3–M5 remain gated and unauthorized.**
+- **M2 was separately and explicitly authorized by Joseph Carfagno on 2026-08-12**, after M1's closeout merged through PR #32 at `cff0545`; the authorization record merged through PR #33 at `b547ec2`, and `main` was synchronized locally with a clean working tree. M2 is phase-gated: planning and pre-release architecture/ADR review are the only initially released work; product implementation remains gated pending independent review and explicit approval of that baseline. **M3–M5 remain gated and unauthorized.**
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
 
@@ -90,14 +91,14 @@ Factual state at this checkpoint:
 
 **Milestone purposes** ([docs/milestones.md](docs/milestones.md)):
 
-| Milestone | Purpose                                                                                                                                | Status                                         |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| M0        | Safe project foundation: TypeScript monorepo, API + web shells, shared packages, full verification tooling and CI, synthetic data only | Complete (2026-07-22)                          |
-| M1        | Synthetic topology model: the core domain modeled and queryable, driven entirely by fixtures                                           | Complete (2026-08-12)                          |
-| M2        | Interactive topology interface: graph exploration UI reading exclusively through the query API                                         | Authorized — planning phase pending activation |
-| M3        | Operational health overlays: synthetic states (healthy, degraded, down, disconnected, expiring certificate, latent downstream risk)    | Unauthorized                                   |
-| M4        | Change-impact simulation: deterministic, explainable blast-radius analysis — validated before any LLM reasoning                        | Unauthorized                                   |
-| M5        | Read-only local Kubernetes connector: disposable local cluster (e.g., Kind) only — never an employer or production cluster             | Unauthorized                                   |
+| Milestone | Purpose                                                                                                                                | Status                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| M0        | Safe project foundation: TypeScript monorepo, API + web shells, shared packages, full verification tooling and CI, synthetic data only | Complete (2026-07-22)             |
+| M1        | Synthetic topology model: the core domain modeled and queryable, driven entirely by fixtures                                           | Complete (2026-08-12)             |
+| M2        | Interactive topology interface: graph exploration UI reading exclusively through the query API                                         | Authorized — M2-P planning active |
+| M3        | Operational health overlays: synthetic states (healthy, degraded, down, disconnected, expiring certificate, latent downstream risk)    | Unauthorized                      |
+| M4        | Change-impact simulation: deterministic, explainable blast-radius analysis — validated before any LLM reasoning                        | Unauthorized                      |
+| M5        | Read-only local Kubernetes connector: disposable local cluster (e.g., Kind) only — never an employer or production cluster             | Unauthorized                      |
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
@@ -131,16 +132,16 @@ What actually exists in the repository through this checkpoint:
 
 Facts observed at this checkpoint:
 
-- **PR #32 (commit `cff05457167be20b49dd9064089087d6ee66091e`) is the latest merged change** — "docs: close M1 synthetic topology milestone," squash-merged to `main` on 2026-08-12 with GitHub Actions `verify` passing in 2m33s. **M1 is formally complete.**
-- **This checkpoint's own work lives on branch `docs/m2-authorization`, based on merged `main` at `cff0545`.** It records Joseph Carfagno's explicit M2 authorization and has not yet been committed, pushed, or merged.
-- At this checkpoint, `main`/`origin/main` are synchronized at `cff0545`; the base working tree was clean before these documentation edits began.
+- **PR #33 (commit `b547ec298124cb9864d9b4466c62d665f457aba6`) is the latest merged change** — "docs: authorize M2 planning phase," squash-merged to `main` on 2026-08-12 with GitHub Actions `verify` passing in 2m14s. M2-P is active; no product implementation was authorized.
+- **This checkpoint's own work lives on branch `docs/m2-planning`, based on merged `main` at `b547ec2`.** It contains the first M2 planning candidate and Proposed ADRs 0026–0028; it is not committed, pushed, reviewed, approved, or merged.
+- At this checkpoint, `main`/`origin/main` are synchronized at `b547ec2`; the base working tree was clean before these planning edits began.
 - **The merged S8 delta** (PR #31, independently re-derived via `git diff --stat a4c6a5d 0477cbd` and reconfirmed in [docs/audits/m0-synthetic-boundary-audit.md § 15](docs/audits/m0-synthetic-boundary-audit.md)) touched exactly 12 files: six documentation files ([TASKS.md](TASKS.md), this document, [CLAUDE.md](CLAUDE.md), [README.md](README.md), [docs/m1-plan.md](docs/m1-plan.md), [docs/milestones.md](docs/milestones.md)), the audit extension ([docs/audits/m0-synthetic-boundary-audit.md](docs/audits/m0-synthetic-boundary-audit.md)), the minimal shell correction (`apps/web/src/App.tsx`, `apps/web/src/App.test.tsx`, `tests/acceptance/specs/shell.spec.ts`), the exhaustive API traceability test (`apps/api/src/routes/evidence.test.ts`), and the one-line source-text-safe NUL-byte correction (`packages/graph-model/src/reconciliation.ts`). No fixture, ADR, manifest, lockfile, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI-workflow file changed.
 
 **A replacement conductor MUST inspect the actual Git state (`git status`, `git log --oneline --decorate -10`, `git remote -v`) and trust Git over any recorded prose — here or anywhere else.** A future handoff MUST replace this section with the state actually observed at its checkpoint, never copy Git facts forward.
 
 ## 7. Current Authorized Work
 
-**M1 is formally complete. M2 was explicitly authorized by Joseph Carfagno on 2026-08-12 and is phase-gated.** Its authorization record is pending merge; once merged and synchronized, **M2-P (implementation planning and pre-release architecture/ADR review) is the only active released phase.** No M2 product implementation is released until that baseline is independently reviewed and explicitly approved. M3 and every later milestone remain gated and unauthorized.
+**M1 is formally complete. M2-P planning is active through PR #33 at `b547ec2`.** The current candidate is [docs/m2-plan.md](docs/m2-plan.md) with Proposed ADRs 0026–0028. No M2 product implementation is released until that baseline is independently reviewed and explicitly approved. M3 and every later milestone remain gated and unauthorized.
 
 **S7 (context) is complete and formally closed.** S7 delivered the query API v1 in `apps/api` implementing accepted [ADR-0024](docs/adr/0024-m1-query-api-runtime-contract.md) as amended by [ADR-0025](docs/adr/0025-s7-source-alias-erasable-syntax-compatibility.md) — see [TASKS.md](TASKS.md) for the full delivery record. Merged through PR #28 at `a7624cd`; closeout merged through PR #29 at `9acfefa`.
 
@@ -154,9 +155,9 @@ Facts observed at this checkpoint:
 
 **S8 did NOT implement, beyond the two narrowly authorized exceptions named in items 4–5 above:** any topology exploration UI or other M2 behavior; new frontend features, graph visualization, or `apps/web` API consumption beyond the named text correction; changes to S1–S7 production _behavior_ (item 5's fix is explicitly behavior-preserving); changes to domain schemas, repository contracts, fixtures, or snapshot/storage behavior; connectors, authentication, infrastructure, deployment, or real-system access; new dependencies, upgrades, package-manifest changes, or lockfile changes; or changes to `scripts/verify.sh`/`scripts/bootstrap.sh`.
 
-**Permitted work after this authorization record merges:** maintenance and corrections of the completed M0/M1 state; M2-P planning and architecture/ADR work recorded in [TASKS.md](TASKS.md). **No M2 product implementation and no M3+ work** until their respective gates are explicitly released.
+**Permitted work now:** maintenance and corrections of the completed M0/M1 state; M2-P planning, independent review, architecture/ADR corrections, and factual checkpoint work recorded in [TASKS.md](TASKS.md). **No M2 product implementation and no M3+ work** until their respective gates are explicitly released.
 
-**Next-agent preflight** (run before acting on this checkpoint): `git status` (clean tree required), `git log --oneline --decorate -10` (confirm position against this document), then read [TASKS.md](TASKS.md) before any work. After this authorization record merges and `main` is synchronized, **M2-P is the only active released phase; no M2 product implementation is released.**
+**Next-agent preflight** (run before acting on this checkpoint): `git status`, `git log --oneline --decorate -10`, then read [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and Proposed ADRs 0026–0028. **M2-P is the only active released phase; no M2 product implementation is released.**
 
 **The checkpoint/slice cycle, in order:**
 
@@ -170,11 +171,11 @@ Facts observed at this checkpoint:
 4. HANDOFF.md reflects the merged repository state;
 5. the next slice receives explicit human authorization recorded in TASKS.md.
 
-**The `m1-complete` checkpoint satisfied conditions 1–4 for M1's closeout through PR #32 at `cff0545`. Condition 5 is now separately satisfied at the milestone level by Joseph Carfagno's explicit M2 authorization recorded here and in TASKS.md.** M2-P activates only after this authorization record merges and `main` is synchronized.
+**The `m1-complete` checkpoint satisfied conditions 1–4 for M1's closeout through PR #32 at `cff0545`; PR #33 at `b547ec2` recorded the separate M2 authorization and activated M2-P.** M2-A remains gated pending review, approval, merge, and a separate release.
 
 ## 8. Prohibited Work
 
-**M2-P planning is the only released M2 work after this authorization record merges.** Everything else is prohibited except the maintenance work named in § 7, in particular:
+**M2-P planning is the only released M2 work.** Everything else is prohibited except the maintenance work named in § 7, in particular:
 
 - **Any M2 product implementation** — topology exploration UI, graph visualization, search, navigation, new `apps/web` API consumption, or other M2 behavior — until the M2 planning baseline and required ADRs are independently reviewed and explicitly approved.
 - Any change to the now-complete S1–S8 production behavior, domain schemas, repository contracts, fixtures, reconciliation, snapshot/storage behavior, or query API behavior, outside an explicitly authorized maintenance correction.
@@ -235,12 +236,12 @@ Operating rules, non-negotiable:
   one explicitly released slice at a time; only the human releases slices or
   milestones. Do not authorize, imply, or begin gated work.
 - Current milestone state: M0 and M1 are complete; M1 closed through PR #32
-  at cff0545 on 2026-08-12. Joseph Carfagno then explicitly authorized M2.
-  That authorization becomes effective only after its documentation PR merges
-  and main is synchronized cleanly. M2-P planning and pre-release
-  architecture/ADR review are the only initially released work; no M2 product
-  implementation is released until that baseline is independently reviewed
-  and explicitly human-approved. M3 and later milestones remain unauthorized.
+  at cff0545 on 2026-08-12. Joseph Carfagno then explicitly authorized M2,
+  recorded through PR #33 at b547ec2. M2-P planning and pre-release
+  architecture/ADR review are active; docs/m2-plan.md and ADRs 0026–0028 are
+  Proposed candidates only. No M2 product implementation is released until
+  that baseline is independently reviewed and explicitly human-approved.
+  M3 and later milestones remain unauthorized.
   Verify the actual Git state before treating this as current; if a later
   checkpoint exists, trust it over this prompt.
 - Review implementation output independently against the accepted ADRs and
