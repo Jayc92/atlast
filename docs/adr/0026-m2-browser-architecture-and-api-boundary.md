@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 2026-08-12
 
-> **Approval note (2026-08-12):** Explicitly accepted by Joseph Carfagno after independent architecture review, correction, and focused re-review found no remaining blocker. Acceptance becomes operational only after PR #34 merges and `main` is synchronized locally with a clean working tree. It establishes the M2 browser architecture decision but does not release M2-A, authorize dependency installation or implementation, or authorize M3+.
+> **Approval note (2026-08-12):** Explicitly accepted by Joseph Carfagno after independent architecture review, correction, and focused re-review found no remaining blocker. Acceptance became operational through PR #34 at `106b1e7` after `main` was synchronized locally with a clean working tree. Acceptance itself did not release implementation. Joseph subsequently and separately authorized M2-A on 2026-08-12 within the exact boundary in [docs/m2-plan.md](../m2-plan.md); that release becomes operational only after its authorization record merges and `main` is synchronized cleanly. M2-B+ and M3+ remain unauthorized.
 
 ## Context
 

@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved by human review on 2026-08-12; operational after the approval record merges through PR #34 and `main` is synchronized
+**Status:** Approved and operational through PR #34 at `106b1e7`; M2-A separately authorized on 2026-08-12, pending its authorization-record merge
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. The approval becomes operational only after its record merges through PR #34 and `main` is synchronized locally with a clean working tree. Approval establishes the M2 implementation baseline but does not release M2-A, authorize dependency installation or product changes, or authorize M3+. M2-A still requires a separate explicit human release with an exact scope.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. The approval record merged through PR #34 at `106b1e7`, and `main` was synchronized locally with a clean working tree. Joseph then separately authorized M2-A on 2026-08-12. That release becomes operational only after its own documentation record merges and `main` is again synchronized cleanly. M2-B through M2-F and M3+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-These slices are planning output only. None is released by this document.
+M2-A was separately and explicitly authorized by Joseph Carfagno on 2026-08-12. Its release becomes operational only after the documentation record of that authorization merges and `main` is synchronized locally with a clean working tree. M2-B through M2-F remain gated.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -253,8 +253,22 @@ Before M2-A may be released:
 1. [x] This plan and ADRs 0026–0028 received independent architecture review.
 2. [x] Every identified correction was applied while the ADRs remained Proposed, and focused re-review found no remaining blocker.
 3. [x] Joseph Carfagno explicitly accepted the final ADR set and approved this plan on 2026-08-12.
-4. [ ] The approval record must merge to `main`, CI must pass, and the local repository must be synchronized cleanly.
-5. [ ] Joseph Carfagno must separately release M2-A with an exact scope.
+4. [x] The approval record merged through PR #34 at `106b1e7`, CI passed, and the local repository was synchronized cleanly.
+5. [x] Joseph Carfagno separately released M2-A with the exact scope recorded below on 2026-08-12; that release becomes operational only after its authorization record merges and `main` is synchronized cleanly.
+
+### Exact M2-A authorization boundary
+
+M2-A may implement only:
+
+- additive browser-facing HTTP/runtime contracts and directly corresponding tests/exports in `packages/shared/src/**`, without changing accepted M1 domain or repository semantics;
+- a validated `fetch`/`AbortController` query client, closed error mapping, request cache, single-flight latest-resolution coordinator, complete-pin URL parsing/canonicalization, and routing foundation in `apps/web/src/**`, with directly corresponding tests;
+- the exact `/api/health` versus `/api/v1/*` Vite proxy correction in `apps/web/vite.config.ts`;
+- the ADR-0026 restricted-import ESLint boundary in `eslint.config.mjs` and a directly corresponding proof that representative forbidden imports fail;
+- React Router as the one new pinned third-party dependency, the direct `@atlast/shared` workspace dependency, necessary `apps/web` manifest/TypeScript configuration, and the resulting `pnpm-lock.yaml` changes;
+- browser acceptance coverage proving the built preview reaches both `/api/health` and at least one real `/api/v1` route, limited to `tests/acceptance/**`; and
+- factual M2-A progress updates in `TASKS.md`, including the required before/after browser bundle size and every ADR-0018 measurement that becomes meaningful in this slice.
+
+M2-A must not implement visible topology application features assigned to M2-B, graph rendering/layout or `@xyflow/react`/`elkjs` from M2-C, the M2-D trust inspector, the M2-E snapshot-anchor API/history UI, M2-F closeout work, API-server production changes, new API routes, fixtures, graph-model/repository/reconciliation/storage changes, connectors, authentication, deployment, real-system access, or M3+ work. It must not alter `scripts/verify.sh`, `scripts/bootstrap.sh`, or accepted ADR text. Implementation output still requires independent review, the complete repository verifier, PR/CI approval, merge, and checkpoint update before any next-slice decision.
 
 ## 13. Exit Criteria for M2-P
 
