@@ -1,6 +1,6 @@
 # Atlast — Architecture
 
-**Status:** Current — approved 2026-07-22 with the documentation set. The M0 foundation (TypeScript monorepo, web application and backend API shells, shared package shells, verification tooling, and CI — see [milestones.md M0](milestones.md#m0--safe-project-foundation-active)) is implemented; the M1+ product/domain architecture described here (discovery, evidence, reconciliation, graph, overlays, query API, AI engine) remains conceptual and gated on milestone authorization. This document defines the architecture _philosophy_ and the conceptual shape of the system so that implementation decisions have something to be measured against. Design positions here bind only through human-approved ADRs in `docs/adr/`; tooling and storage choices are evaluated against § 6 and require approval before use.
+**Status:** Current. M0 and M1 are implemented and complete; M2 was explicitly authorized by Joseph Carfagno on 2026-08-12 and is phase-gated, with planning and pre-release architecture/ADR review as its only initially released phase. The M2 exploration UI and all M3+ architecture remain conceptual until their respective implementation gates are released. This document defines the architecture _philosophy_ and conceptual system shape; design positions bind only through human-approved ADRs in `docs/adr/`, and tooling choices require approval before use.
 
 ---
 
