@@ -12,6 +12,8 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "@atlast/graph-model": "workspace:*",
+    "@atlast/shared": "workspace:*",
     "fastify": "5.10.0"
   },
   "devDependencies": {

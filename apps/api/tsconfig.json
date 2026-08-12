@@ -16,7 +16,18 @@
     "erasableSyntaxOnly": true,
     "rewriteRelativeImportExtensions": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": ["node"],
+    // @atlast/graph-model and @atlast/shared are consumed as TypeScript
+    // source inside the workspace for typecheck/test (their built dist/
+    // output is not available until `pnpm build` runs, and
+    // scripts/verify.sh runs `pnpm typecheck` first) — the matching runtime
+    // alias lives in vitest.config.ts; the build config clears this
+    // override so the build resolves both packages through their real
+    // package entry points instead (ADR-0024 § 14).
+    "paths": {
+      "@atlast/graph-model": ["../../packages/graph-model/src/index.ts"],
+      "@atlast/shared": ["../../packages/shared/src/index.ts"]
+    }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "vitest.config.ts"]
 }
