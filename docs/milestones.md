@@ -1,6 +1,6 @@
 # Atlast — Milestones
 
-**Status:** Current. M0 and M1 are complete. Joseph Carfagno explicitly authorized M2, and its authorization record merged through PR #33 at `b547ec2` on 2026-08-12. **Joseph explicitly approved [docs/m2-plan.md](m2-plan.md) and accepted ADRs 0026–0028 after independent review, remediation, and blocker-free re-review; the approval record is pending merge through PR #34.** M2-A remains separately gated and unreleased. No M2 product implementation or M3+ work is authorized.
+**Status:** Current. M0 and M1 are complete. The accepted M2 baseline merged through PR #34 at `106b1e7` on 2026-08-12. **Joseph Carfagno separately authorized M2-A on 2026-08-12; its release becomes operational only after the authorization record merges and `main` is synchronized cleanly.** M2-B+ and M3+ remain unauthorized.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
@@ -62,13 +62,13 @@
 - [x] Every fact in the graph is traceable to its synthetic evidence via the API — _proven exhaustively by `apps/api/src/routes/evidence.test.ts` (all 20 valid Evidence records dereferenced through `GET /api/v1/evidence/{evidenceId}` alone, across all seven valid fixture scenarios)._
 - [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0025, all Accepted._
 
-**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately and explicitly authorized M2 on 2026-08-12; that authorization record merged through PR #33 at `b547ec2`, and `main` was synchronized locally with a clean working tree. The M2 baseline is now explicitly human-approved, with PR #34 merge and clean synchronization pending. M2-A still requires its own explicit release; M3 and later milestones remain unauthorized.
+**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, and its accepted baseline merged through PR #34 at `106b1e7` with clean synchronization. Joseph then explicitly authorized M2-A only on 2026-08-12. Its release is pending the documentation-merge checkpoint; M2-B and later remain unauthorized.
 
 ---
 
 ## M2 — Interactive Topology Interface (authorized 2026-08-12 — phase-gated)
 
-> **Authorization status:** M2 authorization is effective through PR #33 at `b547ec2`. [docs/m2-plan.md](m2-plan.md) and ADRs 0026–0028 were explicitly human-approved on 2026-08-12 after independent review and remediation; the approval becomes operational after PR #34 merges and `main` is synchronized cleanly. **M2-A is not released, and this approval authorizes no implementation.** M3 and later milestones remain gated and unauthorized.
+> **Authorization status:** The accepted M2 baseline is operational through PR #34 at `106b1e7`. Joseph explicitly authorized M2-A on 2026-08-12 within [docs/m2-plan.md's exact boundary](m2-plan.md#exact-m2-a-authorization-boundary); that release becomes operational only after its authorization record merges and `main` is synchronized cleanly. **M2-B through M2-F and M3+ remain gated and unauthorized.**
 
 **Goal:** People who don't write queries can explore the graph.
 
