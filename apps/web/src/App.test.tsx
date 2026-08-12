@@ -66,6 +66,24 @@ describe("App — primary rendered content", () => {
     // teardown; the online state is asserted in its own test below.
     await screen.findByText("Local API connected");
   });
+
+  it("shows M0 as delivered, M1 as core delivered (not formally closed), and every later milestone as gated", async () => {
+    stubHealthEndpoint({
+      ok: true,
+      jsonPayload: { status: "ok", service: "atlast-api" },
+    });
+
+    render(<App />);
+
+    expect(screen.getAllByText("delivered", { exact: true })).toHaveLength(1);
+    expect(screen.getAllByText("core delivered")).toHaveLength(1);
+    expect(screen.getAllByText("gated")).toHaveLength(4);
+    expect(
+      screen.getByText(/The M1 synthetic topology core is delivered/),
+    ).toBeDefined();
+
+    await screen.findByText("Local API connected");
+  });
 });
 
 describe("App — API health states", () => {
