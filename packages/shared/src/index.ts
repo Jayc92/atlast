@@ -180,3 +180,7 @@ export {
   type SnapshotSummaryData,
   type UnknownIdentifierDetails,
 } from "./http-contract.ts";
+export {
+  strictDecimalQueryParameterSchema,
+  strictIntegerQueryParameterSchema,
+} from "./http-query-coercion.ts";
