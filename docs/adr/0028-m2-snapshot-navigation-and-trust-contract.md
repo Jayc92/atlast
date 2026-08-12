@@ -1,7 +1,9 @@
 # ADR-0028: M2 Snapshot Navigation and Trust-Presentation Contract
 
-**Status:** Proposed — proposes one additive M2 API route; does not amend an accepted ADR unless accepted
+**Status:** Accepted
 **Date:** 2026-08-12
+
+> **Approval note (2026-08-12):** Explicitly accepted by Joseph Carfagno after independent architecture review, correction, and focused re-review found no remaining blocker. Acceptance approves the additive M2 snapshot-anchor route and trust-presentation contract. It becomes operational only after PR #34 merges and `main` is synchronized locally with a clean working tree; it does not release M2-A or M2-E, authorize implementation, or authorize M3+.
 
 ## Context
 

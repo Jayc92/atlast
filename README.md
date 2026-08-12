@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 and M1 complete; M2 explicitly authorized and phase-gated.** M2's authorization record merged through PR #33 at `b547ec2` on 2026-08-12. M2-P planning and architecture/ADR review are active; [docs/m2-plan.md](docs/m2-plan.md) and ADRs 0026–0028 are Proposed and authorize no implementation. The topology interface remains gated until that baseline is independently reviewed and explicitly approved. M3 and later milestones remain unauthorized. Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 and M1 complete; M2 explicitly authorized and phase-gated.** M2's authorization record merged through PR #33 at `b547ec2`. Joseph explicitly approved [docs/m2-plan.md](docs/m2-plan.md) and accepted ADRs 0026–0028 on 2026-08-12 after independent review and remediation; the approval record is pending merge through PR #34. **M2-A remains separately gated and unreleased; no M2 product implementation or M3+ work is authorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -128,7 +128,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-The M0 foundation and M1 synthetic topology model are formally complete ([TASKS.md](TASKS.md)); M1 closed through PR #32 at `cff0545` on 2026-08-12. **Joseph Carfagno separately and explicitly authorized M2 on 2026-08-12, and that authorization record merged through PR #33 at `b547ec2`.** M2 is phase-gated: its first released phase is implementation planning and pre-release architecture/ADR review only; no graph-exploration product implementation is released until that baseline is independently reviewed and explicitly approved. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M3 and later milestones remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+The M0 foundation and M1 synthetic topology model are formally complete ([TASKS.md](TASKS.md)); M1 closed through PR #32 at `cff0545` on 2026-08-12. **Joseph Carfagno separately and explicitly authorized M2 on 2026-08-12, and that authorization record merged through PR #33 at `b547ec2`.** The M2 baseline was subsequently independently reviewed, remediated, re-reviewed without remaining blockers, and explicitly human-approved. Its PR #34 merge checkpoint remains pending, and M2-A still requires a separate explicit release. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **No M2 product implementation or M3+ work is authorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 

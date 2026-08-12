@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Proposed — M2-P planning output; not approved for implementation
+**Status:** Approved by human review on 2026-08-12; operational after the approval record merges through PR #34 and `main` is synchronized
 **Date:** 2026-08-12
 
-> **Authorization boundary:** Joseph Carfagno explicitly authorized M2 on 2026-08-12 through PR #33 at `b547ec2`. That authorization released this planning and pre-release architecture/ADR phase only. Nothing in this document authorizes product implementation, dependency installation, API changes, or edits to `apps/web`. Implementation remains gated until this plan and its proposed ADRs are independently reviewed and explicitly human-approved.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. The approval becomes operational only after its record merges through PR #34 and `main` is synchronized locally with a clean working tree. Approval establishes the M2 implementation baseline but does not release M2-A, authorize dependency installation or product changes, or authorize M3+. M2-A still requires a separate explicit human release with an exact scope.
 
 ## 1. Objective
 
@@ -242,7 +242,7 @@ Existing `scripts/verify.sh` remains the only repository verification entry poin
 
 ## 12. Required Decisions Before Implementation
 
-The proposed ADRs accompanying this plan are:
+The accepted ADRs accompanying this plan are:
 
 - [ADR-0026](adr/0026-m2-browser-architecture-and-api-boundary.md): browser architecture, query-only boundary, runtime validation, routing, proxy, and coordinated reads.
 - [ADR-0027](adr/0027-m2-graph-rendering-and-accessibility.md): graph rendering/layout choice and accessible equivalent.
@@ -250,19 +250,19 @@ The proposed ADRs accompanying this plan are:
 
 Before M2-A may be released:
 
-1. This plan and ADRs 0026–0028 receive independent architecture review.
-2. Every identified correction is applied while the ADRs remain Proposed.
-3. Joseph Carfagno explicitly accepts the final ADR set and approves this plan.
-4. The approval record merges to `main`, CI passes, and the local repository is synchronized cleanly.
-5. Joseph Carfagno separately releases M2-A with an exact scope.
+1. [x] This plan and ADRs 0026–0028 received independent architecture review.
+2. [x] Every identified correction was applied while the ADRs remained Proposed, and focused re-review found no remaining blocker.
+3. [x] Joseph Carfagno explicitly accepted the final ADR set and approved this plan on 2026-08-12.
+4. [ ] The approval record must merge to `main`, CI must pass, and the local repository must be synchronized cleanly.
+5. [ ] Joseph Carfagno must separately release M2-A with an exact scope.
 
 ## 13. Exit Criteria for M2-P
 
-- [ ] Existing API capabilities and M2 gaps are accurately inventoried.
-- [ ] Primary journeys, information architecture, URL model, and snapshot coordination are settled.
-- [ ] Graph rendering, layout, accessibility, and responsive strategy are settled.
-- [ ] Trust metadata and failure-state presentation are settled.
-- [ ] Snapshot playback has an API-only, bounded design.
-- [ ] ADR-0018's mandatory M2 storage re-evaluation is accepted with an explicit measurement and closeout decision gate.
-- [ ] Proposed slices and verification obligations are independently reviewed.
-- [ ] ADRs 0026–0028 and this plan are explicitly human-approved.
+- [x] Existing API capabilities and M2 gaps are accurately inventoried.
+- [x] Primary journeys, information architecture, URL model, and snapshot coordination are settled.
+- [x] Graph rendering, layout, accessibility, and responsive strategy are settled.
+- [x] Trust metadata and failure-state presentation are settled.
+- [x] Snapshot playback has an API-only, bounded design.
+- [x] ADR-0018's mandatory M2 storage re-evaluation is accepted with an explicit measurement and closeout decision gate.
+- [x] Proposed slices and verification obligations were independently reviewed.
+- [x] ADRs 0026–0028 and this plan were explicitly human-approved on 2026-08-12.

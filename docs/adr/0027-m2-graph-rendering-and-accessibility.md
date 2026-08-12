@@ -1,7 +1,9 @@
 # ADR-0027: M2 Graph Rendering, Layout, and Accessibility
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-08-12
+
+> **Approval note (2026-08-12):** Explicitly accepted by Joseph Carfagno after independent architecture review, correction, and focused re-review found no remaining blocker. Acceptance becomes operational only after PR #34 merges and `main` is synchronized locally with a clean working tree. It establishes the M2 graph-rendering and accessibility decision but does not release M2-A, authorize dependency installation or implementation, or authorize M3+.
 
 ## Context
 
