@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 and M1 complete; M2 explicitly authorized and phase-gated.** M2-A is complete and closed through PR #37 at `2bbf13b`. Joseph separately authorized M2-B only on 2026-08-12; its release becomes operational only after the authorization record merges and `main` is synchronized cleanly. **M2-C+ and M3+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 and M1 complete; M2 explicitly authorized and phase-gated.** M2-A is complete and closed through PR #37 at `2bbf13b`; M2-B is complete through PR #39 at `9dd507b`, pending this documentation closeout. **No implementation slice is active; M2-C+ and M3+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -128,7 +128,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-The M0 foundation and M1 synthetic topology model are formally complete ([TASKS.md](TASKS.md)); M1 closed through PR #32 at `cff0545` on 2026-08-12. **M2-A is complete and closed through PR #37 at `2bbf13b`; Joseph then separately authorized M2-B only.** That release remains pending its authorization-record merge and clean synchronization checkpoint. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M2-C+ and M3+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+The M0 foundation and M1 synthetic topology model are formally complete ([TASKS.md](TASKS.md)); M1 closed through PR #32 at `cff0545` on 2026-08-12. **M2-A is complete and closed through PR #37 at `2bbf13b`; M2-B is complete through PR #39 at `9dd507b`, pending this documentation closeout.** See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **No implementation slice is active; M2-C+ and M3+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
