@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational through PR #34 at `106b1e7`; M2-A complete through PR #36 at `fa38812`; M2-B+ unauthorized
+**Status:** Approved and operational; M2-A complete and closed through PR #37 at `2bbf13b`; M2-B separately authorized on 2026-08-12, pending its authorization-record merge; M2-C+ unauthorized
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. The approval record merged through PR #34 at `106b1e7`. M2-A was separately authorized through PR #35 at `c3c661a`, implemented, independently reviewed and remediated, and merged through PR #36 at `fa38812`. M2-A is complete. M2-B through M2-F and M3+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A is complete and closed through PR #37 at `2bbf13b`. Joseph then separately and explicitly authorized M2-B only on 2026-08-12. That release becomes operational only after its documentation record merges and `main` is synchronized cleanly. M2-C through M2-F and M3+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A was separately and explicitly authorized by Joseph Carfagno on 2026-08-12. Its authorization record merged through PR #35 at `c3c661a`; implementation then merged through PR #36 at `fa38812` after independent review, remediation, complete local verification, and passing GitHub Actions `verify`. M2-A is complete. M2-B through M2-F remain gated.
+M2-A is complete and closed through PR #37 at `2bbf13b`. M2-B was separately and explicitly authorized by Joseph Carfagno on 2026-08-12; its release becomes operational only after the documentation record of that authorization merges and `main` is synchronized locally with a clean working tree. M2-C through M2-F remain gated.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -271,6 +271,20 @@ M2-A may implement only:
 - factual M2-A progress updates in `TASKS.md`, including the required before/after browser bundle size and every ADR-0018 measurement that becomes meaningful in this slice.
 
 M2-A must not implement visible topology application features assigned to M2-B, graph rendering/layout or `@xyflow/react`/`elkjs` from M2-C, the M2-D trust inspector, the M2-E snapshot-anchor API/history UI, M2-F closeout work, API-server production changes, new API routes, fixtures, graph-model/repository/reconciliation/storage changes, connectors, authentication, deployment, real-system access, or M3+ work. It must not alter `scripts/verify.sh`, `scripts/bootstrap.sh`, or accepted ADR text. Implementation output still requires independent review, the complete repository verifier, PR/CI approval, merge, and checkpoint update before any next-slice decision.
+
+### Exact M2-B authorization boundary
+
+M2-B may implement only:
+
+- the visible application shell for `/topology` and `/entities/:entityId` in `apps/web/src/**`, replacing the M2-A inert placeholders without changing the existing `/` foundation page beyond navigation needed to enter the topology application;
+- Entity inventory and canonical-identifier search using only the M2-A validated query client and the accepted query API, including bounded pagination and opaque cursor handling;
+- entity-focused routing and selection using the existing canonical URL state, complete-pin parsing/serialization, React Router foundation, request cache, and single-flight latest-resolution coordinator;
+- coordinated latest-to-pinned inventory, search, and entity-detail reads that preserve one complete resolved snapshot identity for the current exploration generation;
+- canonical loading, empty, expected API-error, redacted internal-error, retry, and invalid-URL-correction states required by Journey F, with accessible status communication and no stale result relabeled current;
+- responsive, keyboard-reachable shell/navigation and structured Entity inventory/search/detail presentation without a graph canvas, traversal workspace, trust inspector, or history controls;
+- directly corresponding `apps/web/src/**` unit/component tests and factual M2-B progress updates in `TASKS.md`, including measurements that become meaningful in this slice.
+
+M2-B must not add or upgrade dependencies; change package manifests, the lockfile, shared contracts, API production code/routes, graph-model/repository/reconciliation/storage behavior, fixtures, accepted ADR text, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; implement traversal, Relationship graph projection, graph rendering/layout, `@xyflow/react`, `elkjs`, the M2-D trust inspector/Evidence dereferencing/conflict or ambiguity presentation, the M2-E snapshot-anchor API/history playback, M2-F hardening/audit/closeout, connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, PR/CI approval, merge, and checkpoint update before any next-slice decision.
 
 ## 13. Exit Criteria for M2-P
 
