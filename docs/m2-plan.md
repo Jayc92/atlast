@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational; M2-A complete and closed through PR #37 at `2bbf13b`; M2-B complete through PR #39 at `9dd507b`, pending documentation closeout; M2-C+ unauthorized
+**Status:** Approved and operational; M2-A and M2-B complete, with M2-B closed through PR #40 at `6e87aeb`; M2-C separately authorized on 2026-08-12, pending its authorization-record merge; M2-D+ unauthorized
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A is complete and closed through PR #37 at `2bbf13b`. M2-B was separately authorized, implemented, independently reviewed and remediated, manually approved, and merged through PR #39 at `9dd507b`; this documentation closes that checkpoint. M2-C through M2-F and M3+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A and M2-B are complete, with M2-B closed through PR #40 at `6e87aeb`. Joseph then separately and explicitly authorized M2-C only on 2026-08-12. That release becomes operational only after its documentation record merges and `main` is synchronized cleanly. M2-D through M2-F and M3+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A is complete and closed through PR #37 at `2bbf13b`. M2-B was separately authorized, implemented, independently reviewed and remediated, manually approved, and merged through PR #39 at `9dd507b`; this documentation closes that checkpoint. No implementation slice is active. M2-C through M2-F remain gated.
+M2-A and M2-B are complete, with M2-B closed through PR #40 at `6e87aeb`. M2-C was separately and explicitly authorized by Joseph Carfagno on 2026-08-12; its release becomes operational only after this authorization record merges and `main` is synchronized locally with a clean working tree. M2-D through M2-F remain gated.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -287,6 +287,22 @@ M2-B may implement only:
 - directly corresponding `apps/web/src/**` unit/component tests and factual M2-B progress updates in `TASKS.md`, including measurements that become meaningful in this slice.
 
 M2-B must not add or upgrade dependencies; change package manifests, the lockfile, shared contracts, API production code/routes, graph-model/repository/reconciliation/storage behavior, fixtures, accepted ADR text, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; implement traversal, Relationship graph projection, graph rendering/layout, `@xyflow/react`, `elkjs`, the M2-D trust inspector/Evidence dereferencing/conflict or ambiguity presentation, the M2-E snapshot-anchor API/history playback, M2-F hardening/audit/closeout, connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, PR/CI approval, merge, and checkpoint update before any next-slice decision.
+
+### Exact M2-C authorization boundary
+
+M2-C may implement only:
+
+- traversal controls for `direction` (`upstream`/`downstream`), `depth` (1–5), and `minConfidence` (0–1), canonicalized through the existing URL-state foundation, plus bounded traversal reads through the existing validated M2-A query client at the M2-B exploration session's complete resolved snapshot identity;
+- a pure domain-to-view adapter that converts validated traversal results into canonically ordered Entity nodes, directed Relationship-claim candidate edges, selection records, missing-endpoint boundary references, and explicit traversal-truncation records without choosing a winning claim or altering domain meaning;
+- deterministic layered layout through `elkjs`, with fixed options, canonical adapter input ordering, presentation-only coordinates, and focused determinism/non-mutation tests;
+- an interactive viewport through `@xyflow/react` for pan, zoom, node/edge rendering, and selection, without placing domain decisions in React Flow components;
+- the normative, keyboard-operable structured topology equivalent required by ADR-0027, covering the same loaded entities, relationships, missing endpoints, and truncation state as the graph viewport;
+- one shared selection/focus model across graph and structured views, preserving selected subject, snapshot identity, and traversal bounds when switching `view=graph|list`, with deliberate focus movement and visible controls outside the canvas;
+- responsive pane behavior, visible keyboard/touch alternatives, non-color state communication, and `prefers-reduced-motion` handling directly required by ADR-0027 for this slice's surface;
+- exact pinned versions of the already-approved `@xyflow/react` and `elkjs` dependencies in `apps/web/package.json`, only the directly resulting `pnpm-lock.yaml` changes, and any necessary `apps/web` TypeScript/test configuration for those packages — no other new dependency or upgrade;
+- directly corresponding `apps/web/src/**` unit/component tests, browser acceptance under `tests/acceptance/**` for the primary desktop/mobile traversal journey, and factual M2-C progress and required before/after bundle/latency/memory/cardinality/truncation measurements in `TASKS.md`.
+
+M2-C must not change shared contracts, API production code/routes, graph-model/repository/reconciliation/storage behavior, fixtures, accepted ADR text, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; implement the M2-D trust inspector, Evidence dereferencing, detailed assertion/confidence/freshness/validity/rule-trace presentation, or conflict/ambiguity explanation beyond the labels and separate candidate edges needed for honest graph/list rendering; implement M2-E snapshot-anchor API/history playback; perform M2-F hardening/audit/closeout; add connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, human browser/accessibility review, PR/CI approval, merge, and checkpoint update before any next-slice decision.
 
 ## 13. Exit Criteria for M2-P
 
