@@ -18,6 +18,10 @@
     "jsx": "react-jsx",
     "useDefineForClassFields": true,
     "noEmit": true,
+    // The pinned React Flow/ELK declarations do not satisfy this repository's
+    // exactOptionalPropertyTypes setting internally. Project source remains
+    // fully checked; only third-party declaration implementation details skip.
+    "skipLibCheck": true,
     "types": ["vite/client"],
     // @atlast/shared is consumed through its real dist/main/types/exports in
     // production builds; this alias exists for typecheck/test only, mirroring

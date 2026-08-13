@@ -7,10 +7,15 @@
  * but not confidence, freshness, conflict/ambiguity state, rule traces, or
  * Evidence dereferencing.
  */
-import type { ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router";
-import type { SnapshotIdentity, SubjectDetailResult } from "@atlast/shared";
-import { fetchEntityDetail } from "../api/client.ts";
+import type {
+  SnapshotIdentity,
+  SubjectDetailResult,
+  TraversalDirection,
+  TraversalResult,
+} from "@atlast/shared";
+import { fetchEntityDetail, fetchTraversal } from "../api/client.ts";
 import { buildRequestCacheKey } from "../api/cache.ts";
 import type { ClientQueryResult } from "../api/errors.ts";
 import { serializeTopologyUrlState } from "../url/query-state.ts";
@@ -27,6 +32,7 @@ import {
   topologySessionCoordinator,
 } from "./session.ts";
 import { TopologyShell } from "./TopologyShell.tsx";
+import { TraversalWorkspace } from "./TraversalWorkspace.tsx";
 import { useAsyncQuery } from "./use-async-query.ts";
 import { useCanonicalTopologyUrlState } from "./use-topology-url-state.ts";
 
@@ -44,13 +50,48 @@ function pinToken(identity: SnapshotIdentity): string {
   return `${identity.asOf}|${String(identity.horizon)}|${identity.derivationVersion}`;
 }
 
+interface KeyedTraversalResult {
+  readonly queryKey: string;
+  readonly contextKey: string;
+  readonly data: TraversalResult;
+}
+
+function useNarrowTopologyViewport(): boolean {
+  const [isNarrow, setIsNarrow] = useState(
+    () =>
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(max-width: 45rem)").matches,
+  );
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") {
+      return;
+    }
+    const mediaQuery = window.matchMedia("(max-width: 45rem)");
+    const handleChange = (event: MediaQueryListEvent): void => {
+      setIsNarrow(event.matches);
+    };
+    setIsNarrow(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return (): void => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
+
+  return isNarrow;
+}
+
 export function EntityDetailPage(): ReactElement {
   const routeParams = useParams<{ entityId: string }>();
   const trimmedEntityId = routeParams.entityId?.trim();
   const isValidEntityId =
     trimmedEntityId !== undefined && trimmedEntityId.length > 0;
 
-  const { state: urlState, wasCorrected } = useCanonicalTopologyUrlState();
+  const {
+    state: urlState,
+    wasCorrected,
+    setSearchParams,
+  } = useCanonicalTopologyUrlState();
 
   const identityQueryKey =
     urlState.pin !== undefined
@@ -86,6 +127,79 @@ export function EntityDetailPage(): ReactElement {
       );
     },
   });
+
+  const direction: TraversalDirection = urlState.direction ?? "downstream";
+  const depth = urlState.depth ?? 1;
+  const minConfidence = urlState.minConfidence ?? 0;
+  const isNarrowViewport = useNarrowTopologyViewport();
+  const canTraverse = detailQuery.state.status === "loaded";
+  const traversalContextKey =
+    identity !== undefined && isValidEntityId
+      ? `${trimmedEntityId}|${pinToken(identity)}`
+      : "inactive:traversal-context";
+  const traversalQueryKey =
+    identity !== undefined && isValidEntityId && canTraverse
+      ? buildRequestCacheKey({
+          operation: "traversal",
+          identity: pinFields(identity),
+          params: {
+            entityId: trimmedEntityId,
+            direction,
+            depth,
+            minConfidence,
+          },
+        })
+      : "inactive:traversal";
+  const traversalQuery = useAsyncQuery<KeyedTraversalResult>({
+    queryKey: traversalQueryKey,
+    cache: true,
+    run: async (signal): Promise<ClientQueryResult<KeyedTraversalResult>> => {
+      if (identity === undefined || !isValidEntityId || !canTraverse) {
+        return Promise.resolve({ ok: false, error: { kind: "aborted" } });
+      }
+      const result = await fetchTraversal(
+        trimmedEntityId,
+        { direction, depth, minConfidence, identity },
+        signal,
+      ).then((response) => requireResolvedIdentity(response, identity));
+      return result.ok
+        ? {
+            ok: true,
+            data: {
+              queryKey: traversalQueryKey,
+              contextKey: traversalContextKey,
+              data: result.data,
+            },
+          }
+        : result;
+    },
+  });
+  const [retainedTraversal, setRetainedTraversal] = useState<{
+    readonly contextKey: string;
+    readonly data: TraversalResult;
+  }>();
+
+  useEffect(() => {
+    if (
+      traversalQuery.state.status === "loaded" &&
+      traversalQuery.state.data.queryKey === traversalQueryKey
+    ) {
+      setRetainedTraversal({
+        contextKey: traversalQuery.state.data.contextKey,
+        data: traversalQuery.state.data.data,
+      });
+    }
+  }, [traversalQuery.state, traversalQueryKey]);
+
+  const retainedTraversalForContext =
+    retainedTraversal?.contextKey === traversalContextKey
+      ? retainedTraversal.data
+      : undefined;
+  const currentTraversal =
+    traversalQuery.state.status === "loaded" &&
+    traversalQuery.state.data.queryKey === traversalQueryKey
+      ? traversalQuery.state.data.data
+      : undefined;
 
   if (!isValidEntityId) {
     return <Navigate to="/topology" replace />;
@@ -137,7 +251,10 @@ export function EntityDetailPage(): ReactElement {
         (() => {
           const view = projectEntityDetail(detailQuery.state.data.data);
           return (
-            <article aria-labelledby="entity-detail-heading">
+            <article
+              className="topology-entity-summary"
+              aria-labelledby="entity-detail-heading"
+            >
               <h2 id="entity-detail-heading">{view.identifier}</h2>
               {view.entityTypes.length > 0 ? (
                 <>
@@ -161,6 +278,76 @@ export function EntityDetailPage(): ReactElement {
             </article>
           );
         })()}
+      {identityQuery.state.status === "loaded" &&
+        traversalQuery.state.status === "api-error" &&
+        retainedTraversalForContext === undefined && (
+          <ApiErrorStatus
+            error={traversalQuery.state.error}
+            onRetry={traversalQuery.retry}
+          />
+        )}
+      {identityQuery.state.status === "loaded" &&
+        traversalQuery.state.status === "internal-error" &&
+        retainedTraversalForContext === undefined && (
+          <InternalErrorStatus onRetry={traversalQuery.retry} />
+        )}
+      {detailQuery.state.status === "loaded" &&
+        (currentTraversal !== undefined ||
+          retainedTraversalForContext !== undefined) &&
+        (() => {
+          const traversal = currentTraversal ?? retainedTraversalForContext;
+          if (traversal === undefined || identity === undefined) {
+            return null;
+          }
+          const updateUrl = (
+            updates: Partial<{
+              direction: TraversalDirection;
+              depth: number;
+              minConfidence: number;
+              view: "graph" | "list";
+              selected: string;
+            }>,
+          ): void => {
+            setSearchParams(
+              serializeTopologyUrlState({
+                ...urlState,
+                ...updates,
+                // UI-only exploration changes preserve the caller's mode. The
+                // resolved identity still binds reads within this render, but
+                // it must not silently turn an unpinned latest URL into a pin.
+                ...(urlState.pin !== undefined ? { pin: identity } : {}),
+              }),
+            );
+          };
+          return (
+            <TraversalWorkspace
+              origin={detailQuery.state.data.data}
+              traversal={traversal}
+              direction={direction}
+              depth={depth}
+              minConfidence={minConfidence}
+              viewMode={urlState.view ?? (isNarrowViewport ? "list" : "graph")}
+              selected={urlState.selected}
+              updating={currentTraversal === undefined}
+              onBoundsChange={(bounds) => {
+                updateUrl(bounds);
+              }}
+              onViewModeChange={(view) => {
+                updateUrl({ view });
+              }}
+              onSelect={(selected) => {
+                updateUrl({ selected });
+              }}
+            />
+          );
+        })()}
+      {identityQuery.state.status === "loaded" &&
+        (traversalQuery.state.status === "loading" ||
+          traversalQuery.state.status === "loaded") &&
+        currentTraversal === undefined &&
+        retainedTraversalForContext === undefined && (
+          <LoadingStatus label="Loading bounded relationships…" />
+        )}
       {identity !== undefined && (
         <p className="topology-snapshot-indicator">
           Snapshot: {urlState.pin !== undefined ? "pinned" : "latest"} · asOf{" "}
