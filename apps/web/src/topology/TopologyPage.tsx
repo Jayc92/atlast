@@ -2,8 +2,8 @@
  * The `/topology` route (docs/m2-plan.md § 10 M2-B): Entity inventory and
  * canonical-identifier search, using only the M2-A validated query client and
  * accepted query API, with bounded pagination and completely opaque cursor
- * handling. No graph canvas, traversal workspace, trust inspector, or
- * history controls — those remain M2-C/M2-D/M2-E scope.
+ * handling. M2-D adds exact-Relationship trust inspection without widening
+ * the API; history controls remain M2-E scope.
  *
  * Pagination cursors are ephemeral component state, never written to the
  * URL (docs/m2-plan.md § 5: "A copied URL represents the exploration
@@ -11,13 +11,14 @@
  * client-side history of the opaque cursors used to reach each position,
  * never parsed or constructed, only stored and replayed verbatim.
  */
-import { useState, type ReactElement } from "react";
+import { useRef, useState, type ReactElement } from "react";
 import { Link } from "react-router";
 import {
   MINIMUM_SEARCH_QUERY_LENGTH,
   type EntityPage,
   type SnapshotIdentity,
   type SubjectPage,
+  type SubjectReadResult,
 } from "@atlast/shared";
 import { fetchEntityInventory, fetchSearch } from "../api/client.ts";
 import { buildRequestCacheKey } from "../api/cache.ts";
@@ -43,6 +44,7 @@ import {
   topologySessionCoordinator,
 } from "./session.ts";
 import { TopologyShell } from "./TopologyShell.tsx";
+import { TrustInspector } from "./TrustInspector.tsx";
 import { useAsyncQuery, type UseAsyncQueryResult } from "./use-async-query.ts";
 import { useCanonicalTopologyUrlState } from "./use-topology-url-state.ts";
 
@@ -78,6 +80,8 @@ function withQuery(
   current: TopologyUrlState,
   q: string | undefined,
 ): TopologyUrlState {
+  // A new result set deliberately clears any prior Relationship selection;
+  // retaining it would show trust for a subject outside the visible search.
   return {
     ...(current.direction !== undefined
       ? { direction: current.direction }
@@ -87,7 +91,6 @@ function withQuery(
       ? { minConfidence: current.minConfidence }
       : {}),
     ...(current.view !== undefined ? { view: current.view } : {}),
-    ...(current.selected !== undefined ? { selected: current.selected } : {}),
     ...(current.pin !== undefined ? { pin: current.pin } : {}),
     ...(q !== undefined ? { q } : {}),
   };
@@ -247,9 +250,11 @@ function EntityInventoryList({
 function SubjectResultsList({
   page,
   urlState,
+  onInspectRelationship,
 }: {
   readonly page: SubjectPage;
   readonly urlState: TopologyUrlState;
+  readonly onInspectRelationship: (identifier: string) => void;
 }): ReactElement {
   if (page.items.length === 0) {
     return <EmptyStatus message="No subjects match this search." />;
@@ -265,7 +270,15 @@ function SubjectResultsList({
                 {view.identifier}
               </Link>
             ) : (
-              <span>{view.identifier}</span>
+              <button
+                type="button"
+                className="topology-inline-inspect"
+                onClick={() => {
+                  onInspectRelationship(view.identifier);
+                }}
+              >
+                Inspect {view.identifier}
+              </button>
             )}
             <span className="topology-result-kind"> ({view.subjectKind})</span>
             {view.subjectKind === "entity" && view.entityTypes.length > 0 && (
@@ -289,6 +302,7 @@ function SubjectResultsList({
 }
 
 export function TopologyPage(): ReactElement {
+  const inspectorReturnFocusRef = useRef<HTMLElement | null>(null);
   const {
     state: urlState,
     wasCorrected,
@@ -374,6 +388,86 @@ export function TopologyPage(): ReactElement {
       ).then((result) => requireResolvedIdentity(result, identity));
     },
   });
+  const selectedRelationshipIdentifier = urlState.selected?.startsWith(
+    "atlast:relationship:",
+  )
+    ? urlState.selected
+    : undefined;
+  const relationshipFromCurrentPage =
+    searchQuery.state.status === "loaded" &&
+    selectedRelationshipIdentifier !== undefined
+      ? searchQuery.state.data.items.find(
+          (item) =>
+            item.subject.subjectKind === "relationship" &&
+            item.subject.identifier === selectedRelationshipIdentifier,
+        )
+      : undefined;
+  const relationshipTrustQueryKey =
+    identity !== undefined &&
+    selectedRelationshipIdentifier !== undefined &&
+    relationshipFromCurrentPage === undefined
+      ? buildRequestCacheKey({
+          operation: "relationshipTrust",
+          identity: pinFields(identity),
+          params: { relationshipId: selectedRelationshipIdentifier },
+        })
+      : "inactive:relationshipTrust";
+  const relationshipTrustQuery = useAsyncQuery<SubjectReadResult | null>({
+    queryKey: relationshipTrustQueryKey,
+    cache: true,
+    run: async (
+      signal,
+    ): Promise<ClientQueryResult<SubjectReadResult | null>> => {
+      if (
+        identity === undefined ||
+        selectedRelationshipIdentifier === undefined ||
+        relationshipFromCurrentPage !== undefined
+      ) {
+        return { ok: false, error: { kind: "aborted" } };
+      }
+      const result = await fetchSearch(
+        {
+          q: selectedRelationshipIdentifier,
+          limit: 100,
+          identity,
+        },
+        signal,
+      ).then((response) => requireResolvedIdentity(response, identity));
+      if (!result.ok) {
+        return result;
+      }
+      const exact = result.data.items.find(
+        (item) =>
+          item.subject.subjectKind === "relationship" &&
+          item.subject.identifier === selectedRelationshipIdentifier,
+      );
+      return { ok: true, data: exact ?? null };
+    },
+  });
+  const selectedRelationship =
+    relationshipFromCurrentPage ??
+    (relationshipTrustQuery.state.status === "loaded"
+      ? (relationshipTrustQuery.state.data ?? undefined)
+      : undefined);
+
+  const inspectRelationship = (identifier: string): void => {
+    inspectorReturnFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    setSearchParams(
+      serializeTopologyUrlState({
+        ...urlState,
+        selected: identifier,
+      }),
+    );
+  };
+
+  const closeInspector = (): void => {
+    const withoutSelected = { ...urlState };
+    delete withoutSelected.selected;
+    setSearchParams(serializeTopologyUrlState(withoutSelected));
+  };
 
   function goToNextPage(nextCursor: string | undefined): void {
     if (nextCursor === undefined) {
@@ -424,7 +518,11 @@ export function TopologyPage(): ReactElement {
           : isSearchMode
             ? renderQueryState(searchQuery, "Searching…", (page) => (
                 <>
-                  <SubjectResultsList page={page} urlState={urlState} />
+                  <SubjectResultsList
+                    page={page}
+                    urlState={urlState}
+                    onInspectRelationship={inspectRelationship}
+                  />
                   <PaginationControls
                     pageNumber={pageIndex + 1}
                     hasPrevious={pageIndex > 0}
@@ -455,6 +553,35 @@ export function TopologyPage(): ReactElement {
                 ),
               )}
       </div>
+      {selectedRelationshipIdentifier !== undefined &&
+        relationshipFromCurrentPage === undefined &&
+        relationshipTrustQuery.state.status === "loading" && (
+          <LoadingStatus label="Rehydrating exact Relationship trust…" />
+        )}
+      {selectedRelationshipIdentifier !== undefined &&
+        relationshipTrustQuery.state.status === "api-error" && (
+          <ApiErrorStatus
+            error={relationshipTrustQuery.state.error}
+            onRetry={relationshipTrustQuery.retry}
+          />
+        )}
+      {selectedRelationshipIdentifier !== undefined &&
+        relationshipTrustQuery.state.status === "internal-error" && (
+          <InternalErrorStatus onRetry={relationshipTrustQuery.retry} />
+        )}
+      {selectedRelationshipIdentifier !== undefined &&
+        relationshipTrustQuery.state.status === "loaded" &&
+        relationshipTrustQuery.state.data === null && (
+          <EmptyStatus message="The exact Relationship identifier is not visible at this snapshot." />
+        )}
+      {selectedRelationship !== undefined && identity !== undefined && (
+        <TrustInspector
+          selection={{ subject: selectedRelationship }}
+          snapshotIdentity={identity}
+          returnFocus={inspectorReturnFocusRef.current}
+          onClose={closeInspector}
+        />
+      )}
       {identity !== undefined && (
         <p className="topology-snapshot-indicator">
           Snapshot: {urlState.pin !== undefined ? "pinned" : "latest"} · asOf{" "}
