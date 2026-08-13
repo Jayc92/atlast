@@ -7,11 +7,11 @@ The canonical, model-neutral resume document for this project. A replacement con
 ## 1. Document Control
 
 - **Last updated:** 2026-08-13
-- **Checkpoint name:** `m2-d-authorization-pending-merge`
-- **Latest merged checkpoint commit:** `751d47c` (`docs: close M2 implementation slice C (#43)`) — the M2-C closeout, squash-merged through [PR #43](https://github.com/Jayc92/atlast/pull/43) on 2026-08-13 with GitHub Actions `verify` passing in 2m57s.
-- **Latest merged product commit:** `a43b0c5` — M2-C is the latest implemented product checkpoint.
-- **This document update records Joseph Carfagno's explicit M2-D-only authorization**, made after the M2-C closeout merged through PR #43 at `751d47c`. The release becomes operational only after this authorization record merges and `main` is synchronized cleanly. **M2-E+ and M3+ remain unauthorized.**
-- **Branch state at this checkpoint:** `docs/m2-d-authorization`, based on synchronized, clean `main` at `751d47c`.
+- **Checkpoint name:** `m2-d-trust-inspector-merged`
+- **Latest merged checkpoint commit:** `a41d799` (`feat: add M2 trust inspector (#45)`) — the M2-D implementation, squash-merged through [PR #45](https://github.com/Jayc92/atlast/pull/45) on 2026-08-13 with GitHub Actions `verify` passing in 3m6s.
+- **Latest merged product commit:** `a41d799` — M2-D is the latest implemented product checkpoint.
+- **This document update closes M2-D** after independent review, remediation, complete local verification, human browser QA, PR approval, merge, and passing CI. **No implementation slice is active. M2-E+ and M3+ remain unauthorized.**
+- **Branch state at this checkpoint:** `docs/m2-d-closeout`, based on synchronized, clean `main` at `a41d799`.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves every previous checkpoint version. Do not append old checkpoints to this file — retrieve them with `git log -- HANDOFF.md`.
 - **Precedence:** the repository source-of-truth documents ([PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), [docs/m1-plan.md](docs/m1-plan.md), [docs/m2-plan.md](docs/m2-plan.md), the accepted ADRs in [docs/adr/](docs/adr/README.md), [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md)) **override this document wherever they conflict**. HANDOFF.md summarizes; it never supersedes.
 
@@ -45,7 +45,7 @@ The canonical, model-neutral resume document for this project. A replacement con
   - [docs/architecture.md](docs/architecture.md) — architecture philosophy and conceptual design
   - [docs/milestones.md](docs/milestones.md) — authorized milestone sequence M0–M5 with exit criteria
   - [docs/m1-plan.md](docs/m1-plan.md) — the approved, completed M1 implementation baseline
-  - [docs/m2-plan.md](docs/m2-plan.md) — the human-approved M2 baseline and slice boundaries; M2-A through M2-C complete, M2-D+ gated
+  - [docs/m2-plan.md](docs/m2-plan.md) — the human-approved M2 baseline and slice boundaries; M2-A through M2-D complete, M2-E+ gated
   - [docs/adr/](docs/adr/README.md) — accepted ADRs 0001–0025 (index with amendment notes)
   - [docs/audits/](docs/audits/m0-synthetic-boundary-audit.md) — boundary audits
   - `packages/shared` — the merged S1 domain schemas, S2 repository contract surface, S3 fixture-catalog validation suite, S7 HTTP contracts, and M2-A browser health contract
@@ -74,7 +74,7 @@ Factual state at this checkpoint:
 - **S8 authorization became effective** when its authorization PR ([PR #30](https://github.com/Jayc92/atlast/pull/30)) merged to `main` at `a4c6a5d` on 2026-08-12.
 - **S8 is complete** — the M1 synthetic-boundary re-audit ([docs/audits/m0-synthetic-boundary-audit.md § 14](docs/audits/m0-synthetic-boundary-audit.md); one source-hygiene finding — an embedded NUL byte in `packages/graph-model/src/reconciliation.ts` — found and resolved under its own separate explicit narrow authorization), the exhaustive API traceability integration test in `apps/api/src/routes/evidence.test.ts`, the minimal `apps/web` shell-status correction, and factual M1 documentation closeout were all implemented, independently reviewed, verified, and **merged to `main` through [PR #31](https://github.com/Jayc92/atlast/pull/31) at `0477cbd` on 2026-08-12 with GitHub Actions `verify` passing in 2m27s.** An independent post-merge revalidation ([docs/audits/m0-synthetic-boundary-audit.md § 15](docs/audits/m0-synthetic-boundary-audit.md)) then confirmed, directly against the real merge commit: zero literal NUL bytes across all 180 tracked files, the merged changed-file scope matching exactly what was authorized, and no real-system boundary introduced.
 - **S1–S8 are now complete. M1 is formally complete as of 2026-08-12 — checkpoint `m1-complete`.**
-- **M2 was separately and explicitly authorized by Joseph Carfagno on 2026-08-12**, after M1's closeout merged through PR #32 at `cff0545`; the authorization record merged through PR #33 at `b547ec2`. The independently reviewed M2 baseline merged through PR #34 at `106b1e7`. M2-A through M2-C were each separately authorized, implemented, independently reviewed and remediated, verified, merged, and closed; M2-C closed through PR #43 at `751d47c`. Joseph then separately and explicitly authorized M2-D only on 2026-08-13. That release becomes operational only after this authorization record merges and `main` is synchronized cleanly. **M2-E through M2-F and M3–M5 remain gated and unauthorized.**
+- **M2 was separately and explicitly authorized by Joseph Carfagno on 2026-08-12**, after M1's closeout merged through PR #32 at `cff0545`; the authorization record merged through PR #33 at `b547ec2`. The independently reviewed M2 baseline merged through PR #34 at `106b1e7`. M2-A through M2-D were each separately authorized, implemented, independently reviewed and remediated, verified, merged, and closed; M2-D merged through PR #45 at `a41d799` on 2026-08-13. **No implementation slice is active. M2-E through M2-F and M3–M5 remain gated and unauthorized.**
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
 
@@ -95,7 +95,7 @@ Factual state at this checkpoint:
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
 | M0        | Safe project foundation: TypeScript monorepo, API + web shells, shared packages, full verification tooling and CI, synthetic data only | Complete (2026-07-22) |
 | M1        | Synthetic topology model: the core domain modeled and queryable, driven entirely by fixtures                                           | Complete (2026-08-12) |
-| M2        | Interactive topology interface: graph exploration UI reading exclusively through the query API                                         | M2-A/B/C complete     |
+| M2        | Interactive topology interface: graph exploration UI reading exclusively through the query API                                         | M2-A/B/C/D complete   |
 | M3        | Operational health overlays: synthetic states (healthy, degraded, down, disconnected, expiring certificate, latent downstream risk)    | Unauthorized          |
 | M4        | Change-impact simulation: deterministic, explainable blast-radius analysis — validated before any LLM reasoning                        | Unauthorized          |
 | M5        | Read-only local Kubernetes connector: disposable local cluster (e.g., Kind) only — never an employer or production cluster             | Unauthorized          |
@@ -129,8 +129,10 @@ What actually exists in the repository through this checkpoint:
 - **Final M2-B verification evidence:** independent review found and remediated a React Strict Mode shared-probe cancellation deadlock, browser-history search-input desynchronization, and acceptance of dependent responses carrying the wrong resolved snapshot identity. Human browser QA then passed inventory, detail, search, Back/Forward synchronization, and direct-refresh checks. The complete local `./scripts/verify.sh` passed all seven stages: shared 384/384, graph-model 372/372, API 65/65, web 120/120, production builds, and browser acceptance 6/6. GitHub Actions `verify` passed on PR #39 in 3m0s.
 - **M2-C (merged PR #42 at `a43b0c5`, 2026-08-13):** query-API-only bounded upstream/downstream traversal; a deterministic pure domain-to-view projection preserving separate candidate edges and explicit boundary references; fixed-option ELK layout; a lazy React Flow graph viewport; an equivalent keyboard-operable structured view; shared canonical URL selection and focus; explicit ambiguity/conflict labels; responsive and reduced-motion behavior; and the exact pinned `@xyflow/react@12.11.3` and `elkjs@0.12.0` dependencies.
 - **Final M2-C verification evidence:** independent review found and remediated silent latest-to-pinned URL conversion, missing direct viewport/workspace tests, incomplete accessible ambiguity/conflict labels, and a weak acceptance URL assertion. Manual browser QA passed graph/structured equivalence, direction changes, selection persistence, URL state, Back/Forward, and responsive overflow; focused re-review found no blockers. The complete local `./scripts/verify.sh` passed all seven stages: shared 384/384, graph-model 372/372, API 65/65, web 133/133 in 19 files, production builds, and browser acceptance 8/8. GitHub Actions `verify` passed on PR #42 in 3m22s. The lazy graph chunk is approximately 501.46 kB gzip and remains explicitly tracked for M2-F review.
+- **M2-D (merged PR #45 at `a41d799`, 2026-08-13):** query-API-only Entity and Relationship trust entry points; exact Relationship rehydration through accepted identifier search; complete assertion and competing-claim presentation; labeled numeric confidence, snapshot-tied freshness, half-open validity, conflict, ambiguity, and ordered rule traces; complete inspectable/copyable snapshot identity; deduplicated direct Evidence dereferencing with independent loading/error/retry states; traversal-truncation honesty; and accessible focus movement and return behavior. No shared contract, API behavior, graph-model behavior, fixture, dependency, lockfile, accepted ADR, verification-tooling, or browser-acceptance change landed.
+- **Final M2-D verification evidence:** independent review found no blocker and identified targeted coverage/presentation gaps, all remediated before approval: absent/API-error/internal-error Relationship rehydration, genuine Evidence API-error/retry, explicit latest-mode preservation, confidence labels, snapshot-tied freshness explanation, open-validity wording, and one-unit snapshot-identity copy. Human browser QA passed Entity and exact-Relationship entry, heading focus, focus return, complete trust semantics, copy feedback, Evidence loading, and 390×844 responsive overflow. The complete local `./scripts/verify.sh` passed all seven stages: shared 384/384, graph-model 372/372, API 65/65, web 146/146 in 22 files, production builds, and browser acceptance 8/8. GitHub Actions `verify` passed on PR #45 in 3m6s. The eager bundle measured 412.60 kB JS (124.67 kB gzip) and 14.83 kB CSS (3.56 kB gzip); the lazy graph chunk remained unchanged at 1,615.03 kB JS (501.46 kB gzip) plus 15.41 kB CSS (2.56 kB gzip).
 
-**What does NOT exist yet** — do not let any document or prompt claim otherwise: trust inspection and Evidence/confidence/freshness/validity/rule-trace presentation (authorized M2-D, not yet implemented), history playback and its bounded snapshot-anchor API extension (M2-E), or final accessibility/responsive hardening, audit, and milestone closeout (M2-F). M2-C provides bounded graph/structured traversal and honest conflict/ambiguity labels, not the later trust inspector or temporal history capabilities. M2-E through M2-F remain unauthorized.
+**What does NOT exist yet** — do not let any document or prompt claim otherwise: history playback and its bounded snapshot-anchor API extension (M2-E), or final accessibility/responsive hardening, audit, storage decision, and milestone closeout (M2-F). M2-E through M2-F remain unauthorized.
 
 **Design note (no longer an open limitation):** `packages/graph-model` and `apps/api` still consume `@atlast/shared`/`@atlast/graph-model` as TypeScript source through tsconfig `paths` aliases and matching Vitest `resolve.alias` entries for typecheck and test — this is now the deliberate, ADR-0024 § 14-specified convention, not a stand-in for a missing capability: `scripts/verify.sh` runs `pnpm typecheck` before `pnpm build` (ADR-0013), so the aliases let typecheck/test run without requiring a prior build. Production builds resolve both packages through their real `main`/`types`/`exports` entry points instead, proven by S7's clean-build-then-run verification.
 
@@ -138,16 +140,16 @@ What actually exists in the repository through this checkpoint:
 
 Facts observed at this checkpoint:
 
-- **PR #43 (commit `751d47c`) is the latest merged change** — "docs: close M2 implementation slice C," squash-merged to `main` on 2026-08-13 after passing GitHub Actions `verify` in 2m57s.
-- **This checkpoint's own work lives on branch `docs/m2-d-authorization`, based on synchronized, clean `main` at `751d47c`.** It is documentation-only and records Joseph Carfagno's explicit M2-D release; it does not approve future implementation output.
-- At this checkpoint, `main`, `origin/main`, and `origin/HEAD` were synchronized at `751d47c`, and the working tree was clean before these authorization edits began.
-- **The merged M2-C delta** (PR #42) touched only `TASKS.md`, the authorized `apps/web/**` manifest/config/source surface, `pnpm-lock.yaml` for the two approved graph dependencies, and `tests/acceptance/specs/topology-graph.spec.ts`. No `apps/api`, `packages/shared`, `packages/graph-model`, fixture, accepted ADR, verification script, bootstrap script, or CI workflow changed.
+- **PR #45 (commit `a41d799`) is the latest merged change** — "feat: add M2 trust inspector," squash-merged to `main` on 2026-08-13 after passing GitHub Actions `verify` in 3m6s.
+- **This checkpoint's own work lives on branch `docs/m2-d-closeout`, based on synchronized, clean `main` at `a41d799`.** It is documentation-only and records the merged M2-D state; it does not authorize M2-E.
+- At this checkpoint, `main`, `origin/main`, and `origin/HEAD` were synchronized at `a41d799`, and the working tree was clean before these closeout edits began.
+- **The merged M2-D delta** (PR #45) touched only `TASKS.md` and the authorized `apps/web/src/**` source/test/style surface. No package manifest, lockfile, `apps/api`, `packages/shared`, `packages/graph-model`, fixture, accepted ADR, acceptance test, verification script, bootstrap script, or CI workflow changed.
 
 **A replacement conductor MUST inspect the actual Git state (`git status`, `git log --oneline --decorate -10`, `git remote -v`) and trust Git over any recorded prose — here or anywhere else.** A future handoff MUST replace this section with the state actually observed at its checkpoint, never copy Git facts forward.
 
 ## 7. Current Authorized Work
 
-**M1 is formally complete, the accepted M2 baseline is operational through PR #34 at `106b1e7`, and M2-A through M2-C are complete, with M2-C closed through PR #43 at `751d47c`. Joseph Carfagno has explicitly authorized M2-D only.** The release becomes operational only after this authorization record merges and `main` is synchronized locally with a clean working tree. Authorization does not approve future M2-D output. M2-E through M2-F and M3+ remain gated and unauthorized.
+**M1 is formally complete, the accepted M2 baseline is operational through PR #34 at `106b1e7`, and M2-A through M2-D are complete, with M2-D merged through PR #45 at `a41d799`.** No implementation slice is active. M2-E through M2-F and M3+ remain gated and unauthorized.
 
 **S7 (context) is complete and formally closed.** S7 delivered the query API v1 in `apps/api` implementing accepted [ADR-0024](docs/adr/0024-m1-query-api-runtime-contract.md) as amended by [ADR-0025](docs/adr/0025-s7-source-alias-erasable-syntax-compatibility.md) — see [TASKS.md](TASKS.md) for the full delivery record. Merged through PR #28 at `a7624cd`; closeout merged through PR #29 at `9acfefa`.
 
@@ -161,9 +163,9 @@ Facts observed at this checkpoint:
 
 **S8 did NOT implement, beyond the two narrowly authorized exceptions named in items 4–5 above:** any topology exploration UI or other M2 behavior; new frontend features, graph visualization, or `apps/web` API consumption beyond the named text correction; changes to S1–S7 production _behavior_ (item 5's fix is explicitly behavior-preserving); changes to domain schemas, repository contracts, fixtures, or snapshot/storage behavior; connectors, authentication, infrastructure, deployment, or real-system access; new dependencies, upgrades, package-manifest changes, or lockfile changes; or changes to `scripts/verify.sh`/`scripts/bootstrap.sh`.
 
-**Permitted work now:** this M2-D authorization checkpoint and maintenance or factual corrections to completed M0/M1/M2-A/M2-B/M2-C state. After this authorization record merges and `main` is synchronized cleanly, M2-D implementation may proceed only within [the exact M2-D authorization boundary](docs/m2-plan.md#exact-m2-d-authorization-boundary). **M2-E through M2-F and M3+ implementation remain unauthorized.**
+**Permitted work now:** this M2-D closeout checkpoint and maintenance or factual corrections to completed M0/M1/M2-A/M2-B/M2-C/M2-D state. **M2-E through M2-F and M3+ implementation remain unauthorized.**
 
-**Next-agent preflight** (run before acting on this checkpoint): `git status`, `git log --oneline --decorate -10`, then read [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and Accepted ADRs 0026–0028. Confirm this authorization record is merged and local `main` is clean and synchronized before implementing anything. **M2-A through M2-C are complete; M2-D alone is explicitly authorized subject to that operational precondition; M2-E+ remain unauthorized.**
+**Next-agent preflight** (run before acting on this checkpoint): `git status`, `git log --oneline --decorate -10`, then read [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and Accepted ADRs 0026–0028. Confirm this closeout record is merged and local `main` is clean and synchronized before implementing anything. **M2-A through M2-D are complete; no implementation slice is active; M2-E+ remain unauthorized.**
 
 **The checkpoint/slice cycle, in order:**
 
@@ -177,13 +179,12 @@ Facts observed at this checkpoint:
 4. HANDOFF.md reflects the merged repository state;
 5. the next slice receives explicit human authorization recorded in TASKS.md.
 
-**The `m2-c-graph-workspace-merged` checkpoint satisfies conditions 1–4 for M2-C through PR #43 at `751d47c`: implementation and closeout merged, `main` synchronized cleanly, local and CI verification plus human browser QA recorded, and this handoff reflects the merged state. Joseph Carfagno has now satisfied condition 5 by explicitly authorizing M2-D. M2-D becomes operational only after this authorization record itself merges and local `main` is cleanly synchronized.**
+**The `m2-d-trust-inspector-merged` checkpoint satisfies conditions 1–4 for M2-D through PR #45 at `a41d799`: implementation merged, `main` synchronized cleanly, local and CI verification plus human browser QA recorded, and this handoff reflects the merged state. Condition 5 is not satisfied for M2-E; M2-E remains unauthorized.**
 
 ## 8. Prohibited Work
 
-**No new M2 implementation slice is operational until this authorization record merges and local `main` is cleanly synchronized.** Once that precondition is met, only M2-D work inside [the exact authorization boundary](docs/m2-plan.md#exact-m2-d-authorization-boundary) is permitted. In particular:
+**No new M2 implementation slice is operational.** In particular:
 
-- **Any M2-D product implementation before this authorization record merges and `main` is synchronized cleanly, or any M2-D work outside its exact boundary.**
 - **Any M2-E through M2-F product implementation** until the relevant slice is separately and explicitly authorized.
 - Any change to the now-complete S1–S8 production behavior, domain schemas, repository contracts, fixtures, reconciliation, snapshot/storage behavior, or query API behavior, outside an explicitly authorized maintenance correction.
 - Connectors, authentication, infrastructure, deployment, or real-system access of any kind — M5 is the first and only permitted real-system contact, and remains unauthorized.
@@ -255,9 +256,10 @@ Operating rules, non-negotiable:
   PR #39 at 9dd507b with CI passing and closed through PR #40 at 6e87aeb. M2-C
   was separately authorized, implemented, independently reviewed and remediated,
   manually QA-tested, and merged through PR #42 at a43b0c5 with CI passing in
-  3m22s, then closed through PR #43 at 751d47c. Joseph explicitly authorized
-  M2-D only; that release becomes operational after this authorization record
-  merges and main is synchronized cleanly. M2-E+ remain unauthorized.
+  3m22s, then closed through PR #43 at 751d47c. M2-D was separately authorized,
+  implemented, independently reviewed and remediated, human-QA approved, and
+  merged through PR #45 at a41d799 with CI passing in 3m6s. No implementation
+  slice is active; M2-E+ remain unauthorized.
   M3 and later milestones remain unauthorized.
   Verify the actual Git state before treating this as current; if a later
   checkpoint exists, trust it over this prompt.
