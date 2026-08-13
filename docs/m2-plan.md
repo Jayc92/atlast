@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational; M2-A through M2-D complete, with M2-D merged through PR #45 at `a41d799`; no active implementation slice; M2-E+ unauthorized
+**Status:** Approved and operational; M2-A through M2-D complete, with M2-D closed through PR #46 at `452f60f`; M2-E separately authorized on 2026-08-13, pending its authorization-record merge; M2-F unauthorized
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-D are complete; M2-D merged through PR #45 at `a41d799` on 2026-08-13 after independent review, remediation, human browser QA, complete local verification, and passing CI. No implementation slice is active. M2-E through M2-F and M3+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-D are complete; M2-D closed through PR #46 at `452f60f`. Joseph then separately and explicitly authorized M2-E only on 2026-08-13. That release becomes operational only after its documentation record merges and `main` is synchronized cleanly. M2-F and M3+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A through M2-D are complete, with M2-D merged through PR #45 at `a41d799`. No implementation slice is active. M2-E through M2-F remain gated.
+M2-A through M2-D are complete, with M2-D closed through PR #46 at `452f60f`. M2-E was separately and explicitly authorized by Joseph Carfagno on 2026-08-13; its release becomes operational only after this authorization record merges and `main` is synchronized locally with a clean working tree. M2-F remains gated.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -321,6 +321,18 @@ M2-D may implement only:
 - directly corresponding `apps/web/src/**` unit/component tests and factual M2-D progress plus bundle/latency/memory/Evidence-cardinality measurements in `TASKS.md`.
 
 M2-D must not add or change shared contracts, API production code/routes, graph-model/repository/reconciliation/storage behavior, fixtures, accepted ADR text, dependencies, package manifests, the lockfile, `tests/acceptance/**`, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; implement the M2-E snapshot-anchor API/history playback or manufacture historical coordinates; perform M2-F browser-acceptance expansion, hardening, audit, storage decision, or closeout; add connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, human browser/accessibility review, PR/CI approval, merge, and checkpoint update before any next-slice decision.
+
+### Exact M2-E authorization boundary
+
+M2-E may implement only:
+
+- additive shared HTTP schemas and browser client validation for the accepted ADR-0028 `GET /api/v1/snapshot-anchors` request/response contract;
+- the one read-only, query-parameter-free `GET /api/v1/snapshot-anchors` API route, composed only from the existing public `EvidenceStore` and `TopologyGraphStore` interfaces exactly as ADR-0028 specifies: one current-watermark read, bounded paging at that fixed horizon, at most 101 snapshot-summary candidate resolutions, newest-first output capped at 100, and honest truncation/empty-store/error behavior;
+- API-only history controls in `apps/web/src/**` that load those anchors, display checksum and subject count, select a complete `asOf`/`horizon`/`derivationVersion` pin for every coordinated graph read, preserve copied-link and reload reproducibility, and perform a genuinely new latest request when returning to latest;
+- honest historical loading, stale-data, truncation, invalid-copied-coordinate, and failed-pinned-read states that keep the requested identity visible and never silently substitute latest or another snapshot;
+- directly corresponding shared/API/web tests plus browser acceptance for complete-pin copied links, historical Relationship-to-Evidence traceability, and no silent latest fallback; and factual fixture cardinality, retained-Evidence count, anchor count/truncation, route latency, result-cardinality, traversal, bundle, and process/browser-memory measurements in `TASKS.md`.
+
+M2-E must not add a repository method; alter graph-model/repository/reconciliation/storage behavior or private implementation fields; expose Evidence or fixture metadata through the anchor route; add Relationship detail, assertion, evidence-chain, or bulk-Evidence routes; change fixtures, accepted ADR text, dependencies, package manifests, the lockfile, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; manufacture timeline coordinates or treat anchors as freshness-transition history; perform M2-F hardening, audit, storage decision, or milestone closeout; add connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, human browser/accessibility review, PR/CI approval, merge, and checkpoint update before any next-slice decision.
 
 ## 13. Exit Criteria for M2-P
 
