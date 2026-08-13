@@ -1,6 +1,6 @@
 # Atlast — Milestones
 
-**Status:** Current. M0 and M1 are complete. M2-A through M2-D are complete; M2-D closed through PR #46 at `452f60f`. Joseph Carfagno separately authorized M2-E on 2026-08-13; its release becomes operational only after this authorization record merges and `main` is synchronized cleanly. M2-F and M3+ remain unauthorized.
+**Status:** Current. M0 and M1 are complete. M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e`. Joseph Carfagno pre-authorized M2-F and M3 planning on 2026-08-13, but both remain dormant behind their predecessor closeouts. M3 product implementation and M4+ remain unauthorized.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
@@ -62,13 +62,13 @@
 - [x] Every fact in the graph is traceable to its synthetic evidence via the API — _proven exhaustively by `apps/api/src/routes/evidence.test.ts` (all 20 valid Evidence records dereferenced through `GET /api/v1/evidence/{evidenceId}` alone, across all seven valid fixture scenarios)._
 - [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0025, all Accepted._
 
-**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, and its accepted baseline merged through PR #34 at `106b1e7`. M2-A through M2-D were each separately authorized, implemented, independently reviewed and remediated, merged, and closed; M2-D closed through PR #46 at `452f60f`. Joseph then separately authorized M2-E only; M2-F and later remain unauthorized.
+**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, and its accepted baseline merged through PR #34 at `106b1e7`. M2-A through M2-D were each separately authorized, implemented, independently reviewed and remediated, merged, and closed; M2-E is active through PR #47 at `f9d441e`. Joseph then pre-authorized M2-F and M3 planning, each contingent on its predecessor milestone checkpoint. M3 product implementation and M4+ remain unauthorized.
 
 ---
 
 ## M2 — Interactive Topology Interface (authorized 2026-08-12 — phase-gated)
 
-> **Authorization status:** M2-A through M2-D are complete; M2-D closed through PR #46 at `452f60f`. Joseph explicitly authorized M2-E on 2026-08-13 within [docs/m2-plan.md's exact boundary](m2-plan.md#exact-m2-e-authorization-boundary); that release becomes operational only after this authorization record merges and `main` is synchronized cleanly. **M2-F and M3+ remain gated and unauthorized.**
+> **Authorization status:** M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e` within [docs/m2-plan.md's exact boundary](m2-plan.md#exact-m2-e-authorization-boundary). M2-F is pre-authorized but dormant until M2-E closes. **M3 planning is pre-authorized but dormant until M2 closes; M3 product implementation and M4+ remain gated and unauthorized.**
 
 **Goal:** People who don't write queries can explore the graph.
 
@@ -86,7 +86,9 @@
 
 ---
 
-## M3 — Operational Health Overlays (gated)
+## M3 — Operational Health Overlays (planning pre-authorized; implementation gated)
+
+> **Authorization status:** Joseph Carfagno explicitly pre-authorized M3 planning and pre-release architecture/ADR review on 2026-08-13. This phase cannot become operational before M2 is formally complete. M3 product implementation requires an independently reviewed and explicitly human-approved baseline plus its own implementation release. **M3 product implementation and M4+ remain unauthorized.**
 
 **Goal:** Synthetic operational state projected onto the graph so topology and health are one picture.
 
