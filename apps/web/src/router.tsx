@@ -1,64 +1,25 @@
 /**
- * The M2-A routing foundation (ADR-0026 § 2; docs/m2-plan.md § 5). This adds
- * the router mechanics and the three canonical M2 routes — `/`,
- * `/topology`, and `/entities/:entityId` — so URL-addressable navigation and
- * browser back/forward are real and testable now.
+ * The M2 routing foundation (ADR-0026 § 2; docs/m2-plan.md § 5) and the
+ * M2-B topology application it now routes to — `/`, `/topology`, and
+ * `/entities/:entityId`, all URL-addressable with real browser back/forward
+ * behavior.
  *
- * `/topology` and `/entities/:entityId` deliberately render only a static,
- * clearly labeled placeholder: no inventory, search, entity data, or graph
- * viewport exists here. Building that content is M2-B/M2-C/M2-D scope,
- * released separately; this file adds only the addressable route shape they
- * will later fill in, never their content.
+ * `/topology` and `/entities/:entityId` render the M2-B application shell
+ * (`TopologyPage`/`EntityDetailPage`): Entity inventory, canonical-identifier
+ * search, and entity-focused structured detail. Graph rendering, the trust
+ * inspector, and history playback remain M2-C/M2-D/M2-E scope and are not
+ * implemented here.
  */
 import type { ReactElement } from "react";
 import {
   createBrowserRouter,
-  Link,
   Navigate,
   RouterProvider,
-  useParams,
   type RouteObject,
 } from "react-router";
 import { App } from "./App.tsx";
-
-interface ReservedRouteNoticeProps {
-  readonly heading: string;
-  readonly detail?: string;
-}
-
-/**
- * A static, inert placeholder — no data fetching, no query-client call, no
- * inventory/search/entity rendering. It exists only to prove the route is
- * addressable and reachable via back/forward, not to deliver M2-B content.
- */
-function ReservedRouteNotice({
-  heading,
-  detail,
-}: ReservedRouteNoticeProps): ReactElement {
-  return (
-    <main aria-labelledby="reserved-route-heading">
-      <h1 id="reserved-route-heading">{heading}</h1>
-      <p>
-        This route is reserved by the M2-A routing foundation. Its content is
-        M2-B and later scope and is not implemented yet.
-        {detail !== undefined ? ` ${detail}` : ""}
-      </p>
-      <Link to="/">Return to the foundation page</Link>
-    </main>
-  );
-}
-
-function ReservedEntityRoute(): ReactElement {
-  const { entityId } = useParams<{ entityId: string }>();
-  return (
-    <ReservedRouteNotice
-      heading="Entity detail (reserved for M2-B)"
-      {...(entityId !== undefined
-        ? { detail: `Requested identifier: ${entityId}.` }
-        : {})}
-    />
-  );
-}
+import { EntityDetailPage } from "./topology/EntityDetailPage.tsx";
+import { TopologyPage } from "./topology/TopologyPage.tsx";
 
 /**
  * Exported separately from `createBrowserRouter` so tests can feed the same
@@ -67,13 +28,8 @@ function ReservedEntityRoute(): ReactElement {
  */
 export const topologyRouteDefinitions: readonly RouteObject[] = [
   { path: "/", element: <App /> },
-  {
-    path: "/topology",
-    element: (
-      <ReservedRouteNotice heading="Topology exploration (reserved for M2-B)" />
-    ),
-  },
-  { path: "/entities/:entityId", element: <ReservedEntityRoute /> },
+  { path: "/topology", element: <TopologyPage /> },
+  { path: "/entities/:entityId", element: <EntityDetailPage /> },
   { path: "*", element: <Navigate to="/" replace /> },
 ];
 
