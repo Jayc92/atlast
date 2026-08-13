@@ -1,6 +1,6 @@
 # Atlast — Tasks
 
-The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0 and M1 are complete. M2-A through M2-C are complete; M2-C merged through PR #42 at `a43b0c5` and is being closed by the current documentation checkpoint.** No implementation slice is active. **M2-D+ and M3+ remain unauthorized.**
+The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0 and M1 are complete. M2-A through M2-C are complete, with M2-C closed through PR #43 at `751d47c`.** Joseph explicitly authorized M2-D only on 2026-08-13; its release becomes operational after this authorization record merges and `main` is synchronized cleanly. **M2-E+ and M3+ remain unauthorized.**
 
 **Legend:** `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked (note the blocker)
 
@@ -208,7 +208,8 @@ M1 exit criteria (below) are now all checked and closed as project facts, per [d
 
 **Bundle measurement, M2-B merged baseline → merged M2-C:** the eagerly loaded JS changed from `392.22 kB` (gzip `119.75 kB`) to `401.81 kB` (gzip `122.32 kB`), **+9.59 kB raw / +2.57 kB gzip**; eager CSS changed from `9.70 kB` (gzip `2.52 kB`) to `13.28 kB` (gzip `3.25 kB`), **+3.58 kB raw / +0.73 kB gzip**. React Flow and ELK are deliberately code-split and fetched only for graph mode as `1,615.03 kB` JS (gzip `501.46 kB`) plus `15.41 kB` CSS (gzip `2.56 kB`); inventory, search, entity summary, and structured mode do not pay that graph chunk on initial load. This sizeable bounded graph chunk is recorded for the mandatory M2-F storage/performance review rather than hidden or treated as a release failure.
 
-- [ ] **M2-D through M2-F** — not released; each requires its own explicit human decision after the prior slice is independently reviewed, verified, merged, and closed.
+- [~] **M2-D — Entity/Relationship trust inspector, Evidence dereferencing, and complete trust-state presentation** — explicitly authorized by Joseph Carfagno on 2026-08-13 after the M2-C closeout merged through PR #43 at `751d47c`. The release becomes operational only after this authorization record merges and `main` is synchronized locally with a clean working tree. Scope is restricted to [the exact M2-D boundary](docs/m2-plan.md#exact-m2-d-authorization-boundary): query-API-only Entity and Relationship trust inspection; complete visible and competing assertion presentation; confidence, freshness, half-open validity, conflict, ambiguity, and ordered rule-trace semantics; direct dereferencing of every provenance identifier through the existing Evidence route; accessible inspector focus/return behavior and honest failure states; directly corresponding `apps/web/src/**` tests; and factual measurements. **Authorization does not approve future M2-D output. M2-E through M2-F and M3+ remain unauthorized.**
+- [ ] **M2-E through M2-F** — not released; each requires its own explicit human decision after the prior slice is independently reviewed, verified, merged, and closed.
 
 - [ ] Graph exploration UI: navigation, search, entity detail
 - [ ] Provenance/confidence/freshness view for every displayed fact

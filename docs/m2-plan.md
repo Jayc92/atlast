@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational; M2-A through M2-C complete, with M2-C merged through PR #42 at `a43b0c5`; no implementation slice active; M2-D+ unauthorized
+**Status:** Approved and operational; M2-A through M2-C complete, with M2-C closed through PR #43 at `751d47c`; M2-D separately authorized on 2026-08-13, pending its authorization-record merge; M2-E+ unauthorized
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-C are complete; M2-C merged through PR #42 at `a43b0c5` after independent review, remediation, manual QA, local verification, and passing CI. No implementation slice is active. M2-D through M2-F and M3+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-C are complete; M2-C closed through PR #43 at `751d47c` after independent review, remediation, manual QA, local verification, passing CI, and factual checkpoint update. Joseph then separately and explicitly authorized M2-D only on 2026-08-13. That release becomes operational only after its documentation record merges and `main` is synchronized cleanly. M2-E through M2-F and M3+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A through M2-C are complete, with M2-C merged through PR #42 at `a43b0c5`. No implementation slice is active. M2-D through M2-F remain gated.
+M2-A through M2-C are complete, with M2-C closed through PR #43 at `751d47c`. M2-D was separately and explicitly authorized by Joseph Carfagno on 2026-08-13; its release becomes operational only after this authorization record merges and `main` is synchronized locally with a clean working tree. M2-E through M2-F remain gated.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -305,6 +305,20 @@ M2-C may implement only:
 - directly corresponding `apps/web/src/**` unit/component tests, browser acceptance under `tests/acceptance/**` for the primary desktop/mobile traversal journey, and factual M2-C progress and required before/after bundle/latency/memory/cardinality/truncation measurements in `TASKS.md`.
 
 M2-C must not change shared contracts, API production code/routes, graph-model/repository/reconciliation/storage behavior, fixtures, accepted ADR text, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; implement the M2-D trust inspector, Evidence dereferencing, detailed assertion/confidence/freshness/validity/rule-trace presentation, or conflict/ambiguity explanation beyond the labels and separate candidate edges needed for honest graph/list rendering; implement M2-E snapshot-anchor API/history playback; perform M2-F hardening/audit/closeout; add connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, human browser/accessibility review, PR/CI approval, merge, and checkpoint update before any next-slice decision.
+
+### Exact M2-D authorization boundary
+
+M2-D may implement only:
+
+- an Entity/Relationship trust inspector in `apps/web/src/**`, opened from the existing Entity detail, graph, structured, and exact-Relationship-search surfaces without adding a Relationship API route;
+- complete presentation of every selected assertion revision's exact claim kind and fields, numeric confidence, query-time freshness, half-open `[validFrom, validTo)` validity, uncontested/conflicted state and every competing claim, unambiguous/ambiguous state and every near match, and ordered rule trace, without selecting or implying a winning claim;
+- provenance citations for the selected assertion, every competing claim, and rule trace, with each Evidence identifier dereferenced individually through the existing validated `GET /api/v1/evidence/{evidenceId}` client function and the resulting Evidence rendered without a fixture, repository, graph-model, or storage side door;
+- Relationship rehydration only through the already accepted exact-identifier search/traversal path, accepting only an exact identifier match and failing honestly when absent;
+- accessible inspector semantics, deliberate focus movement on open, focus return to the invoking subject on close, keyboard/touch operation, responsive presentation, non-color trust-state communication, and useful status announcements without making routine content noisy;
+- canonical loading, partial-Evidence-loading, empty, unavailable, expected API-error, redacted internal-error, retry, and stale-data states that never hide conflict, ambiguity, stale/historical state, truncation, or a failed Evidence citation;
+- directly corresponding `apps/web/src/**` unit/component tests and factual M2-D progress plus bundle/latency/memory/Evidence-cardinality measurements in `TASKS.md`.
+
+M2-D must not add or change shared contracts, API production code/routes, graph-model/repository/reconciliation/storage behavior, fixtures, accepted ADR text, dependencies, package manifests, the lockfile, `tests/acceptance/**`, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; implement the M2-E snapshot-anchor API/history playback or manufacture historical coordinates; perform M2-F browser-acceptance expansion, hardening, audit, storage decision, or closeout; add connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, human browser/accessibility review, PR/CI approval, merge, and checkpoint update before any next-slice decision.
 
 ## 13. Exit Criteria for M2-P
 
