@@ -7,13 +7,13 @@ The canonical, model-neutral resume document for this project. A replacement con
 ## 1. Document Control
 
 - **Last updated:** 2026-08-12
-- **Checkpoint name:** `m2-planning-candidate`
-- **Latest merged checkpoint commit:** `b547ec298124cb9864d9b4466c62d665f457aba6` (`docs: authorize M2 planning phase (#33)`) — the M2 authorization record, squash-merged through [PR #33](https://github.com/Jayc92/atlast/pull/33) on 2026-08-12 with GitHub Actions `verify` passing in 2m14s.
-- **Latest merged product commit:** `cff0545` — M1 remains the latest implemented product checkpoint and is formally complete. PR #33 changed documentation and activated M2-P planning only.
-- **This document update records the final M1 closeout**, performed after an independent post-merge revalidation directly against `0477cbd` (per [docs/audits/m0-synthetic-boundary-audit.md § 15](docs/audits/m0-synthetic-boundary-audit.md)): a fresh byte-safe NUL sweep of all 180 tracked files found none; the merged changed-file scope was independently re-derived and matches exactly what the pre-merge S8 candidate described; no real-system boundary was introduced; and the complete, unmodified `./scripts/verify.sh` passed all seven stages locally at the merge commit. **All four M1 exit criteria are now satisfied and closed as project facts** (not candidate findings) — see [TASKS.md](TASKS.md) and § 4/§ 7 below.
-- **Branch state at this checkpoint:** `docs/m2-planning`, based on merged `main` at `b547ec2`; the base working tree was clean before these planning edits.
+- **Checkpoint name:** `m2-a-browser-foundation-merged`
+- **Latest merged checkpoint commit:** `fa38812` (`feat: add M2 browser client foundation (#36)`) — the M2-A implementation, squash-merged through [PR #36](https://github.com/Jayc92/atlast/pull/36) on 2026-08-12 with GitHub Actions `verify` passing in 2m36s.
+- **Latest merged product commit:** `fa38812` — M2-A is the latest implemented product checkpoint.
+- **This document update records the M2-A closeout:** M2-A was authorized through PR #35 at `c3c661a`, implemented within the exact accepted boundary, independently reviewed and remediated, verified locally through all seven `./scripts/verify.sh` stages, and merged through PR #36 at `fa38812`. **M2-A is complete. No implementation slice is active. M2-B+ and M3+ remain unauthorized.**
+- **Branch state at this checkpoint:** `docs/m2-a-closeout`, based on synchronized, clean `main` at `fa38812`.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves every previous checkpoint version. Do not append old checkpoints to this file — retrieve them with `git log -- HANDOFF.md`.
-- **Precedence:** the repository source-of-truth documents ([PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), [docs/m1-plan.md](docs/m1-plan.md), the accepted ADRs in [docs/adr/](docs/adr/README.md), [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md)) **override this document wherever they conflict**. HANDOFF.md summarizes; it never supersedes.
+- **Precedence:** the repository source-of-truth documents ([PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), [docs/m1-plan.md](docs/m1-plan.md), [docs/m2-plan.md](docs/m2-plan.md), the accepted ADRs in [docs/adr/](docs/adr/README.md), [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md)) **override this document wherever they conflict**. HANDOFF.md summarizes; it never supersedes.
 
 ## 2. Product Summary
 
@@ -45,12 +45,12 @@ The canonical, model-neutral resume document for this project. A replacement con
   - [docs/architecture.md](docs/architecture.md) — architecture philosophy and conceptual design
   - [docs/milestones.md](docs/milestones.md) — authorized milestone sequence M0–M5 with exit criteria
   - [docs/m1-plan.md](docs/m1-plan.md) — the approved, completed M1 implementation baseline
-  - [docs/m2-plan.md](docs/m2-plan.md) — the human-approved M2 baseline, pending PR #34 merge; not implementation authority
+  - [docs/m2-plan.md](docs/m2-plan.md) — the human-approved M2 baseline and slice boundaries; M2-A complete, M2-B+ gated
   - [docs/adr/](docs/adr/README.md) — accepted ADRs 0001–0025 (index with amendment notes)
   - [docs/audits/](docs/audits/m0-synthetic-boundary-audit.md) — boundary audits
-  - `packages/shared` — the merged S1 domain schemas, S2 repository contract surface, and the S3 fixture-catalog validation suite
+  - `packages/shared` — the merged S1 domain schemas, S2 repository contract surface, S3 fixture-catalog validation suite, S7 HTTP contracts, and M2-A browser health contract
   - `packages/graph-model` — the merged S4 temporal foundations (Evidence ordering, horizon selection, validity membership, RFC 8785 canonical serialization, collection ordering, SHA-256 digests) and the merged S5 reconciliation engine (the `m1-v1` derivation policy, identity normalization, event-time reconciliation, freshness classification)
-  - `apps/api`, `apps/web`, `tests/acceptance`, `scripts/` — the M0 foundation
+  - `apps/api` — the M1 query API v1; `apps/web` — the M0 shell plus M2-A browser client, cache/coordinator, canonical URL, router, proxy, and import-boundary foundations; `tests/acceptance` — shell and built-preview proxy checks; `scripts/` — repository verification tooling
   - `fixtures/demo-company/` — the merged S3 synthetic fixture catalog ([fixtures/demo-company/README.md](fixtures/demo-company/README.md) documents the scenarios)
 
 This document contains **no credentials, tokens, machine secrets, or private employer data**, and none may ever be added to it.
@@ -74,7 +74,7 @@ Factual state at this checkpoint:
 - **S8 authorization became effective** when its authorization PR ([PR #30](https://github.com/Jayc92/atlast/pull/30)) merged to `main` at `a4c6a5d` on 2026-08-12.
 - **S8 is complete** — the M1 synthetic-boundary re-audit ([docs/audits/m0-synthetic-boundary-audit.md § 14](docs/audits/m0-synthetic-boundary-audit.md); one source-hygiene finding — an embedded NUL byte in `packages/graph-model/src/reconciliation.ts` — found and resolved under its own separate explicit narrow authorization), the exhaustive API traceability integration test in `apps/api/src/routes/evidence.test.ts`, the minimal `apps/web` shell-status correction, and factual M1 documentation closeout were all implemented, independently reviewed, verified, and **merged to `main` through [PR #31](https://github.com/Jayc92/atlast/pull/31) at `0477cbd` on 2026-08-12 with GitHub Actions `verify` passing in 2m27s.** An independent post-merge revalidation ([docs/audits/m0-synthetic-boundary-audit.md § 15](docs/audits/m0-synthetic-boundary-audit.md)) then confirmed, directly against the real merge commit: zero literal NUL bytes across all 180 tracked files, the merged changed-file scope matching exactly what was authorized, and no real-system boundary introduced.
 - **S1–S8 are now complete. M1 is formally complete as of 2026-08-12 — checkpoint `m1-complete`.**
-- **M2 was separately and explicitly authorized by Joseph Carfagno on 2026-08-12**, after M1's closeout merged through PR #32 at `cff0545`; the authorization record merged through PR #33 at `b547ec2`, and `main` was synchronized locally with a clean working tree. M2 is phase-gated: planning and pre-release architecture/ADR review are the only initially released work; product implementation remains gated pending independent review and explicit approval of that baseline. **M3–M5 remain gated and unauthorized.**
+- **M2 was separately and explicitly authorized by Joseph Carfagno on 2026-08-12**, after M1's closeout merged through PR #32 at `cff0545`; the authorization record merged through PR #33 at `b547ec2`. The independently reviewed M2 baseline merged through PR #34 at `106b1e7`. M2-A was separately authorized through PR #35 at `c3c661a`, implemented, independently reviewed and remediated, and merged through PR #36 at `fa38812` with GitHub Actions `verify` passing in 2m36s. **M2-A is complete; no implementation slice is active. M2-B through M2-F and M3–M5 remain gated and unauthorized.**
 
 **M1 slice purposes** ([docs/m1-plan.md § 4](docs/m1-plan.md#4-proposed-implementation-slices)):
 
@@ -91,14 +91,14 @@ Factual state at this checkpoint:
 
 **Milestone purposes** ([docs/milestones.md](docs/milestones.md)):
 
-| Milestone | Purpose                                                                                                                                | Status                         |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| M0        | Safe project foundation: TypeScript monorepo, API + web shells, shared packages, full verification tooling and CI, synthetic data only | Complete (2026-07-22)          |
-| M1        | Synthetic topology model: the core domain modeled and queryable, driven entirely by fixtures                                           | Complete (2026-08-12)          |
-| M2        | Interactive topology interface: graph exploration UI reading exclusively through the query API                                         | M2-A authorized; merge pending |
-| M3        | Operational health overlays: synthetic states (healthy, degraded, down, disconnected, expiring certificate, latent downstream risk)    | Unauthorized                   |
-| M4        | Change-impact simulation: deterministic, explainable blast-radius analysis — validated before any LLM reasoning                        | Unauthorized                   |
-| M5        | Read-only local Kubernetes connector: disposable local cluster (e.g., Kind) only — never an employer or production cluster             | Unauthorized                   |
+| Milestone | Purpose                                                                                                                                | Status                     |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| M0        | Safe project foundation: TypeScript monorepo, API + web shells, shared packages, full verification tooling and CI, synthetic data only | Complete (2026-07-22)      |
+| M1        | Synthetic topology model: the core domain modeled and queryable, driven entirely by fixtures                                           | Complete (2026-08-12)      |
+| M2        | Interactive topology interface: graph exploration UI reading exclusively through the query API                                         | M2-A complete; M2-B+ gated |
+| M3        | Operational health overlays: synthetic states (healthy, degraded, down, disconnected, expiring certificate, latent downstream risk)    | Unauthorized               |
+| M4        | Change-impact simulation: deterministic, explainable blast-radius analysis — validated before any LLM reasoning                        | Unauthorized               |
+| M5        | Read-only local Kubernetes connector: disposable local cluster (e.g., Kind) only — never an employer or production cluster             | Unauthorized               |
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
@@ -123,8 +123,10 @@ What actually exists in the repository through this checkpoint:
 - **Final S7 verification evidence:** 64 `apps/api` tests passing in 7 files (unchanged elsewhere: shared 373/373 in 14 files, graph-model 372/372 in 19 files, web 5/5); `pnpm typecheck`/`pnpm lint`/`pnpm format:check` clean repository-wide; `git diff --check` clean; a clean-build proof (`rm -rf` all three packages' `dist/`, then `pnpm build`) succeeded with every emitted relative import ending in `.js`; the compiled `apps/api/dist/server.js` and the raw `node apps/api/src/server.ts` dev-loop entrypoint each started, served `GET /health` and a representative query route with real fixture data, and stopped cleanly; the complete unmodified `./scripts/verify.sh` pipeline (all 7 stages, including browser acceptance 2/2) passed locally, and GitHub Actions `verify` passed on PR #28 in 2m14s.
 - **S8 (merged PR #31 at `0477cbd`, 2026-08-12):** the M1 synthetic-boundary re-audit ([docs/audits/m0-synthetic-boundary-audit.md § 14](docs/audits/m0-synthetic-boundary-audit.md)) covering the complete S1–S7 delta and the now-populated `fixtures/demo-company/` catalog; an exhaustive API-boundary traceability integration test in `apps/api/src/routes/evidence.test.ts` proving, via `GET /api/v1/evidence/{evidenceId}` alone, that all 20 valid Evidence records in the catalog are dereferenceable from the provenance/competing-claim/rule-trace identifiers of every subject visible across an 18-coordinate sweep of the complete fixture catalog (15 visible subjects of both kinds, 21 assertion revisions, all seven valid scenarios contributing non-vacuously); one source-hygiene finding (an embedded NUL byte in `packages/graph-model/src/reconciliation.ts`'s `draftKey` builder, the same defect class the S6 review fixed in `snapshot-resolver.ts`) found by the audit's corrected byte-safe sweep and resolved under its own separate explicit narrow authorization — the literal byte replaced with the source-text escape for U+0000, preserving the exact runtime delimiter, verified byte-safe and runtime-equivalent; and a minimal `apps/web` shell-status correction (M1 now shown as delivered rather than gated/core-delivered) with its directly corresponding `apps/web`/`tests/acceptance` assertions.
 - **Final S8 / M1 closeout verification evidence:** 65 `apps/api` tests passing in 7 files (unchanged elsewhere: shared 373/373 in 14 files, graph-model 372/372 in 19 files, web 6/6); the complete unmodified `./scripts/verify.sh` pipeline (all 7 stages, including browser acceptance 2/2) passed locally both pre-merge and, independently, again post-merge directly against `0477cbd`; GitHub Actions `verify` passed on PR #31 in 2m27s. A fresh byte-safe NUL sweep of all 180 tracked files at the merge commit found zero literal `0x00` bytes anywhere.
+- **M2-A (merged PR #36 at `fa38812`, 2026-08-12):** additive browser-facing health response validation in `packages/shared`; a validated browser query client covering health and all seven accepted v1 routes with closed/redacted client errors; a bounded in-memory request cache; retry-safe, generation-aware single-flight latest-resolution coordination; complete-pin URL parsing, deterministic serialization, and canonicalization; React Router foundations for `/`, `/topology`, and `/entities/:entityId`; exact Vite proxy separation for `/api/health` and `/api/v1/*`; an ESLint-enforced no-side-door browser import boundary; pinned `react-router` plus the direct `@atlast/shared` dependency; and built-preview browser acceptance proving both health and a real v1 route reach the fixture-backed API. No visible topology feature assigned to M2-B+ landed.
+- **Final M2-A verification evidence:** independent review found and remediated retry handling after thrown/rejected latest resolution, unknown/repeated/empty URL canonicalization, and genuine history-delta back/forward coverage. The complete local `./scripts/verify.sh` passed all seven stages: shared 384/384, graph-model 372/372, API 65/65, web 79/79, production builds, and browser acceptance 6/6. GitHub Actions `verify` passed on PR #36 in 2m36s.
 
-**What does NOT exist yet** — do not let any document or prompt claim otherwise: any topology UI. S4 delivered serialization/ordering/membership **primitives**, S5 composed them into the `m1-v1` reconciliation engine with content-addressed GraphAssertions, S6 composed both into deterministic snapshot construction, identity, and checksums plus the in-memory repository implementations satisfying the S2 contract suite end-to-end, **S7 wired all of it to a real HTTP query API** (inventory, entity detail, search, bounded traversal, Evidence lookup, the entity-scoped evidence chain, and pinned snapshot summary) — the M1 fixtures-to-query-API loop is implemented end-to-end — and **S8 closed M1 with an exhaustive traceability proof and a clean boundary re-audit**. The M2 baseline is human-approved, but its graph exploration UI remains unimplemented and M2-A is separately gated and unreleased.
+**What does NOT exist yet** — do not let any document or prompt claim otherwise: a visible topology exploration application. M2-A delivered the validated browser/API, cache/coordinator, canonical URL, routing, proxy, and import-boundary foundations only; `/topology` and `/entities/:entityId` intentionally remain inert placeholders. Inventory/search/entity UI is M2-B, graph rendering is M2-C, trust inspection is M2-D, history playback is M2-E, and final hardening/closeout is M2-F. None is authorized yet.
 
 **Design note (no longer an open limitation):** `packages/graph-model` and `apps/api` still consume `@atlast/shared`/`@atlast/graph-model` as TypeScript source through tsconfig `paths` aliases and matching Vitest `resolve.alias` entries for typecheck and test — this is now the deliberate, ADR-0024 § 14-specified convention, not a stand-in for a missing capability: `scripts/verify.sh` runs `pnpm typecheck` before `pnpm build` (ADR-0013), so the aliases let typecheck/test run without requiring a prior build. Production builds resolve both packages through their real `main`/`types`/`exports` entry points instead, proven by S7's clean-build-then-run verification.
 
@@ -132,16 +134,16 @@ What actually exists in the repository through this checkpoint:
 
 Facts observed at this checkpoint:
 
-- **PR #34 (commit `106b1e750314184af5c4faf0a5fdd949648f5a44`) is the latest merged change** — "docs: propose M2 architecture baseline," squash-merged to `main` on 2026-08-12 after independent review, remediation, explicit human acceptance, and passing GitHub Actions `verify`. The accepted M2 baseline is operational.
-- **This checkpoint's own work lives on branch `docs/m2-a-authorization`, based on merged `main` at `106b1e7`.** It records Joseph Carfagno's explicit M2-A-only authorization. The release is not operational until this documentation record merges and `main` is synchronized cleanly.
-- At this checkpoint, `main`/`origin/main` were synchronized at `106b1e7`, and the base working tree was clean before these authorization edits began.
-- **The merged S8 delta** (PR #31, independently re-derived via `git diff --stat a4c6a5d 0477cbd` and reconfirmed in [docs/audits/m0-synthetic-boundary-audit.md § 15](docs/audits/m0-synthetic-boundary-audit.md)) touched exactly 12 files: six documentation files ([TASKS.md](TASKS.md), this document, [CLAUDE.md](CLAUDE.md), [README.md](README.md), [docs/m1-plan.md](docs/m1-plan.md), [docs/milestones.md](docs/milestones.md)), the audit extension ([docs/audits/m0-synthetic-boundary-audit.md](docs/audits/m0-synthetic-boundary-audit.md)), the minimal shell correction (`apps/web/src/App.tsx`, `apps/web/src/App.test.tsx`, `tests/acceptance/specs/shell.spec.ts`), the exhaustive API traceability test (`apps/api/src/routes/evidence.test.ts`), and the one-line source-text-safe NUL-byte correction (`packages/graph-model/src/reconciliation.ts`). No fixture, ADR, manifest, lockfile, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI-workflow file changed.
+- **PR #36 (commit `fa38812`) is the latest merged change** — "feat: add M2 browser client foundation," squash-merged to `main` on 2026-08-12 after independent review, remediation, complete local verification, and passing GitHub Actions `verify` in 2m36s.
+- **This checkpoint's own work lives on branch `docs/m2-a-closeout`, based on synchronized, clean `main` at `fa38812`.** It is documentation-only and records the merged M2-A state; it does not authorize M2-B.
+- At this checkpoint, `main`, `origin/main`, and `origin/HEAD` were synchronized at `fa38812`, and the working tree was clean before these closeout edits began.
+- **The merged M2-A delta** (PR #36) touched exactly the authorized browser-foundation surface: `TASKS.md`; additive `packages/shared` health contract/test/export; `apps/web` API client, error, cache, coordinator, URL, router, package/config/proxy, and boundary-test files; root ESLint boundary configuration; `pnpm-lock.yaml`; and one built-preview API-proxy acceptance spec. No `apps/api` production file, `packages/graph-model`, fixture, accepted ADR, verification script, bootstrap script, or CI workflow changed.
 
 **A replacement conductor MUST inspect the actual Git state (`git status`, `git log --oneline --decorate -10`, `git remote -v`) and trust Git over any recorded prose — here or anywhere else.** A future handoff MUST replace this section with the state actually observed at its checkpoint, never copy Git facts forward.
 
 ## 7. Current Authorized Work
 
-**M1 is formally complete and the accepted M2 baseline is operational through PR #34 at `106b1e7`. Joseph Carfagno explicitly authorized M2-A only on 2026-08-12.** The M2-A release becomes operational only after its authorization record merges and `main` is synchronized cleanly. Its exact scope is in [docs/m2-plan.md](docs/m2-plan.md#exact-m2-a-authorization-boundary). **M2-B+ and M3+ remain gated and unauthorized.**
+**M1 is formally complete, the accepted M2 baseline is operational through PR #34 at `106b1e7`, and M2-A is complete through PR #36 at `fa38812`. No implementation slice is active.** M2-B through M2-F and M3+ remain gated and unauthorized.
 
 **S7 (context) is complete and formally closed.** S7 delivered the query API v1 in `apps/api` implementing accepted [ADR-0024](docs/adr/0024-m1-query-api-runtime-contract.md) as amended by [ADR-0025](docs/adr/0025-s7-source-alias-erasable-syntax-compatibility.md) — see [TASKS.md](TASKS.md) for the full delivery record. Merged through PR #28 at `a7624cd`; closeout merged through PR #29 at `9acfefa`.
 
@@ -155,9 +157,9 @@ Facts observed at this checkpoint:
 
 **S8 did NOT implement, beyond the two narrowly authorized exceptions named in items 4–5 above:** any topology exploration UI or other M2 behavior; new frontend features, graph visualization, or `apps/web` API consumption beyond the named text correction; changes to S1–S7 production _behavior_ (item 5's fix is explicitly behavior-preserving); changes to domain schemas, repository contracts, fixtures, or snapshot/storage behavior; connectors, authentication, infrastructure, deployment, or real-system access; new dependencies, upgrades, package-manifest changes, or lockfile changes; or changes to `scripts/verify.sh`/`scripts/bootstrap.sh`.
 
-**Permitted work now:** maintenance and corrections of the completed M0/M1 state; M2-A authorization-record verification, merge, synchronization, and factual checkpoint work. After that merge checkpoint, only the exact M2-A implementation boundary is released. **No M2-B+ or M3+ work** is authorized.
+**Permitted work now:** maintenance and corrections of the completed M0/M1/M2-A state and factual checkpoint work. **No M2-B+ or M3+ implementation work is authorized.**
 
-**Next-agent preflight** (run before acting on this checkpoint): `git status`, `git log --oneline --decorate -10`, then read [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and Accepted ADRs 0026–0028. **M2-A becomes operational only after its authorization record merges and `main` is synchronized cleanly; M2-B+ remain unauthorized.**
+**Next-agent preflight** (run before acting on this checkpoint): `git status`, `git log --oneline --decorate -10`, then read [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and Accepted ADRs 0026–0028. **M2-A is complete; M2-B+ remain unauthorized.**
 
 **The checkpoint/slice cycle, in order:**
 
@@ -171,13 +173,13 @@ Facts observed at this checkpoint:
 4. HANDOFF.md reflects the merged repository state;
 5. the next slice receives explicit human authorization recorded in TASKS.md.
 
-**The `m1-complete` checkpoint satisfied conditions 1–4 for M1's closeout through PR #32 at `cff0545`; PR #33 at `b547ec2` recorded the separate M2 authorization, and PR #34 at `106b1e7` made the reviewed M2 baseline operational.** M2-A is separately authorized and pending only its authorization-record merge and clean synchronization checkpoint.
+**The `m2-a-browser-foundation-merged` checkpoint satisfies conditions 1–4 for M2-A through PR #36 at `fa38812`: implementation merged, `main` synchronized cleanly, local and CI verification recorded, and this handoff reflects the merged state. Condition 5 is intentionally unsatisfied: M2-B has not been authorized.**
 
 ## 8. Prohibited Work
 
-**M2-A authorization/checkpoint work is the only currently operational M2 work.** Until its authorization record merges and `main` is synchronized cleanly, everything else is prohibited except the maintenance work named in § 7. In particular:
+**No M2 implementation slice is currently operational.** M2-A is complete; everything else is prohibited except the maintenance and checkpoint work named in § 7. In particular:
 
-- **Any M2 product implementation** until the M2-A authorization record merges and `main` is synchronized cleanly; after that checkpoint, any implementation outside the exact M2-A boundary remains prohibited.
+- **Any M2-B through M2-F product implementation** until the relevant slice is separately and explicitly authorized.
 - Any change to the now-complete S1–S8 production behavior, domain schemas, repository contracts, fixtures, reconciliation, snapshot/storage behavior, or query API behavior, outside an explicitly authorized maintenance correction.
 - Connectors, authentication, infrastructure, deployment, or real-system access of any kind — M5 is the first and only permitted real-system contact, and remains unauthorized.
 - New dependencies, upgrades, package-manifest changes, or lockfile changes without their own justification and, if significant, a new ADR.
@@ -241,8 +243,9 @@ Operating rules, non-negotiable:
   independently reviewed, corrected, re-reviewed without remaining blockers,
   and explicitly accepted by Joseph Carfagno on 2026-08-12. Their approval
   record merged through PR #34 at 106b1e7. Joseph then explicitly authorized
-  M2-A only; that release is pending its authorization-record merge and clean
-  synchronization checkpoint. M2-B+ remain unauthorized.
+  M2-A through PR #35 at c3c661a. M2-A was implemented, independently reviewed
+  and remediated, and merged through PR #36 at fa38812 with CI passing. M2-A is
+  complete; no implementation slice is active. M2-B+ remain unauthorized.
   M3 and later milestones remain unauthorized.
   Verify the actual Git state before treating this as current; if a later
   checkpoint exists, trust it over this prompt.

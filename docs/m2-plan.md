@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational through PR #34 at `106b1e7`; M2-A separately authorized on 2026-08-12, pending its authorization-record merge
+**Status:** Approved and operational through PR #34 at `106b1e7`; M2-A complete through PR #36 at `fa38812`; M2-B+ unauthorized
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. The approval record merged through PR #34 at `106b1e7`, and `main` was synchronized locally with a clean working tree. Joseph then separately authorized M2-A on 2026-08-12. That release becomes operational only after its own documentation record merges and `main` is again synchronized cleanly. M2-B through M2-F and M3+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. The approval record merged through PR #34 at `106b1e7`. M2-A was separately authorized through PR #35 at `c3c661a`, implemented, independently reviewed and remediated, and merged through PR #36 at `fa38812`. M2-A is complete. M2-B through M2-F and M3+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A was separately and explicitly authorized by Joseph Carfagno on 2026-08-12. Its release becomes operational only after the documentation record of that authorization merges and `main` is synchronized locally with a clean working tree. M2-B through M2-F remain gated.
+M2-A was separately and explicitly authorized by Joseph Carfagno on 2026-08-12. Its authorization record merged through PR #35 at `c3c661a`; implementation then merged through PR #36 at `fa38812` after independent review, remediation, complete local verification, and passing GitHub Actions `verify`. M2-A is complete. M2-B through M2-F remain gated.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -254,9 +254,11 @@ Before M2-A may be released:
 2. [x] Every identified correction was applied while the ADRs remained Proposed, and focused re-review found no remaining blocker.
 3. [x] Joseph Carfagno explicitly accepted the final ADR set and approved this plan on 2026-08-12.
 4. [x] The approval record merged through PR #34 at `106b1e7`, CI passed, and the local repository was synchronized cleanly.
-5. [x] Joseph Carfagno separately released M2-A with the exact scope recorded below on 2026-08-12; that release becomes operational only after its authorization record merges and `main` is synchronized cleanly.
+5. [x] Joseph Carfagno separately released M2-A with the exact scope recorded below on 2026-08-12; the authorization record merged through PR #35 at `c3c661a`, and `main` was synchronized cleanly before implementation began.
 
 ### Exact M2-A authorization boundary
+
+**Implementation status:** complete. The bounded M2-A implementation was independently reviewed and remediated, passed the complete local `./scripts/verify.sh`, and merged through PR #36 at `fa38812` with GitHub Actions `verify` passing in 2m36s. This completion does not authorize M2-B.
 
 M2-A may implement only:
 
