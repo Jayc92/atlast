@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational; M2-A through M2-C complete, with M2-C closed through PR #43 at `751d47c`; M2-D separately authorized on 2026-08-13, pending its authorization-record merge; M2-E+ unauthorized
+**Status:** Approved and operational; M2-A through M2-D complete, with M2-D merged through PR #45 at `a41d799`; no active implementation slice; M2-E+ unauthorized
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-C are complete; M2-C closed through PR #43 at `751d47c` after independent review, remediation, manual QA, local verification, passing CI, and factual checkpoint update. Joseph then separately and explicitly authorized M2-D only on 2026-08-13. That release becomes operational only after its documentation record merges and `main` is synchronized cleanly. M2-E through M2-F and M3+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-D are complete; M2-D merged through PR #45 at `a41d799` on 2026-08-13 after independent review, remediation, human browser QA, complete local verification, and passing CI. No implementation slice is active. M2-E through M2-F and M3+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A through M2-C are complete, with M2-C closed through PR #43 at `751d47c`. M2-D was separately and explicitly authorized by Joseph Carfagno on 2026-08-13; its release becomes operational only after this authorization record merges and `main` is synchronized locally with a clean working tree. M2-E through M2-F remain gated.
+M2-A through M2-D are complete, with M2-D merged through PR #45 at `a41d799`. No implementation slice is active. M2-E through M2-F remain gated.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -307,6 +307,8 @@ M2-C may implement only:
 M2-C must not change shared contracts, API production code/routes, graph-model/repository/reconciliation/storage behavior, fixtures, accepted ADR text, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; implement the M2-D trust inspector, Evidence dereferencing, detailed assertion/confidence/freshness/validity/rule-trace presentation, or conflict/ambiguity explanation beyond the labels and separate candidate edges needed for honest graph/list rendering; implement M2-E snapshot-anchor API/history playback; perform M2-F hardening/audit/closeout; add connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, human browser/accessibility review, PR/CI approval, merge, and checkpoint update before any next-slice decision.
 
 ### Exact M2-D authorization boundary
+
+**Implementation status:** complete. The bounded M2-D implementation was independently reviewed and remediated, passed human browser QA and the complete local `./scripts/verify.sh`, and merged through PR #45 at `a41d799` with GitHub Actions `verify` passing in 3m6s. This completion does not authorize M2-E.
 
 M2-D may implement only:
 

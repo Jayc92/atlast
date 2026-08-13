@@ -8,13 +8,13 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 and M1 are complete. M2 was explicitly authorized by Joseph Carfagno on 2026-08-12 and is phase-gated.** M2-A through M2-C are complete; M2-C closed through PR #43 at `751d47c`. Joseph then separately and explicitly authorized **M2-D only** on 2026-08-13; that release becomes operational only after its documentation record merges and `main` is synchronized cleanly. **M2-E through M2-F and M3+ remain unauthorized.** See [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md).
+**M0 and M1 are complete. M2 was explicitly authorized by Joseph Carfagno on 2026-08-12 and is phase-gated.** M2-A through M2-D are complete; M2-D merged through PR #45 at `a41d799` on 2026-08-13 after independent review, remediation, human browser QA, complete local verification, and passing CI. **No implementation slice is active. M2-E through M2-F and M3+ remain unauthorized.** See [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md).
 
 Permitted work right now, and nothing beyond it:
 
 - **Maintenance and corrections to the completed M0 foundation and the merged, formally complete S1–S8 slices** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — the S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, S5 reconciliation engine, S6 snapshot layer and in-memory repositories, S7 query API v1 routes and error contract in `apps/api`, and S8's boundary re-audit, exhaustive API traceability test, and documentation closeout.
 - **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0025) and of the checkpoint documentation ([HANDOFF.md](HANDOFF.md), per the checkpoint protocol below).
-- **M2-D authorization/checkpoint work is active.** No M2-D implementation may begin until this documentation PR merges and `main` is synchronized cleanly. After that checkpoint, work is restricted to the exact M2-D boundary in [docs/m2-plan.md](docs/m2-plan.md). **M2-E+ and M3+ remain unauthorized.**
+- **M2-D is complete and this documentation-only closeout is the only active work.** Maintenance and factual checkpoint corrections may continue, but no new product implementation may begin without a separate explicit release. **M2-E+ and M3+ remain unauthorized.**
 
 **M2 has been explicitly authorized but remains phase-gated as described above. M3 and later milestones remain unauthorized**, each gated on its own explicit human authorization at the preceding milestone's close.
 
@@ -32,7 +32,7 @@ Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliat
 **M0 and M1 are complete. M2 is explicitly authorized but phase-gated; M3 and every later milestone remain unauthorized:**
 
 - Maintenance, corrections, and explicitly released M1 slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod, named by accepted ADR-0005, was introduced in S1 with its justification-at-PR).
-- **M1 is formally complete, the M2 baseline is operational through PR #34 at `106b1e7`, and M2-A through M2-C are complete, with M2-C closed through PR #43 at `751d47c`.** M2-D alone is explicitly authorized but not operational until this authorization record merges and `main` is synchronized cleanly. Do NOT implement M2-E+ or M3+ work before each is separately authorized.
+- **M1 is formally complete, the M2 baseline is operational through PR #34 at `106b1e7`, and M2-A through M2-D are complete, with M2-D merged through PR #45 at `a41d799`.** No implementation slice is active. Do NOT implement M2-E+ or M3+ work before each is separately authorized.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
 - Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
 
