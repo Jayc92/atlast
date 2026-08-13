@@ -20,12 +20,14 @@ import { createMemoryRouter, RouterProvider } from "react-router";
 import { topologyRouteDefinitions } from "../router.tsx";
 import { topologyRequestCache, topologySessionCoordinator } from "./session.ts";
 import {
+  buildEvidenceDetailResult,
   buildEntityPage,
   buildEntityReadResult,
   buildRelationshipSubjectReadResult,
   buildSubjectPage,
   buildSubjectReadResult,
   FIXTURE_IDENTITY,
+  FIXTURE_EVIDENCE_IDENTIFIER,
 } from "./test-support/fixtures.ts";
 import { jsonRoute, stubApiFetch } from "./test-support/stub-fetch.ts";
 
@@ -313,7 +315,9 @@ describe("TopologyPage — search", () => {
       }),
     ).toBeDefined();
     expect(
-      screen.getByText("atlast:relationship:checkout-calls-ledger"),
+      screen.getByRole("button", {
+        name: "Inspect atlast:relationship:checkout-calls-ledger",
+      }),
     ).toBeDefined();
     // A relationship result is shown honestly but is never a navigable
     // entity-detail link (M2-D trust inspector remains out of M2-B scope).
@@ -347,6 +351,144 @@ describe("TopologyPage — search", () => {
           .value,
       ).toBe("orders");
     });
+  });
+
+  it("opens trust for an exact Relationship search result without inventing an Entity route", async () => {
+    const relationship = buildRelationshipSubjectReadResult({
+      identifier: "atlast:relationship:checkout-calls-ledger",
+      relationshipType: "calls",
+      sourceEntityIdentifier: "atlast:entity:service/checkout",
+      targetEntityIdentifier: "atlast:entity:service/ledger",
+    });
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+        buildEvidenceDetailResult(),
+      ),
+      jsonRoute(
+        (url) => url.includes("/api/v1/search"),
+        buildSubjectPage([relationship]),
+      ),
+      jsonRoute((url) => url.includes("/api/v1/entities"), buildEntityPage([])),
+    ]);
+    const router = renderTopology("/topology?q=checkout");
+
+    const invoker = await screen.findByRole("button", {
+      name: `Inspect ${relationship.subject.identifier}`,
+    });
+    fireEvent.click(invoker);
+
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Trust inspector" }),
+    ).toBeDefined();
+    expect(screen.getByText("calls")).toBeDefined();
+    expect(router.state.location.search).toContain(
+      `selected=${encodeURIComponent(relationship.subject.identifier)}`,
+    );
+    expect(
+      screen.queryByRole("link", { name: relationship.subject.identifier }),
+    ).toBeNull();
+  });
+
+  it("rehydrates a directly linked Relationship selection by exact identifier only", async () => {
+    const relationship = buildRelationshipSubjectReadResult({
+      identifier: "atlast:relationship:checkout-calls-ledger",
+      relationshipType: "calls",
+      sourceEntityIdentifier: "atlast:entity:service/checkout",
+      targetEntityIdentifier: "atlast:entity:service/ledger",
+    });
+    const fetchStub = stubApiFetch([
+      jsonRoute(
+        (url) => url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+        buildEvidenceDetailResult(),
+      ),
+      jsonRoute(
+        (url) => url.includes("/api/v1/search"),
+        buildSubjectPage([relationship]),
+      ),
+      jsonRoute((url) => url.includes("/api/v1/entities"), buildEntityPage([])),
+    ]);
+
+    renderTopology(
+      `/topology?selected=${encodeURIComponent(relationship.subject.identifier)}`,
+    );
+
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Trust inspector" }),
+    ).toBeDefined();
+    const exactSearch = fetchStub.mock.calls.find(([url]) =>
+      url.includes("/api/v1/search"),
+    );
+    expect(exactSearch?.[0]).toContain(
+      `q=${encodeURIComponent(relationship.subject.identifier)}`,
+    );
+  });
+
+  it("fails honestly when a directly linked Relationship is absent", async () => {
+    const relationshipIdentifier = "atlast:relationship:checkout-calls-missing";
+    stubApiFetch([
+      jsonRoute((url) => url.includes("/api/v1/search"), buildSubjectPage([])),
+      jsonRoute((url) => url.includes("/api/v1/entities"), buildEntityPage([])),
+    ]);
+
+    renderTopology(
+      `/topology?selected=${encodeURIComponent(relationshipIdentifier)}`,
+    );
+
+    expect(
+      await screen.findByText(
+        "The exact Relationship identifier is not visible at this snapshot.",
+      ),
+    ).toBeDefined();
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Trust inspector" }),
+    ).toBeNull();
+  });
+
+  it("shows a validated API error while rehydrating Relationship trust", async () => {
+    const relationshipIdentifier = "atlast:relationship:checkout-calls-missing";
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes("/api/v1/search"),
+        {
+          code: "UNKNOWN_IDENTIFIER",
+          message: "The requested Relationship is not available.",
+          details: {
+            identifierKind: "subject",
+            identifier: relationshipIdentifier,
+            resolvedIdentity: FIXTURE_IDENTITY,
+          },
+        },
+        false,
+      ),
+      jsonRoute((url) => url.includes("/api/v1/entities"), buildEntityPage([])),
+    ]);
+
+    renderTopology(
+      `/topology?selected=${encodeURIComponent(relationshipIdentifier)}`,
+    );
+
+    expect(
+      await screen.findByText("The requested Relationship is not available."),
+    ).toBeDefined();
+  });
+
+  it("redacts a malformed Relationship rehydration response", async () => {
+    const relationshipIdentifier =
+      "atlast:relationship:checkout-calls-malformed";
+    stubApiFetch([
+      jsonRoute((url) => url.includes("/api/v1/search"), {
+        leakedDetail: "must not render",
+      }),
+      jsonRoute((url) => url.includes("/api/v1/entities"), buildEntityPage([])),
+    ]);
+
+    renderTopology(
+      `/topology?selected=${encodeURIComponent(relationshipIdentifier)}`,
+    );
+
+    expect(await screen.findByText(/failure has been hidden/i)).toBeDefined();
+    expect(screen.queryByText("must not render")).toBeNull();
   });
 });
 

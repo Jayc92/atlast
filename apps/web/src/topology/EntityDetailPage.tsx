@@ -2,12 +2,10 @@
  * The `/entities/:entityId` route (docs/m2-plan.md § 10 M2-B): entity-focused
  * routing and structured detail presentation, pinned to the same resolved
  * snapshot identity the inventory/search pages use. Deliberately not the
- * M2-D trust inspector: it shows the entity's identifier and every visible
  * entity-type claim (never collapsed to one "winner" — GUARDRAILS.md § 1.2),
- * but not confidence, freshness, conflict/ambiguity state, rule traces, or
- * Evidence dereferencing.
+ * and M2-D adds the query-API-only trust inspector for selected subjects.
  */
-import { useEffect, useState, type ReactElement } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router";
 import type {
   SnapshotIdentity,
@@ -33,6 +31,8 @@ import {
 } from "./session.ts";
 import { TopologyShell } from "./TopologyShell.tsx";
 import { TraversalWorkspace } from "./TraversalWorkspace.tsx";
+import { TrustInspector } from "./TrustInspector.tsx";
+import { resolveTrustSelection } from "./trust-selection.ts";
 import { useAsyncQuery } from "./use-async-query.ts";
 import { useCanonicalTopologyUrlState } from "./use-topology-url-state.ts";
 
@@ -82,6 +82,7 @@ function useNarrowTopologyViewport(): boolean {
 }
 
 export function EntityDetailPage(): ReactElement {
+  const inspectorReturnFocusRef = useRef<HTMLElement | null>(null);
   const routeParams = useParams<{ entityId: string }>();
   const trimmedEntityId = routeParams.entityId?.trim();
   const isValidEntityId =
@@ -200,6 +201,46 @@ export function EntityDetailPage(): ReactElement {
     traversalQuery.state.data.queryKey === traversalQueryKey
       ? traversalQuery.state.data.data
       : undefined;
+  const visibleTraversal = currentTraversal ?? retainedTraversalForContext;
+  const loadedDetail =
+    detailQuery.state.status === "loaded"
+      ? detailQuery.state.data.data
+      : undefined;
+  const trustSelection =
+    loadedDetail === undefined || urlState.selected === undefined
+      ? undefined
+      : visibleTraversal === undefined
+        ? urlState.selected === loadedDetail.subject.identifier
+          ? { subject: loadedDetail }
+          : undefined
+        : resolveTrustSelection(
+            urlState.selected,
+            loadedDetail,
+            visibleTraversal,
+          );
+
+  const rememberInspectorInvoker = (): void => {
+    inspectorReturnFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+  };
+
+  const updateSelected = (selected: string): void => {
+    rememberInspectorInvoker();
+    setSearchParams(
+      serializeTopologyUrlState({
+        ...urlState,
+        selected,
+      }),
+    );
+  };
+
+  const clearSelected = (): void => {
+    const withoutSelected = { ...urlState };
+    delete withoutSelected.selected;
+    setSearchParams(serializeTopologyUrlState(withoutSelected));
+  };
 
   if (!isValidEntityId) {
     return <Navigate to="/topology" replace />;
@@ -275,6 +316,14 @@ export function EntityDetailPage(): ReactElement {
                 {view.assertionCount} visible assertion revision
                 {view.assertionCount === 1 ? "" : "s"}.
               </p>
+              <button
+                type="button"
+                onClick={() => {
+                  updateSelected(view.identifier);
+                }}
+              >
+                Inspect entity trust
+              </button>
             </article>
           );
         })()}
@@ -336,6 +385,7 @@ export function EntityDetailPage(): ReactElement {
                 updateUrl({ view });
               }}
               onSelect={(selected) => {
+                rememberInspectorInvoker();
                 updateUrl({ selected });
               }}
             />
@@ -348,6 +398,17 @@ export function EntityDetailPage(): ReactElement {
         retainedTraversalForContext === undefined && (
           <LoadingStatus label="Loading bounded relationships…" />
         )}
+      {trustSelection !== undefined && identity !== undefined && (
+        <TrustInspector
+          selection={trustSelection}
+          snapshotIdentity={identity}
+          {...(visibleTraversal !== undefined
+            ? { traversalTruncated: visibleTraversal.traversal.truncated }
+            : {})}
+          returnFocus={inspectorReturnFocusRef.current}
+          onClose={clearSelected}
+        />
+      )}
       {identity !== undefined && (
         <p className="topology-snapshot-indicator">
           Snapshot: {urlState.pin !== undefined ? "pinned" : "latest"} · asOf{" "}

@@ -16,11 +16,13 @@ import { createMemoryRouter, RouterProvider } from "react-router";
 import { topologyRouteDefinitions } from "../router.tsx";
 import { topologyRequestCache, topologySessionCoordinator } from "./session.ts";
 import {
+  buildEvidenceDetailResult,
   buildEntityPage,
   buildRelationshipSubjectReadResult,
   buildSubjectDetailResult,
   buildTraversalResult,
   FIXTURE_IDENTITY,
+  FIXTURE_EVIDENCE_IDENTIFIER,
 } from "./test-support/fixtures.ts";
 import { jsonRoute, stubApiFetch } from "./test-support/stub-fetch.ts";
 
@@ -316,5 +318,58 @@ describe("EntityDetailPage", () => {
       expect(params.has("derivationVersion")).toBe(false);
       expect(screen.getByText(/Snapshot: latest/)).toBeDefined();
     });
+  });
+
+  it("opens Entity trust, dereferences Evidence, and removes selection when closed", async () => {
+    const detail = buildSubjectDetailResult({
+      identifier: "atlast:entity:checkout",
+      entityType: "service",
+    });
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+        buildEvidenceDetailResult(),
+      ),
+      jsonRoute((url) => url.includes("/traversal?"), buildTraversalResult([])),
+      jsonRoute(
+        (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+        detail,
+      ),
+      jsonRoute(
+        (url) => url.includes("/api/v1/entities?"),
+        buildEntityPage([]),
+      ),
+    ]);
+    const router = renderEntityDetail(
+      "/entities/atlast%3Aentity%3Acheckout?view=list",
+    );
+
+    const invoker = await screen.findByRole("button", {
+      name: "Inspect entity trust",
+    });
+    invoker.focus();
+    fireEvent.click(invoker);
+
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Trust inspector" }),
+    ).toBeDefined();
+    expect(await screen.findByText(/production/)).toBeDefined();
+    expect(router.state.location.search).toContain(
+      `selected=${encodeURIComponent(detail.data.subject.identifier)}`,
+    );
+    let params = new URLSearchParams(router.state.location.search);
+    expect(params.has("asOf")).toBe(false);
+    expect(params.has("horizon")).toBe(false);
+    expect(params.has("derivationVersion")).toBe(false);
+
+    fireEvent.click(screen.getByRole("button", { name: "Close inspector" }));
+    await waitFor(() => {
+      expect(router.state.location.search).not.toContain("selected=");
+      expect(document.activeElement).toBe(invoker);
+    });
+    params = new URLSearchParams(router.state.location.search);
+    expect(params.has("asOf")).toBe(false);
+    expect(params.has("horizon")).toBe(false);
+    expect(params.has("derivationVersion")).toBe(false);
   });
 });

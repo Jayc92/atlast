@@ -7,6 +7,7 @@
 import type {
   EntityPage,
   EntityReadResult,
+  EvidenceDetailResult,
   SnapshotIdentity,
   SubjectDetailResult,
   SubjectPage,
@@ -25,7 +26,8 @@ export const FIXTURE_META = {
   schemaVersion: "atlast-domain-v1",
 } as const;
 
-const FIXTURE_EVIDENCE_IDENTIFIER = "atlast:evidence:checkout/observation-1";
+export const FIXTURE_EVIDENCE_IDENTIFIER =
+  "atlast:evidence:checkout/observation-1";
 const FIXTURE_ASSERTION_DIGEST = "a".repeat(64);
 
 export function buildEntityAssertionRevision(overrides: {
@@ -187,5 +189,26 @@ export function buildTraversalResult(
     items: [...items],
     traversal: { truncated, subjectCount: items.length },
     meta: FIXTURE_META,
+  };
+}
+
+export function buildEvidenceDetailResult(
+  identifier = FIXTURE_EVIDENCE_IDENTIFIER,
+): EvidenceDetailResult {
+  return {
+    data: {
+      schemaVersion: "atlast-domain-v1",
+      identifier,
+      observedAt: "2026-08-01T00:00:00.000Z",
+      recordedAt: "2026-08-01T00:00:01.000Z",
+      recordedSequence: 1,
+      sourceScopedIdentity: {
+        source: "catalog",
+        sourceNativeId: "checkout",
+      },
+      observation: { observationKind: "entity", entityType: "service" },
+      detail: { environment: "production" },
+    },
+    meta: { schemaVersion: "atlast-domain-v1" },
   };
 }
