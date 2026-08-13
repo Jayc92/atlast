@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational; M2-A through M2-D complete, with M2-D closed through PR #46 at `452f60f`; M2-E separately authorized on 2026-08-13, pending its authorization-record merge; M2-F unauthorized
+**Status:** Approved and operational; M2-A through M2-D complete; M2-E active through PR #47 at `f9d441e`; M2-F contingently pre-authorized but dormant until M2-E closes
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-D are complete; M2-D closed through PR #46 at `452f60f`. Joseph then separately and explicitly authorized M2-E only on 2026-08-13. That release becomes operational only after its documentation record merges and `main` is synchronized cleanly. M2-F and M3+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e`. Joseph explicitly pre-authorized M2-F on 2026-08-13, contingent on M2-E's independent review, verification, merge, and closeout. M2-F is not active now. M3 planning is separately pre-authorized after M2 closes; M3 product implementation and M4+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A through M2-D are complete, with M2-D closed through PR #46 at `452f60f`. M2-E was separately and explicitly authorized by Joseph Carfagno on 2026-08-13; its release becomes operational only after this authorization record merges and `main` is synchronized locally with a clean working tree. M2-F remains gated.
+M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e`. M2-F was contingently pre-authorized by Joseph Carfagno on 2026-08-13 but remains dormant until M2-E is independently reviewed, verified, merged, and closed.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -333,6 +333,18 @@ M2-E may implement only:
 - directly corresponding shared/API/web tests plus browser acceptance for complete-pin copied links, historical Relationship-to-Evidence traceability, and no silent latest fallback; and factual fixture cardinality, retained-Evidence count, anchor count/truncation, route latency, result-cardinality, traversal, bundle, and process/browser-memory measurements in `TASKS.md`.
 
 M2-E must not add a repository method; alter graph-model/repository/reconciliation/storage behavior or private implementation fields; expose Evidence or fixture metadata through the anchor route; add Relationship detail, assertion, evidence-chain, or bulk-Evidence routes; change fixtures, accepted ADR text, dependencies, package manifests, the lockfile, `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; manufacture timeline coordinates or treat anchors as freshness-transition history; perform M2-F hardening, audit, storage decision, or milestone closeout; add connectors, authentication, deployment, real-system access, or M3+ work. Implementation output still requires independent review, the complete repository verifier, human browser/accessibility review, PR/CI approval, merge, and checkpoint update before any next-slice decision.
+
+### Exact M2-F contingent authorization boundary
+
+M2-F remains dormant until M2-E is independently reviewed, verified, merged, and closed. Once that precondition is satisfied and this contingent authorization record is merged and synchronized cleanly, M2-F may implement only:
+
+- browser-acceptance expansion for the accepted M2 primary journeys, complete-pin history playback, trust inspection, honest failures, keyboard operation, responsive behavior, and reduced motion across the supported desktop and mobile viewports;
+- accessibility and responsive hardening of the existing M2 interface without adding new product capabilities or widening the query API;
+- final bundle, latency, retained-Evidence/anchor cardinality, traversal-truncation, and process/browser-memory measurements, including explicit review of the tracked lazy graph payload;
+- the mandatory independent ADR-0018 retain-or-migrate storage review using recorded M2-A through M2-E measurements, with any migration requiring a new ADR and separate authorization rather than implementation inside M2-F;
+- the final synthetic-boundary and no-side-door audit, factual exit-criterion updates, M2 milestone closeout, and directly corresponding tests and documentation.
+
+M2-F must not change domain semantics, repository/reconciliation/snapshot behavior, fixtures, accepted ADR text, dependencies, package manifests, the lockfile, or query API behavior except for a separately authorized correction; add new product features, routes, connectors, authentication, deployment, infrastructure, real-system access, or M3+ behavior; weaken `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; or declare M2 complete before independent review, the full verifier, human browser/accessibility QA, PR/CI approval, merge, post-merge audit, and checkpoint update all succeed. M3 planning remains dormant until M2 is formally complete, and M3 product implementation requires its own approved baseline and explicit release.
 
 ## 13. Exit Criteria for M2-P
 
