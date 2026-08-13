@@ -1,8 +1,9 @@
 /**
  * Browser entry point for the Atlast web application (M0 shell per ADR-0003;
- * M2-A routing foundation per ADR-0026 § 2). Mounts the client-rendered SPA
- * behind the URL-addressable router; the foundation page itself is
- * unchanged, and no M2-B topology feature content exists yet.
+ * M2-A routing foundation and M2-B topology shell per ADR-0026 § 2). Mounts
+ * the client-rendered SPA behind the URL-addressable router; the foundation
+ * page remains available at `/`, while the topology application is routed at
+ * `/topology` and `/entities/:entityId`.
  */
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

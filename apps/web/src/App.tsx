@@ -182,6 +182,18 @@ export function App(): ReactElement {
             time — answers the question every engineer asks before every change:{" "}
             <em>“if I change this, what breaks?”</em>
           </p>
+          <nav
+            className="atlas-enter-nav reveal reveal-5"
+            aria-label="Topology application"
+          >
+            <div>
+              <span className="atlas-enter-kicker">Interactive workspace</span>
+              <p>Browse the synthetic entity inventory and search the map.</p>
+            </div>
+            <a className="atlas-enter-link" href="/topology">
+              Explore topology <span aria-hidden="true">→</span>
+            </a>
+          </nav>
         </section>
 
         <section

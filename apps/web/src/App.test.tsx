@@ -81,6 +81,22 @@ describe("App — primary rendered content", () => {
 
     await screen.findByText("Local API connected");
   });
+
+  it("links into the M2-B topology application", async () => {
+    stubHealthEndpoint({
+      ok: true,
+      jsonPayload: { status: "ok", service: "atlast-api" },
+    });
+
+    render(<App />);
+
+    const enterLink = screen.getByRole("link", {
+      name: /Explore topology/,
+    });
+    expect(enterLink.getAttribute("href")).toBe("/topology");
+
+    await screen.findByText("Local API connected");
+  });
 });
 
 describe("App — API health states", () => {

@@ -4,33 +4,40 @@
  * component level with `createMemoryRouter` — the same route shape
  * `AppRouter` wires into `createBrowserRouter` for production.
  *
- * `fetch` is stubbed because the `/` route renders the existing `App` shell,
- * which performs its own health check on mount (App.test.tsx already covers
- * that behavior in isolation) — no test here contacts a real network
- * endpoint.
+ * `/topology` and `/entities/:entityId` now render the real M2-B
+ * application shell; their structured content is exercised in depth by
+ * `topology/TopologyPage.test.tsx` and `topology/EntityDetailPage.test.tsx`.
+ * This file stays focused on routing mechanics: addressability, redirects,
+ * and browser history.
  */
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { topologyRouteDefinitions } from "./router.tsx";
+import {
+  topologyRequestCache,
+  topologySessionCoordinator,
+} from "./topology/session.ts";
+import {
+  buildEntityPage,
+  buildSubjectDetailResult,
+} from "./topology/test-support/fixtures.ts";
+import { jsonRoute, stubApiFetch } from "./topology/test-support/stub-fetch.ts";
 
 function stubHealthEndpoint(): void {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: (): Promise<unknown> =>
-          Promise.resolve({ status: "ok", service: "atlast-api" }),
-      } as Response),
-    ),
-  );
+  stubApiFetch([
+    jsonRoute((url) => url === "/api/health", {
+      status: "ok",
+      service: "atlast-api",
+    }),
+    jsonRoute((url) => url.includes("/api/v1/entities"), buildEntityPage([])),
+  ]);
 }
 
 afterEach(() => {
   cleanup();
-  vi.unstubAllGlobals();
-  vi.restoreAllMocks();
+  topologyRequestCache.clear();
+  topologySessionCoordinator.beginNewGeneration();
 });
 
 describe("topology routing foundation", () => {
@@ -47,36 +54,48 @@ describe("topology routing foundation", () => {
     await screen.findByText("Local API connected");
   });
 
-  it("renders a reserved, contentless placeholder at /topology", () => {
+  it("renders the real M2-B topology application at /topology", async () => {
+    stubHealthEndpoint();
     const router = createMemoryRouter([...topologyRouteDefinitions], {
       initialEntries: ["/topology"],
     });
     render(<RouterProvider router={router} />);
 
     expect(
-      screen.getByRole("heading", {
-        level: 1,
-        name: /Topology exploration \(reserved for M2-B\)/,
-      }),
+      screen.getByRole("heading", { level: 1, name: "Topology" }),
     ).toBeDefined();
-    // No topology feature content of any kind exists on this route.
-    expect(screen.queryByRole("list")).toBeNull();
-    expect(screen.queryByRole("search")).toBeNull();
+    expect(screen.getByRole("search")).toBeDefined();
+    await screen.findByText("No entities are visible in this snapshot.");
   });
 
-  it("renders a reserved entity placeholder naming the requested identifier at /entities/:entityId", () => {
+  it("renders the real M2-B entity detail application at /entities/:entityId", async () => {
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+        buildSubjectDetailResult({
+          identifier: "atlast:entity:checkout",
+          entityType: "service",
+        }),
+      ),
+      jsonRoute(
+        (url) => url.includes("/api/v1/entities?"),
+        buildEntityPage([]),
+      ),
+    ]);
     const router = createMemoryRouter([...topologyRouteDefinitions], {
-      initialEntries: ["/entities/atlast:entity:service%2Fcheckout"],
+      initialEntries: ["/entities/atlast%3Aentity%3Acheckout"],
     });
     render(<RouterProvider router={router} />);
 
     expect(
-      screen.getByRole("heading", {
-        level: 1,
-        name: /Entity detail \(reserved for M2-B\)/,
+      screen.getByRole("heading", { level: 1, name: "Entity detail" }),
+    ).toBeDefined();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "atlast:entity:checkout",
       }),
     ).toBeDefined();
-    expect(screen.getByText(/atlast:entity:service\/checkout/)).toBeDefined();
   });
 
   it("redirects an unrecognized path back to /", () => {
@@ -100,12 +119,10 @@ describe("topology routing foundation", () => {
     render(<RouterProvider router={router} />);
 
     expect(
-      screen.getByRole("heading", {
-        level: 1,
-        name: /Topology exploration/,
-      }),
+      screen.getByRole("heading", { level: 1, name: "Topology" }),
     ).toBeDefined();
     expect(router.state.location.search).toBe("?view=list&depth=2");
+    await screen.findByText("No entities are visible in this snapshot.");
 
     await router.navigate(-1);
     expect(
@@ -119,7 +136,7 @@ describe("topology routing foundation", () => {
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: /Topology exploration/,
+        name: "Topology",
       }),
     ).toBeDefined();
     expect(router.state.location.search).toBe("?view=list&depth=2");
