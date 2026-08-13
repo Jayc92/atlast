@@ -3,14 +3,23 @@
  * identity coordination shared with `/topology`, invalid-identifier
  * canonicalization, and honest failure states.
  */
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { topologyRouteDefinitions } from "../router.tsx";
 import { topologyRequestCache, topologySessionCoordinator } from "./session.ts";
 import {
   buildEntityPage,
+  buildRelationshipSubjectReadResult,
   buildSubjectDetailResult,
+  buildTraversalResult,
   FIXTURE_IDENTITY,
 } from "./test-support/fixtures.ts";
 import { jsonRoute, stubApiFetch } from "./test-support/stub-fetch.ts";
@@ -38,6 +47,7 @@ describe("EntityDetailPage", () => {
       entityType: "service",
     });
     stubApiFetch([
+      jsonRoute((url) => url.includes("/traversal?"), buildTraversalResult([])),
       jsonRoute(
         (url) =>
           url.includes("/api/v1/entities/atlast%3Aentity%3Aservice%2Fcheckout"),
@@ -113,6 +123,7 @@ describe("EntityDetailPage", () => {
       entityType: "service",
     });
     const fetchStub = stubApiFetch([
+      jsonRoute((url) => url.includes("/traversal?"), buildTraversalResult([])),
       jsonRoute(
         (url) =>
           url.includes("/api/v1/entities/atlast%3Aentity%3Aservice%2Fcheckout"),
@@ -130,13 +141,24 @@ describe("EntityDetailPage", () => {
       level: 2,
       name: "atlast:entity:service/checkout",
     });
-    // A complete pin needs no identity-resolution probe at all.
-    expect(fetchStub).toHaveBeenCalledTimes(1);
+    await screen.findByRole("heading", {
+      level: 2,
+      name: "Relationship workspace",
+    });
+    // A complete pin goes directly to the detail and traversal reads; it does
+    // not perform the unpinned inventory probe used to resolve latest.
+    expect(fetchStub).toHaveBeenCalledTimes(2);
+    expect(
+      fetchStub.mock.calls.every(([url]) =>
+        url.includes(`horizon=${String(FIXTURE_IDENTITY.horizon)}`),
+      ),
+    ).toBe(true);
     expect(screen.getByText(/Snapshot: pinned/)).toBeDefined();
   });
 
   it("canonicalizes a partial snapshot pin and shows the correction notice", async () => {
     stubApiFetch([
+      jsonRoute((url) => url.includes("/traversal?"), buildTraversalResult([])),
       jsonRoute((url) => url.includes("/api/v1/entities"), buildEntityPage([])),
     ]);
 
@@ -158,6 +180,7 @@ describe("EntityDetailPage", () => {
       entityType: "service",
     });
     stubApiFetch([
+      jsonRoute((url) => url.includes("/traversal?"), buildTraversalResult([])),
       jsonRoute(
         (url) =>
           url.includes("/api/v1/entities/atlast%3Aentity%3Aservice%2Fcheckout"),
@@ -188,5 +211,110 @@ describe("EntityDetailPage", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "Topology" }),
     ).toBeDefined();
+  });
+
+  it("writes traversal controls and shared selection to a complete pinned URL", async () => {
+    const checkout = buildSubjectDetailResult({
+      identifier: "atlast:entity:checkout",
+      entityType: "service",
+    });
+    const payments = buildSubjectDetailResult({
+      identifier: "atlast:entity:payments",
+      entityType: "service",
+    }).data;
+    const relationship = buildRelationshipSubjectReadResult({
+      identifier: "atlast:relationship:checkout-calls-payments",
+      relationshipType: "calls",
+      sourceEntityIdentifier: checkout.data.subject.identifier,
+      targetEntityIdentifier: payments.subject.identifier,
+    });
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes("/traversal?"),
+        buildTraversalResult([payments, relationship]),
+      ),
+      jsonRoute(
+        (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+        checkout,
+      ),
+    ]);
+    const router = renderEntityDetail(
+      `/entities/atlast%3Aentity%3Acheckout?view=list&asOf=${encodeURIComponent(
+        FIXTURE_IDENTITY.asOf,
+      )}&horizon=${String(FIXTURE_IDENTITY.horizon)}&derivationVersion=${FIXTURE_IDENTITY.derivationVersion}`,
+    );
+
+    const direction = await screen.findByRole("combobox", {
+      name: "Direction",
+    });
+    fireEvent.change(direction, { target: { value: "upstream" } });
+    await waitFor(() => {
+      expect(router.state.location.search).toContain("direction=upstream");
+    });
+
+    const entityButton = await screen.findByRole("button", {
+      name: "payments, service",
+    });
+    fireEvent.click(entityButton);
+    await waitFor(() => {
+      expect(router.state.location.search).toContain(
+        `selected=${encodeURIComponent(payments.subject.identifier)}`,
+      );
+      expect(router.state.location.search).toContain("horizon=20");
+    });
+  });
+
+  it("preserves latest mode when traversal controls and selection change", async () => {
+    const checkout = buildSubjectDetailResult({
+      identifier: "atlast:entity:checkout",
+      entityType: "service",
+    });
+    const payments = buildSubjectDetailResult({
+      identifier: "atlast:entity:payments",
+      entityType: "service",
+    }).data;
+    const relationship = buildRelationshipSubjectReadResult({
+      identifier: "atlast:relationship:checkout-calls-payments",
+      relationshipType: "calls",
+      sourceEntityIdentifier: checkout.data.subject.identifier,
+      targetEntityIdentifier: payments.subject.identifier,
+    });
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes("/traversal?"),
+        buildTraversalResult([payments, relationship]),
+      ),
+      jsonRoute(
+        (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+        checkout,
+      ),
+      jsonRoute(
+        (url) => url.includes("/api/v1/entities?"),
+        buildEntityPage([]),
+      ),
+    ]);
+    const router = renderEntityDetail(
+      "/entities/atlast%3Aentity%3Acheckout?view=list",
+    );
+
+    fireEvent.change(
+      await screen.findByRole("combobox", { name: "Direction" }),
+      { target: { value: "upstream" } },
+    );
+    await waitFor(() => {
+      expect(router.state.location.search).toContain("direction=upstream");
+    });
+    fireEvent.click(
+      await screen.findByRole("button", { name: "payments, service" }),
+    );
+
+    await waitFor(() => {
+      const params = new URLSearchParams(router.state.location.search);
+      expect(params.get("selected")).toBe(payments.subject.identifier);
+      expect(params.has("asOf")).toBe(false);
+      expect(params.has("horizon")).toBe(false);
+      expect(params.has("derivationVersion")).toBe(false);
+      expect(screen.getByText(/Snapshot: latest/)).toBeDefined();
+    });
   });
 });

@@ -6,9 +6,8 @@
  *
  * `/topology` and `/entities/:entityId` render the M2-B application shell
  * (`TopologyPage`/`EntityDetailPage`): Entity inventory, canonical-identifier
- * search, and entity-focused structured detail. Graph rendering, the trust
- * inspector, and history playback remain M2-C/M2-D/M2-E scope and are not
- * implemented here.
+ * search, entity-focused detail, and the bounded M2-C graph workspace. The
+ * detailed trust inspector and history playback remain M2-D/M2-E scope.
  */
 import type { ReactElement } from "react";
 import {

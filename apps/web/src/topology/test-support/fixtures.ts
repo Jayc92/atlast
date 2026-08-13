@@ -11,6 +11,7 @@ import type {
   SubjectDetailResult,
   SubjectPage,
   SubjectReadResult,
+  TraversalResult,
 } from "@atlast/shared";
 
 export const FIXTURE_IDENTITY: SnapshotIdentity = {
@@ -174,6 +175,17 @@ export function buildSubjectDetailResult(overrides: {
 }): SubjectDetailResult {
   return {
     data: buildSubjectReadResult(overrides),
+    meta: FIXTURE_META,
+  };
+}
+
+export function buildTraversalResult(
+  items: readonly SubjectReadResult[],
+  truncated = false,
+): TraversalResult {
+  return {
+    items: [...items],
+    traversal: { truncated, subjectCount: items.length },
     meta: FIXTURE_META,
   };
 }
