@@ -49,7 +49,17 @@ Binding decisions are made only through human-approved ADRs ([GUARDRAILS.md § 1
 | [0027](0027-m2-graph-rendering-and-accessibility.md)      | React Flow + ELK rendering/layout with a normative accessible structured topology view                 | Accepted |
 | [0028](0028-m2-snapshot-navigation-and-trust-contract.md) | Bounded snapshot-anchor API, reproducible history navigation, and mandatory trust presentation         | Accepted |
 
-**M2 approval note (2026-08-12):** Joseph Carfagno explicitly accepted ADRs 0026–0028 and approved [docs/m2-plan.md](../m2-plan.md) after an independent architecture review found one blocking and two non-blocking issues, a correction pass addressed all findings and residual observations, and focused re-review found no remaining blockers. The approval record merged through PR #34 at `106b1e7`, and `main` was synchronized cleanly. Acceptance established the M2 implementation baseline only. Joseph then separately authorized M2-A within the plan's exact boundary; its release becomes operational only after its own authorization record merges and `main` is synchronized cleanly. M2-B+ and M3+ remain unauthorized.
+**M2 approval note (2026-08-12):** Joseph Carfagno explicitly accepted ADRs 0026-0028 and approved [docs/m2-plan.md](../m2-plan.md) after independent review and correction. M2-A through M2-F were separately released and completed; checkpoint `m2-complete` merged through PR #52 at `b8cd2ee` on 2026-08-16. The M3 baseline was subsequently accepted, but M3-A remains unauthorized.
+
+### Accepted M3 baseline (not implementation authority)
+
+| ADR                                                       | Decision                                                                                                             | Status   |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------- |
+| [0029](0029-m3-overlay-model-and-temporal-semantics.md)   | Separate immutable overlay frames, deterministic direct/effective state, temporal selection, and unknown-target gaps | Accepted |
+| [0030](0030-m3-health-in-context-api-contract.md)         | One bounded server-authoritative health-in-context route with explicit topology/frame coordinates                    | Accepted |
+| [0031](0031-m3-overlay-presentation-and-accessibility.md) | Optional query-only graph/structured overlay presentation with non-color semantics and historical coordination       | Accepted |
+
+**M3 approval note (2026-08-16):** Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved [docs/m3-plan.md](../m3-plan.md) as the M3 implementation baseline after independent architecture review, correction, and focused re-review. The acceptance record becomes operational only after it merges to `main` and local `main` is synchronized cleanly. Baseline acceptance authorizes no implementation; M3-A requires a separate explicit release. M4+ remain unauthorized.
 
 **Approval note (2026-07-23):** ADRs 0014–0018 were accepted by human review as the **M1 architecture baseline**, alongside approval of [docs/m1-plan.md](../m1-plan.md). Acceptance settles the M1 planning decisions only — **it does not authorize M1 implementation**, which requires its own separate, explicit human authorization per [docs/milestones.md](../milestones.md).
 

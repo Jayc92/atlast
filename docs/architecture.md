@@ -1,6 +1,6 @@
 # Atlast — Architecture
 
-**Status:** Current. M0, M1, and M2 are implemented and complete; M2 closed at checkpoint `m2-complete` after M2-F merged through PR #51 at `5aeb11d` and passed post-merge revalidation. M3 planning and pre-release architecture/ADR review are authorized, but M3 product implementation and M4+ remain gated. This document defines the architecture _philosophy_ and conceptual system shape; design positions bind only through human-approved ADRs in `docs/adr/`, and tooling choices require approval before use.
+**Status:** Current. M0, M1, and M2 are implemented and complete; M2 closed through PR #52 at checkpoint `m2-complete`. Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved [m3-plan.md](m3-plan.md) as the M3 implementation baseline on 2026-08-16 after independent review and correction. Baseline acceptance does not release M3-A; M3-A and M4+ remain gated. This document defines the architecture _philosophy_ and conceptual system shape; design positions bind only through human-approved ADRs in `docs/adr/`, and tooling choices require approval before use.
 
 ---
 
