@@ -1,6 +1,6 @@
 # Atlast — Tasks
 
-The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0, M1, and M2 are complete. M3-A is complete and closed through PR #56 at `a767c93` on 2026-08-16.** Joseph Carfagno separately authorized M3-B only; activation awaits this authorization record's merge and clean local synchronization. **M3-C through M3-F and M4+ remain unauthorized.**
+The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0, M1, and M2 are complete. M3-A is complete and closed through PR #56 at `a767c93` on 2026-08-16. M3-B is the only active implementation slice.** Its authorization merged through PR #57 at `8213d7d`, and local `main` synchronized cleanly before implementation began. **M3-C through M3-F and M4+ remain unauthorized.**
 
 **Legend:** `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked (note the blocker)
 
@@ -240,7 +240,7 @@ M1 exit criteria (below) are now all checked and closed as project facts, per [d
 
 **Checkpoint `m2-complete` — M2 milestone closeout (2026-08-16):** all six M2 implementation slices and both milestone exit criteria are complete; PR #51 merged at `5aeb11d`; GitHub Actions and the complete local post-merge verifier passed; audit § 17 confirmed the synthetic boundary, query-API-only browser boundary, exact merged scope, and zero literal NUL bytes across 238 tracked files; ADR-0018 Outcome 1 retains in-memory storage for the measured M2 workload. No M2 implementation slice is active.
 
-## M3 — Operational Health Overlays (M3-B authorized pending activation)
+## M3 — Operational Health Overlays (M3-B active)
 
 Joseph Carfagno explicitly pre-authorized **M3 planning and pre-release architecture/ADR review only** on 2026-08-13. M2 is formally complete, and the independently reviewed, corrected, and explicitly human-approved M3 baseline merged through PR #53 at `b85be38` on 2026-08-16. M3-A's implementation merged through PR #55 at `e9afcd5`, and its closeout merged through PR #56 at `a767c93`. Joseph then explicitly authorized **M3-B only** on 2026-08-16. **M3-C through M3-F and M4+ remain unauthorized.**
 
@@ -254,7 +254,9 @@ Joseph Carfagno explicitly pre-authorized **M3 planning and pre-release architec
 
 **Checkpoint `m3-a-overlay-contracts-fixtures-merged` — M3-A closeout (2026-08-16):** the bounded implementation is merged through PR #55 at `e9afcd5`, GitHub Actions and the complete local verifier pass, and the shared contract/store boundary plus separate overlay fixture catalog are complete. No implementation slice is active. Closing M3-A does not authorize M3-B; M3-B through M3-F and M4+ remain gated and unauthorized.
 
-**M3-B authorization (2026-08-16):** after the M3-A closeout merged through PR #56 at `a767c93` and local `main` synchronized cleanly, Joseph Carfagno explicitly authorized M3-B only. The exact boundary is a new internal `packages/overlay-model` workspace package containing the in-memory implementation of the merged `OperationalOverlayStore` interface and a pure deterministic health projector; exhaustive tests proving immutability, the 100-entry bound, total frame/entry ordering and selection, origin projection, revision-qualified scope-relative latent-risk paths, cycles, missing direct state, and gaps; directly required workspace/build plumbing; and factual measurements in this file. No API route, browser behavior, external dependency, graph subject/assertion/Evidence/repository schema change, topology mutation, or M3-C+ behavior is authorized. Activation requires this authorization record to merge and local `main` to synchronize cleanly.
+**M3-B authorization (2026-08-16):** after the M3-A closeout merged through PR #56 at `a767c93` and local `main` synchronized cleanly, Joseph Carfagno explicitly authorized M3-B only. The exact boundary is a new internal `packages/overlay-model` workspace package containing the in-memory implementation of the merged `OperationalOverlayStore` interface and a pure deterministic health projector; exhaustive tests proving immutability, the 100-entry bound, total frame/entry ordering and selection, origin projection, revision-qualified scope-relative latent-risk paths, cycles, missing direct state, and gaps; directly required workspace/build plumbing; and factual measurements in this file. No API route, browser behavior, external dependency, graph subject/assertion/Evidence/repository schema change, topology mutation, or M3-C+ behavior is authorized. The authorization merged through PR #57 at `8213d7d`; local `main` then synchronized cleanly, activating M3-B.
+
+**M3-B implementation candidate (2026-08-16):** the new internal `@atlast/overlay-model` package implements immutable validated in-memory frame storage, deterministic exact and latest-at-or-before selection, and a pure scope-relative health projector. The projector preserves traversal-origin inclusion, confidence-qualified directed Relationship revisions, auditable shortest latent-risk paths with deterministic tie ordering, cycle safety, unreported missing direct state, unknown-target gaps without topology expansion, and truncation propagation. Focused overlay-model tests pass **22/22**. The unchanged complete seven-stage repository verifier passes: shared **419/419**, overlay-model **22/22**, graph-model **372/372**, API **69/69**, web **154/154**, production builds, and browser acceptance **24/24**. No API route, browser behavior, fixture, external dependency, existing graph schema/storage behavior, or topology mutation changed.
 
 - [x] Inventory the completed topology, snapshot, API, browser, accessibility, and synthetic-boundary seams.
 - [x] Draft the M3 implementation plan and Proposed ADRs 0029-0031.
@@ -262,7 +264,7 @@ Joseph Carfagno explicitly pre-authorized **M3 planning and pre-release architec
 - [x] Obtain explicit human approval of the complete baseline - _Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved docs/m3-plan.md on 2026-08-16._
 - [x] Separately authorize M3-A after the approval record merges and `main` is synchronized cleanly - _explicitly authorized by Joseph Carfagno on 2026-08-16; authorization merged through PR #54 at `e5da808`, then local `main` synchronized cleanly before implementation._
 
-- [ ] Overlay model + synthetic state generator (healthy, degraded, down, disconnected, expiring certificate, latent downstream risk)
+- [x] Overlay model + synthetic state generator (healthy, degraded, down, disconnected, expiring certificate, latent downstream risk)
 - [ ] Health-in-context queries and UI overlay toggles
 - [ ] Unknown-entity overlays surface as gaps, not phantom nodes
 

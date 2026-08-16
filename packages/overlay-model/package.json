@@ -1,0 +1,27 @@
+{
+  "name": "@atlast/overlay-model",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure M3 operational-overlay storage and deterministic health projection under ADR-0029.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --project tsconfig.json",
+    "test": "vitest run",
+    "build": "tsc --project tsconfig.build.json"
+  },
+  "dependencies": {
+    "@atlast/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "vitest": "4.1.10"
+  }
+}
