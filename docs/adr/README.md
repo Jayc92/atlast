@@ -59,7 +59,7 @@ Binding decisions are made only through human-approved ADRs ([GUARDRAILS.md § 1
 | [0030](0030-m3-health-in-context-api-contract.md)         | One bounded server-authoritative health-in-context route with explicit topology/frame coordinates                    | Proposed |
 | [0031](0031-m3-overlay-presentation-and-accessibility.md) | Optional query-only graph/structured overlay presentation with non-color semantics and historical coordination       | Proposed |
 
-**M3 planning note (2026-08-16):** These ADRs and [docs/m3-plan.md](../m3-plan.md) are the first planning candidate produced under the authorized M3 planning phase. They remain Proposed pending independent architecture review, correction, and explicit human approval. They authorize no implementation; M3-A requires a separate release after baseline approval. M4+ remain unauthorized.
+**M3 planning note (2026-08-16):** These ADRs and [docs/m3-plan.md](../m3-plan.md) are the first planning candidate produced under the authorized M3 planning phase. Independent architecture review and correction are complete; the ADRs remain Proposed pending explicit human approval. They authorize no implementation; M3-A requires a separate release after baseline approval. M4+ remain unauthorized.
 
 **Approval note (2026-07-23):** ADRs 0014–0018 were accepted by human review as the **M1 architecture baseline**, alongside approval of [docs/m1-plan.md](../m1-plan.md). Acceptance settles the M1 planning decisions only — **it does not authorize M1 implementation**, which requires its own separate, explicit human authorization per [docs/milestones.md](../milestones.md).
 

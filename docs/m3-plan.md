@@ -5,6 +5,8 @@
 
 > **Authorization boundary:** M3 planning and pre-release architecture/ADR review are authorized after checkpoint `m2-complete`. This plan and ADRs 0029-0031 are Proposed. They authorize no product implementation, dependency, fixture, schema, API, or UI change. M3 implementation requires independent review, explicit human approval of the complete baseline, and a separate bounded slice release. M4+ remain unauthorized.
 
+> **Review state:** Independent architecture review and correction completed on 2026-08-16 against the merged M1/M2 contracts and implementation. This plan remains Proposed pending explicit human approval; review completion does not release M3-A.
+
 ## 1. Objective
 
 M3 projects deterministic synthetic operational health onto the completed, versioned topology without turning health into graph truth or turning Atlast into a monitoring system. A user must be able to view direct synthetic conditions, understand contextual downstream risk, inspect the exact topology snapshot and overlay frame behind the view, and see unknown overlay targets as explicit discovery gaps rather than invented entities.
@@ -40,7 +42,7 @@ The milestone exit criteria remain those in [docs/milestones.md](milestones.md):
 - the health-in-context HTTP response and its metadata;
 - an asynchronous, read-only `OperationalOverlayStore` interface.
 
-Frame and entry identifiers use the closed ASCII forms `atlast:overlay-frame:demo-company/<frame-slug>` and `atlast:overlay-entry:demo-company/<frame-slug>/<entry-slug>`, where slugs are lowercase kebab case. A frame contains 1-100 entries, and target Entity identifiers are unique within it.
+Frame and entry identifiers use the closed ASCII forms `atlast:overlay-frame:demo-company/<frame-slug>` and `atlast:overlay-entry:demo-company/<frame-slug>/<entry-slug>`, where slugs are lowercase kebab case and `scenarioIdentifier` is the literal `demo-company`. A strict frame contains exactly `schemaVersion`, `identifier`, `scenarioIdentifier`, `effectiveAt`, and `entries`; a strict entry contains exactly `identifier`, `targetEntityIdentifier`, and `directCondition`. A frame contains 1-100 entries, its entry identifiers and target Entity identifiers are unique, and every entry identifier's frame slug matches its containing frame. Entries are stored in raw UTF-16 order by `(targetEntityIdentifier, identifier)`. Frames are stored in raw UTF-16 order by `(effectiveAt, identifier)`; equal effective times are valid and the identifier is the deterministic tie-breaker. Duplicate frame identifiers are rejected.
 
 No existing M1 graph subject, assertion, Evidence, repository, snapshot, or HTTP schema is widened to carry health.
 
@@ -80,9 +82,11 @@ It accepts the existing required traversal bounds (`direction`, `depth`, optiona
 1. resolves one bounded topology traversal through `TopologyGraphStore`;
 2. resolves one immutable frame through `OperationalOverlayStore`;
 3. rejects a frame later than the topology `asOf`;
-4. validates each of the frame's at most 100 targets through `TopologyGraphStore.getSubject` at the already resolved identity, classifying only `UNKNOWN_IDENTIFIER` as a gap;
-5. projects health through `packages/overlay-model`;
-6. returns topology subjects, traversal metadata, health projections, and gaps in one validated envelope.
+4. treats the origin and returned Entity targets as already proven, then validates each remaining frame target through `TopologyGraphStore.getSubject` at the already resolved identity, classifying only `UNKNOWN_IDENTIFIER` as a gap;
+5. projects health through `packages/overlay-model` using the origin identifier, validated traversal bounds, traversal result, selected frame, and known/unknown target partition;
+6. returns the unchanged traversal subjects and metadata, one projection for the origin plus every returned Entity, and frame-wide gaps in one validated envelope.
+
+A successful traversal already proves that the origin and returned Entities exist at the resolved identity, so no in-scope target is read a second time. The remaining exact existence reads are bounded by the frame's 100-entry cap. Projections are ordered by Entity identifier; gaps are ordered by `(targetEntityIdentifier, entryIdentifier)`, all using raw UTF-16 code-unit order.
 
 No browser-side join is authoritative. No existing route changes semantics.
 
@@ -91,7 +95,7 @@ No browser-side join is authoritative. No existing route changes semantics.
 The M2 topology workspace gains:
 
 - a canonical master health-overlay toggle;
-- canonical state filters in fixed enum order;
+- canonical state-emphasis filters in fixed enum order;
 - graph node treatments using text/icon/pattern plus color;
 - an equivalent structured health view;
 - a visible gap panel;
@@ -100,7 +104,7 @@ The M2 topology workspace gains:
 - historical coordination with M2 snapshot playback;
 - loading, retained-update, empty, unavailable, invalid-coordinate, and retry states.
 
-The graph remains usable when overlays are hidden or unavailable. Overlay state never removes a topology node or edge.
+The graph remains usable when overlays are hidden or unavailable. State filters only emphasize matching projections: nonmatching and unreported Entities remain visible with neutral treatment, gaps remain listed, and no topology node, edge, structured row, or API projection is removed.
 
 ## 4. Deterministic Health Semantics
 
@@ -110,7 +114,7 @@ Each known Entity has at most one direct condition in a frame. Frame validation 
 
 The order is presentation and contextual-risk policy only; it is not topology confidence and does not alter graph assertions.
 
-Latent downstream risk is derived only for an Entity whose direct condition is `healthy`. It is present when that Entity has a directed path, within the returned bounded subgraph, to an Entity with a direct condition other than `healthy`. This is scope-relative regardless of whether the root request traversed upstream or downstream: the projector follows the actual Relationship direction among subjects already returned and never performs a second traversal. Derivation uses only direct conditions, never recursively derived risk, so cycles cannot amplify state. The result includes the shortest triggering path; ties prefer the more severe target condition, then target Entity identifier, then Relationship identifier using the existing canonical ordering rules. A truncated traversal is labeled as incomplete context and never presented as proof that no latent risk exists outside the loaded subgraph.
+Latent downstream risk is derived only for an Entity whose direct condition is `healthy`. The projection scope is the origin Entity plus every returned Entity subject. An eligible directed edge is one returned Relationship assertion revision whose claim is a Relationship claim, whose confidence meets the validated request floor, and whose source and target are both in scope. The projector follows the claim's actual source-to-target direction regardless of the root traversal direction, does not perform a second traversal, and never treats nested `conflictState.competingClaims` as traversal edges. Derivation uses only direct conditions, never recursively derived risk, so cycles cannot amplify state. Each path step records source Entity, target Entity, Relationship subject, and assertion revision identifiers. The result includes the triggering path with the fewest edges; ties prefer the more severe target condition, then target Entity identifier, then the raw UTF-16 lexicographic sequence of `(sourceEntityIdentifier, targetEntityIdentifier, relationshipIdentifier, assertionIdentifier)` step tuples. A truncated traversal is labeled as incomplete context and never presented as proof that no latent risk exists outside the loaded subgraph.
 
 An Entity without a frame entry is `unreported`, not healthy. `unreported` is an absence state shown by the UI and is not one of the six M3 operational states. Unknown overlay targets are gaps and cannot trigger latent risk.
 
@@ -118,10 +122,10 @@ An Entity without a frame entry is `unreported`, not healthy. `unreported` is an
 
 - Overlay frames are immutable and identified independently from topology snapshots.
 - A frame has one `effectiveAt` UTC millisecond timestamp.
-- Without `overlayFrame`, the API selects the newest frame whose `effectiveAt` is less than or equal to the resolved topology `asOf`.
+- Without `overlayFrame`, the API selects the greatest frame by `(effectiveAt, frame identifier)` whose `effectiveAt` is less than or equal to the resolved topology `asOf`.
 - An explicit frame must exist and must not be later than topology `asOf`.
 - A pinned historical URL with overlays enabled carries the complete topology pin plus `overlayFrame`.
-- Latest topology mode may omit both coordinate families; the UI displays the resolved topology and frame identities returned by the API.
+- The HTTP route supports an unpinned latest request for non-browser consumers. In the browser, latest mode first uses the M2 single-flight coordinator to establish one topology identity and then issues the health-context request pinned to that identity; the URL remains unpinned while the UI displays the returned topology and frame identities.
 - Refresh latest starts a new coordinated generation. Failed refresh retains the prior labeled result and never relabels it current.
 - Overlay frames have no Evidence horizon and do not modify topology checksums.
 
@@ -139,18 +143,18 @@ Implementation remains dormant until the baseline is approved and the first slic
 ### M3-B - overlay provider and deterministic projection
 
 - Add `packages/overlay-model` with the in-memory store and pure projector.
-- Prove immutability, the 100-entry bound, frame ordering/selection, severity, scope-relative latent-risk paths, cycles, missing direct state, and gaps.
+- Prove immutability, the 100-entry bound, total frame/entry ordering and selection, origin projection, revision-qualified scope-relative latent-risk paths, cycles, missing direct state, and gaps.
 - No API or browser behavior.
 
 ### M3-C - health-in-context API
 
 - Add the exact route, query coercion, response validation, dependency injection, closed errors, and integration tests.
-- Prove one traversal resolution, one frame resolution, at most 100 exact target-existence reads at the same identity, deterministic ordering, historical compatibility, and no topology mutation.
+- Prove one traversal resolution, one frame resolution, no redundant in-scope target reads, at most 100 exact out-of-scope target-existence reads at the same identity, deterministic ordering, historical compatibility, and no topology mutation.
 - No browser behavior.
 
 ### M3-D - topology overlay UI
 
-- Add validated client support, canonical URL state, graph/structured overlay rendering, state filters, explanations, and gaps.
+- Add validated client support, canonical URL state, graph/structured overlay rendering, state-emphasis filters, explanations, and gaps.
 - Preserve the M2 coordinator, trust inspector, history playback, and no-side-door lint boundary.
 - No new data source or API behavior.
 
@@ -170,9 +174,9 @@ Implementation remains dormant until the baseline is approved and the first slic
 
 Every slice runs the unchanged `./scripts/verify.sh`. M3 adds:
 
-- schema rejection tests for duplicate targets, malformed identifiers, invalid timestamps, unknown states, and unsorted output;
+- schema rejection tests for duplicate frame, entry, and target identifiers; mismatched frame slugs; malformed identifiers; invalid timestamps; unknown states; and unsorted output;
 - pure determinism tests across input permutations;
-- latent-risk tests for depth bounds, root direction, directed paths within the returned subgraph, confidence-filtered edges, cycles, severity/canonical tie ordering, and truncated traversal;
+- latent-risk tests for the origin, depth bounds, root direction, revision-level confidence-qualified directed paths within the returned subgraph, competing claims, cycles, severity/total tie ordering, and truncated traversal;
 - contract tests proving unknown targets are gaps and never graph subjects;
 - API tests for latest, complete pin, exact frame, no eligible frame, unknown frame, frame-after-snapshot, and closed unexpected failures;
 - browser tests proving graph/structured equivalence, all six non-color labels, canonical URL behavior, historical playback, retry, and overlay-off topology continuity;

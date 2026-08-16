@@ -7,8 +7,8 @@ The canonical, model-neutral resume document for Atlast. A replacement conductor
 - **Last updated:** 2026-08-16
 - **Checkpoint name:** `m2-complete`
 - **Latest merged checkpoint commit:** `b8cd2ee` (`docs: close M2 interactive topology milestone (#52)`), squash-merged through [PR #52](https://github.com/Jayc92/atlast/pull/52) on 2026-08-16.
-- **Verification:** PR #52 GitHub Actions `verify` passed in 3m16s. M2-F's direct post-merge revalidation on `5aeb11d` also passed the complete local verifier and boundary audit.
-- **Milestone state:** M0, M1, and M2 are formally complete. M3 planning and pre-release architecture/ADR review are active. The first M3 baseline candidate is Proposed and unreviewed; M3 product implementation and M4+ remain unauthorized.
+- **Verification:** PR #52 GitHub Actions `verify` passed in 3m16s. M2-F's direct post-merge revalidation on `5aeb11d` also passed the complete local verifier and boundary audit. The independently corrected M3 planning candidate passes the unchanged seven-stage local verifier: shared 387/387, graph-model 372/372, API 69/69, web 154/154, and browser acceptance 24/24.
+- **Milestone state:** M0, M1, and M2 are formally complete. The first M3 baseline candidate is Proposed, independently reviewed, and corrected; explicit human approval is still pending. M3 product implementation and M4+ remain unauthorized.
 - **Branch state while preparing this planning candidate:** `docs/m3-planning`, based on synchronized, clean `main` at `b8cd2ee`.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves prior versions.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved implementation plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
@@ -100,7 +100,7 @@ b8cd2ee (HEAD -> main, origin/main, origin/HEAD) docs: close M2 interactive topo
 a7e0f21 docs: close M2 implementation slice E (#50)
 ```
 
-The M3 planning candidate is prepared on `docs/m3-planning` from clean synchronized `main` at `b8cd2ee`. Always inspect real Git state before trusting this snapshot.
+The M3 planning candidate is prepared and independently corrected on `docs/m3-planning` from clean synchronized `main` at `b8cd2ee`. Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
@@ -171,9 +171,10 @@ ADR index. Inspect git status and git log; real Git state overrides stale text.
 M0, M1, and M2 are formally complete. M2-F merged through PR #51 at 5aeb11d
 and passed post-merge verifier and boundary revalidation; checkpoint m2-complete
 records closure. The first M3 planning candidate is docs/m3-plan.md plus Proposed
-ADRs 0029-0031. It has not been independently reviewed or approved. M3 product
-implementation requires an independently reviewed, explicitly human-approved
-baseline and a separate implementation release. M4+ remain unauthorized.
+ADRs 0029-0031. Independent architecture review and correction are complete, but
+the baseline has not been human-approved. M3 product implementation requires
+explicit human approval and a separate implementation release. M4+ remain
+unauthorized.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic, read-only,
 and fail-honest boundaries. Do not write or commission product code until the

@@ -13,15 +13,19 @@ Color-only nodes, unlabeled icons, hidden gaps, or browser-derived risk would ma
 
 ### 1. Make overlays an optional topology layer
 
-A canonical `health=on` URL parameter enables health-in-context reads. Absence means overlays are off. A canonical `healthStates` parameter may filter the six effective states; values normalize to fixed enum order with duplicates removed. Filtering changes presentation only and never changes the API projection.
+A canonical `health=on` URL parameter enables health-in-context reads; no other `health` value is valid, and absence means overlays are off. `healthStates` is one scalar comma-separated list drawn from the six effective states. Serialization removes duplicates and writes values in the exact order `healthy`, `degraded`, `down`, `disconnected`, `expiring-certificate`, `latent-downstream-risk`. Repeated keys and empty or unknown tokens are invalid URL state: the whole `healthStates` value is dropped, the safe absent meaning is used, and the existing canonicalization notice is shown. Absence means all reported states are emphasized.
 
-When overlays are off, the M2 topology experience and requests remain unchanged. Overlay failure leaves topology visible with a separately labeled error and retry action.
+These are state-emphasis controls, not topology filters. Matching projections receive their state treatment; nonmatching and unreported Entities remain present with neutral treatment. Edges, structured rows, and gap records remain present. The API projection is unchanged.
+
+When overlays are off, the M2 topology experience and requests remain unchanged. The M2 traversal response remains the base topology source when overlays are on. Health-context is an additional validated projection and may publish only when its complete resolved topology identity and ordered traversal subject identifiers exactly match the base traversal for the same origin and bounds. Overlay failure or coordinate mismatch leaves topology visible with a separately labeled error and retry action.
 
 ### 2. Coordinate frame and history explicitly
 
-Pinned historical URLs with health enabled carry `overlayFrame` alongside the complete topology pin. Latest mode may omit all pins; the UI displays the identities resolved by the response. Refresh latest starts one new generation. Stale responses cannot publish into a newer generation.
+`overlayFrame` is valid only when `health=on` and the complete topology pin is present. Pinned historical URLs with health enabled carry `overlayFrame` alongside that pin. In latest mode, the URL omits both coordinate families, but the browser first uses the M2 single-flight coordinator to establish one latest topology identity and then issues health-context pinned to that identity. The UI displays the identities returned by the response. Refresh latest starts one new generation. Stale responses cannot publish into a newer generation.
 
-Changing an M2 history anchor selects the newest eligible frame unless an exact compatible frame is already pinned. Invalid copied coordinates remain visible and offer explicit recovery; the UI never silently substitutes latest.
+Changing an M2 history anchor first clears the old `overlayFrame`, then selects the greatest eligible frame by `(effectiveAt, frame identifier)`, and finally writes the exact returned frame identifier into the URL. An exact frame already compatible with an unchanged topology pin remains selected. Invalid copied coordinates remain visible and offer explicit recovery; the UI never silently substitutes latest.
+
+The complete canonical serialization order is `q`, `direction`, `depth`, `minConfidence`, `view`, `selected`, `health`, `healthStates`, `asOf`, `horizon`, `derivationVersion`, `overlayFrame`. `healthStates` without `health=on` is dropped. `overlayFrame` without both `health=on` and a valid complete pin is dropped. An invalid `health` value disables health and drops both dependent overlay fields while preserving otherwise valid topology state. Unknown or repeated keys and these invalid dependency combinations are flagged as canonicalized and explained through the existing correction notice.
 
 ### 3. Use non-color semantics everywhere
 
@@ -68,11 +72,11 @@ The UI says `Synthetic operational overlay`, not live, real-time, alert, inciden
 
 - Component tests for all six labels, icons/patterns, direct/derived text, unreported state, and gaps.
 - Graph/structured equivalence tests over the same validated response.
-- Canonical URL, history, refresh-generation, invalid-coordinate, and browser Back/Forward tests.
+- Exact URL wire-format, dependency, ordering, canonical-correction, history, refresh-generation, invalid-coordinate, and browser Back/Forward tests.
 - Keyboard focus/activation and inspector-return tests.
 - Reduced-motion, non-color, zoom/reflow, responsive-overflow, and live-region tests.
 - Built-preview desktop/mobile acceptance and representative VoiceOver QA.
-- Overlay-off and overlay-failure tests proving topology remains usable.
+- Overlay-off, response-identity/subject mismatch, and overlay-failure tests proving base topology remains usable and unchanged.
 
 ## Change Conditions
 

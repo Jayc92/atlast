@@ -13,7 +13,7 @@ M2 also made snapshot identity visible and reproducible. M3 therefore needs an e
 
 ### 1. Keep overlays in a separate domain
 
-Add strict shared contracts for immutable `OverlayFrame` values. A frame contains:
+Add strict shared contracts for immutable `OverlayFrame` values. A frame contains exactly:
 
 - schema version `atlast-overlay-v1`;
 - stable frame identifier;
@@ -21,7 +21,9 @@ Add strict shared contracts for immutable `OverlayFrame` values. A frame contain
 - `effectiveAt` UTC millisecond timestamp;
 - canonically ordered direct entries.
 
-Frame identifiers match `atlast:overlay-frame:demo-company/<frame-slug>` and entry identifiers match `atlast:overlay-entry:demo-company/<frame-slug>/<entry-slug>`, with lowercase kebab-case slugs. Each frame contains 1-100 entries. Each entry contains a stable entry identifier, a target Entity identifier, and exactly one direct condition: `healthy`, `degraded`, `down`, `disconnected`, or `expiring-certificate`. Target Entity identifiers are unique within a frame.
+The exact frame fields are `schemaVersion`, `identifier`, `scenarioIdentifier`, `effectiveAt`, and `entries`. The exact entry fields are `identifier`, `targetEntityIdentifier`, and `directCondition`; unknown fields are rejected at both levels. `scenarioIdentifier` is the literal `demo-company`, and slugs are lowercase kebab case. Frame identifiers match `atlast:overlay-frame:demo-company/<frame-slug>` and entry identifiers match `atlast:overlay-entry:demo-company/<frame-slug>/<entry-slug>`. Each frame contains 1-100 entries, entry identifiers and target Entity identifiers are unique within it, and every entry identifier's frame slug matches its containing frame. A direct condition is exactly one of `healthy`, `degraded`, `down`, `disconnected`, or `expiring-certificate`.
+
+Entries are stored in ascending raw UTF-16 code-unit order by `(targetEntityIdentifier, identifier)`. Frames are stored in ascending raw UTF-16 code-unit order by `(effectiveAt, identifier)`. Equal effective times are valid and frame identifier is the deterministic tie-breaker. Duplicate frame identifiers are rejected.
 
 No overlay field is added to Evidence, GraphSubject, GraphAssertion, SnapshotIdentity, or a topology repository interface.
 
@@ -35,13 +37,15 @@ An Entity with no direct entry is `unreported`; absence is not rewritten as heal
 
 Direct severity order is `down`, `disconnected`, `degraded`, `expiring-certificate`, then `healthy`.
 
-Only a directly healthy Entity may derive latent downstream risk. It does so when the returned bounded subgraph contains a directed path from that Entity to a directly non-healthy Entity. This rule is independent of the root traversal direction and never expands beyond the subjects already returned. Derivation reads direct conditions only, not other derived results. It records the shortest triggering path; ties prefer condition severity, then canonical target and Relationship identifier order. Truncation marks the context incomplete and prevents a no-risk result from being described as globally complete.
+Only a directly healthy Entity may derive latent downstream risk. The projection scope is the origin Entity plus each Entity subject returned by traversal. An eligible directed edge is one returned Relationship assertion revision whose claim is a Relationship claim, whose confidence meets the validated request floor, and whose source and target Entity identifiers are both in scope. The projector follows each eligible claim's actual source-to-target direction regardless of the root traversal direction, never expands beyond the supplied result, and never traverses nested `conflictState.competingClaims`.
+
+Derivation reads direct conditions only, not other derived results. It records the triggering path with the fewest edges as a nonempty sequence of strict steps containing `sourceEntityIdentifier`, `targetEntityIdentifier`, `relationshipIdentifier`, and `assertionIdentifier`. Ties prefer condition severity, then target Entity identifier, then the raw UTF-16 lexicographic sequence of `(sourceEntityIdentifier, targetEntityIdentifier, relationshipIdentifier, assertionIdentifier)` step tuples. Projections are ordered by Entity identifier and gaps by `(targetEntityIdentifier, entryIdentifier)`, using the same comparator. Truncation marks every projection's context incomplete and prevents a no-risk result from being described as globally complete.
 
 Disconnected is an observed operational condition; it does not delete topology edges. Expiring certificate is a synthetic operational warning; M3 performs no certificate scan.
 
 ### 4. Use immutable frame-time semantics
 
-Frames are append-only fixture values. Without an exact frame identifier, resolution chooses the newest frame with `effectiveAt <= topology asOf`. Exact lookup rejects an unknown frame and a frame later than the topology snapshot.
+Frames are append-only fixture values. Without an exact frame identifier, resolution chooses the greatest frame by `(effectiveAt, identifier)` among frames with `effectiveAt <= topology asOf`. Exact lookup rejects an unknown frame and a frame later than the topology snapshot.
 
 Topology snapshot identity and overlay frame identity are both returned. Overlay frames do not carry an Evidence horizon, participate in reconciliation, or affect topology checksums.
 
@@ -68,11 +72,11 @@ Topology snapshot identity and overlay frame identity are both returned. Overlay
 
 ## Verification Obligations
 
-- Strict schema and duplicate-target rejection tests.
+- Strict schema, duplicate frame/entry/target rejection, containing-frame slug, and total-order tests.
 - Input mutation isolation and returned-value isolation.
 - Frame ordering and latest-at-or-before selection tests.
 - Direct/effective distinction and all six-state coverage.
-- Cycle-safe latent-risk path and canonical tie tests.
+- Origin-inclusive, revision-qualified, confidence-floor, competing-claim, cycle-safe latent-risk path, and total tie-order tests.
 - Unknown-target gap tests proving no graph subject is created.
 - Topology checksum and subject-count invariance with overlays present, absent, or removed.
 

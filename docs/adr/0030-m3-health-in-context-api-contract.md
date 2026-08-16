@@ -26,10 +26,41 @@ Unknown and repeated query keys follow ADR-0024. The route is loopback-only, rea
 
 ### 2. Compose existing topology with one frame
 
-The handler resolves topology by one `TopologyGraphStore.traverse` call. It then resolves one frame. To distinguish an actually unknown target from a known Entity outside the loaded neighborhood, it checks each of the frame's at most 100 unique target identifiers with `TopologyGraphStore.getSubject` in pinned mode at the traversal's already resolved identity. Only `UNKNOWN_IDENTIFIER` becomes a gap; any other repository failure fails the request through the closed error boundary. Known targets outside the traversal are neither projections nor gaps. The handler then invokes the pure projector. The response contains:
+The handler resolves topology by one `TopologyGraphStore.traverse` call. Successful traversal already proves the origin and every returned Entity exist at the resolved identity, so the handler does not read any in-scope target again. It then resolves one frame. To distinguish an actually unknown target from a known Entity outside the loaded neighborhood, it checks each remaining frame target with `TopologyGraphStore.getSubject` in pinned mode at the traversal's already resolved identity. The frame's 100-entry cap bounds those reads. Only `UNKNOWN_IDENTIFIER` becomes a gap; any other repository failure fails the request through the closed error boundary. Known targets outside the traversal are neither projections nor gaps. The handler invokes the pure projector with the origin identifier, validated traversal bounds, traversal result, selected frame, and known/unknown target partition.
+
+The exact response envelope is:
+
+```ts
+{
+  data: {
+    originEntityIdentifier: EntityIdentifier;
+    items: SubjectReadResult[];
+    projections: HealthProjection[];
+    gaps: OverlayGap[];
+  };
+  traversal: TraversalResultMetadata;
+  meta: ResolvedReadMetadata & {
+    overlay: {
+      schemaVersion: "atlast-overlay-v1";
+      frameIdentifier: OverlayFrameIdentifier;
+      effectiveAt: UtcMillisecondTimestamp;
+    };
+  };
+}
+```
+
+`items` and `traversal` are the unchanged traversal output; as specified by the repository contract, `items` excludes the origin. `projections` contains the origin and every Entity in `items`, ordered by Entity identifier. `gaps` contains frame-wide unknown targets ordered by `(targetEntityIdentifier, entryIdentifier)`. All ordering uses raw UTF-16 code-unit comparison.
+
+`HealthProjection` is a strict discriminated union:
+
+- unreported: `{ reportStatus: "unreported", entityIdentifier, contextCompleteness }`;
+- reported direct: `{ reportStatus: "reported", entityIdentifier, directCondition, effectiveState: directCondition, contextCompleteness }`;
+- reported latent risk: `{ reportStatus: "reported", entityIdentifier, directCondition: "healthy", effectiveState: "latent-downstream-risk", contextCompleteness, derivation }`.
+
+`contextCompleteness` is `complete-within-requested-bounds` or `truncated`; a truncated traversal makes every projection `truncated`. A latent-risk `derivation` contains `triggerEntityIdentifier`, `triggerDirectCondition`, and a nonempty ordered `path`. Each strict path step contains `sourceEntityIdentifier`, `targetEntityIdentifier`, `relationshipIdentifier`, and `assertionIdentifier`. `OverlayGap` is the strict object `{ entryIdentifier, targetEntityIdentifier, directCondition, reason: "UNKNOWN_ENTITY_AT_TOPOLOGY_SNAPSHOT" }`. The response therefore contains:
 
 - the same ordered subject results and traversal metadata as traversal;
-- one ordered projection for every returned Entity;
+- one ordered projection for the origin and every returned Entity;
 - ordered frame-wide unknown-target gaps proven against the same topology identity;
 - metadata with the complete resolved topology identity, schema version, and selected overlay frame identity.
 
@@ -52,7 +83,9 @@ Malformed frame identifiers remain `MALFORMED_REQUEST`. Existing topology errors
 
 ### 5. Preserve latest and pinned behavior
 
-The topology read resolves first. Frame selection uses that resolved `asOf`. An explicit frame never changes the topology identity. A pinned topology request plus exact frame is reproducible. A latest request without a frame resolves both once and returns both identities.
+The topology read resolves first. Frame selection uses that resolved `asOf`. An explicit frame never changes the topology identity. A pinned topology request plus exact frame is reproducible. The HTTP route permits a latest request without a frame for non-browser consumers and resolves both identities once.
+
+The browser does not use that cursorless composition path. In latest URL mode, it first uses the accepted M2 single-flight coordinator to establish one latest topology identity, then issues health-context as a dependent request with the complete topology pin while leaving the URL unpinned. Before publishing overlay data, it validates that the response resolved identity and ordered traversal subject identifiers exactly match the base M2 traversal for the same origin and bounds. A mismatch is an overlay failure: the already rendered topology remains visible and retryable.
 
 ## Consequences
 
@@ -74,8 +107,8 @@ The topology read resolves first. Frame selection uses that resolved `asOf`. An 
 
 - Exact parameter matrix, repeated-key, unknown-key, and coercion tests.
 - Latest, complete topology pin, exact frame, no eligible frame, unknown frame, and frame-after-snapshot tests.
-- One traversal call, one frame resolution, at most 100 target-existence reads, and exact resolved-identity reuse assertions.
-- Response-schema validation, canonical ordering, traversal truncation, and gap tests.
+- One traversal call, one frame resolution, no redundant in-scope target reads, at most 100 out-of-scope target-existence reads, and exact resolved-identity reuse assertions.
+- Exact envelope and discriminated-union validation, origin projection, canonical ordering, revision-level path evidence, traversal truncation, and gap tests.
 - Closed error mapping and redaction tests.
 - Clean built-server runtime proof with the fully assembled application.
 - Tests proving existing routes and topology checksums are unchanged.
