@@ -16,6 +16,7 @@ import {
   evidenceDetailResultSchema,
   invalidReadCoordinateDetailsSchema,
   snapshotDetailResultSchema,
+  snapshotAnchorsResultSchema,
   snapshotSummaryDataSchema,
   unknownIdentifierDetailsSchema,
 } from "./http-contract.ts";
@@ -85,6 +86,66 @@ describe("snapshotSummaryDataSchema and snapshotDetailResultSchema (ADR-0024 § 
   it("rejects an envelope missing meta", () => {
     expect(
       snapshotDetailResultSchema.safeParse({ data: validSummaryData }).success,
+    ).toBe(false);
+  });
+});
+
+describe("snapshotAnchorsResultSchema (ADR-0028 § 1)", () => {
+  const validAnchor = {
+    identity: validResolvedIdentity,
+    checksum:
+      "a3f5c9e12b8d4076fa1e5b09c27d83f4a6510e9dcb2478f30a1b5c6d7e8f9012",
+    subjectCount: 12,
+  } as const;
+
+  it("accepts the exact bounded anchor envelope", () => {
+    expect(
+      snapshotAnchorsResultSchema.safeParse({
+        items: [validAnchor],
+        truncated: false,
+        meta: {
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          resolvedHorizon: validResolvedIdentity.horizon,
+          derivationVersion: validResolvedIdentity.derivationVersion,
+        },
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects more than 100 anchors and extra fixture metadata", () => {
+    expect(
+      snapshotAnchorsResultSchema.safeParse({
+        items: Array.from({ length: 101 }, () => validAnchor),
+        truncated: true,
+        meta: {
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          resolvedHorizon: validResolvedIdentity.horizon,
+          derivationVersion: validResolvedIdentity.derivationVersion,
+          fixtureName: "demo-company",
+        },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("requires each anchor to carry one complete snapshot identity", () => {
+    expect(
+      snapshotAnchorsResultSchema.safeParse({
+        items: [
+          {
+            ...validAnchor,
+            identity: {
+              asOf: validResolvedIdentity.asOf,
+              horizon: validResolvedIdentity.horizon,
+            },
+          },
+        ],
+        truncated: false,
+        meta: {
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          resolvedHorizon: validResolvedIdentity.horizon,
+          derivationVersion: validResolvedIdentity.derivationVersion,
+        },
+      }).success,
     ).toBe(false);
   });
 });

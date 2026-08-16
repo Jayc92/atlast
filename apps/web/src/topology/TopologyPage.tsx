@@ -44,6 +44,7 @@ import {
   topologySessionCoordinator,
 } from "./session.ts";
 import { TopologyShell } from "./TopologyShell.tsx";
+import { SnapshotHistory } from "./SnapshotHistory.tsx";
 import { TrustInspector } from "./TrustInspector.tsx";
 import { useAsyncQuery, type UseAsyncQueryResult } from "./use-async-query.ts";
 import { useCanonicalTopologyUrlState } from "./use-topology-url-state.ts";
@@ -500,6 +501,9 @@ export function TopologyPage(): ReactElement {
             serializeTopologyUrlState(withQuery(urlState, undefined)),
           );
         }}
+      />
+      <SnapshotHistory
+        {...(identity !== undefined ? { resolvedIdentity: identity } : {})}
       />
       {searchQueryTooShort && (
         <p className="topology-search-hint" role="status">

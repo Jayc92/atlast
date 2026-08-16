@@ -57,6 +57,31 @@ export const snapshotDetailResultSchema = z.strictObject({
 
 export type SnapshotDetailResult = z.infer<typeof snapshotDetailResultSchema>;
 
+/** One reproducible historical coordinate exposed by the bounded M2 anchor route. */
+export const snapshotAnchorSchema = z.strictObject({
+  identity: snapshotIdentitySchema,
+  checksum: snapshotSummarySchema.shape.checksum,
+  subjectCount: snapshotSummarySchema.shape.subjectCount,
+});
+
+export type SnapshotAnchor = z.infer<typeof snapshotAnchorSchema>;
+
+/** Fixed-horizon metadata shared by every anchor in one response. */
+export const snapshotAnchorsMetadataSchema = z.strictObject({
+  schemaVersion: schemaVersionSchema,
+  resolvedHorizon: recordedSequenceSchema,
+  derivationVersion: derivationVersionSchema,
+});
+
+/** `GET /api/v1/snapshot-anchors`, capped and intentionally unpaginated. */
+export const snapshotAnchorsResultSchema = z.strictObject({
+  items: z.array(snapshotAnchorSchema).max(100),
+  truncated: z.boolean(),
+  meta: snapshotAnchorsMetadataSchema,
+});
+
+export type SnapshotAnchorsResult = z.infer<typeof snapshotAnchorsResultSchema>;
+
 /**
  * Route 5's complete response envelope (ADR-0024 § 7): Evidence carries no
  * snapshot identity (it is a fact of ingestion, not a graph claim), so

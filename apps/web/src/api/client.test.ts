@@ -13,6 +13,7 @@ import {
   fetchEvidence,
   fetchHealth,
   fetchSearch,
+  fetchSnapshotAnchors,
   fetchSnapshotSummary,
   fetchTraversal,
 } from "./client.ts";
@@ -48,6 +49,22 @@ const VALID_META = {
   },
   schemaVersion: "atlast-domain-v1",
 };
+
+const VALID_ANCHORS = {
+  items: [
+    {
+      identity: VALID_META.resolvedIdentity,
+      checksum: "a".repeat(64),
+      subjectCount: 12,
+    },
+  ],
+  truncated: false,
+  meta: {
+    schemaVersion: VALID_META.schemaVersion,
+    resolvedHorizon: 20,
+    derivationVersion: "m1-v1",
+  },
+} as const;
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -351,5 +368,36 @@ describe("fetchSnapshotSummary", () => {
     );
     expect(requestedUrl.searchParams.get("horizon")).toBe("20");
     expect(requestedUrl.searchParams.get("derivationVersion")).toBe("m1-v1");
+  });
+});
+
+describe("fetchSnapshotAnchors", () => {
+  it("uses the query-free route and validates the bounded response", async () => {
+    const fetchStub = stubFetch({ ok: true, jsonPayload: VALID_ANCHORS });
+    const result = await fetchSnapshotAnchors(new AbortController().signal);
+    expect(result).toEqual({ ok: true, data: VALID_ANCHORS });
+    expect(fetchStub.mock.calls[0]?.[0]).toBe("/api/v1/snapshot-anchors");
+  });
+
+  it("fails closed when an anchor omits a complete pin", async () => {
+    stubFetch({
+      ok: true,
+      jsonPayload: {
+        ...VALID_ANCHORS,
+        items: [
+          {
+            checksum: "a".repeat(64),
+            subjectCount: 12,
+            identity: { asOf: VALID_META.resolvedIdentity.asOf, horizon: 20 },
+          },
+        ],
+      },
+    });
+    await expect(
+      fetchSnapshotAnchors(new AbortController().signal),
+    ).resolves.toEqual({
+      ok: false,
+      error: { kind: "client-internal-failure" },
+    });
   });
 });

@@ -57,10 +57,12 @@ export function useAsyncQuery<Data>(
       ? { status: "loaded", data: cached }
       : { status: "loading" };
   });
+  const stateQueryKeyRef = useRef(queryKey);
   const runRef = useRef(run);
   runRef.current = run;
 
   useEffect(() => {
+    stateQueryKeyRef.current = queryKey;
     const cached = readCache();
     if (cached !== undefined) {
       setState({ status: "loaded", data: cached });
@@ -110,7 +112,12 @@ export function useAsyncQuery<Data>(
   }, [queryKey, retryNonce, cache]);
 
   return {
-    state,
+    // A changed coordinate must never expose the prior query's loaded data
+    // during the render before this effect starts the replacement request.
+    state:
+      stateQueryKeyRef.current === queryKey
+        ? state
+        : { status: "loading" as const },
     retry: (): void => {
       if (cache) {
         topologyRequestCache.delete(queryKey);
