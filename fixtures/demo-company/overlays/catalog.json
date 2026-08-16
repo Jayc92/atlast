@@ -1,0 +1,31 @@
+{
+  "catalogVersion": "demo-company-overlays-v1",
+  "schemaVersion": "atlast-overlay-v1",
+  "scenarioIdentifier": "demo-company",
+  "frames": [
+    {
+      "identifier": "atlast:overlay-frame:demo-company/baseline",
+      "frameFile": "frames/01-baseline.json",
+      "expectedEntryCount": 3
+    },
+    {
+      "identifier": "atlast:overlay-frame:demo-company/active-conditions",
+      "frameFile": "frames/02-active-conditions.json",
+      "expectedEntryCount": 4
+    }
+  ],
+  "coverage": {
+    "directConditions": [
+      "healthy",
+      "degraded",
+      "down",
+      "disconnected",
+      "expiring-certificate"
+    ],
+    "reachableConditionPair": {
+      "sourceEntityIdentifier": "atlast:entity:checkout",
+      "targetEntityIdentifier": "atlast:entity:fulfillment"
+    },
+    "unknownTargetEntityIdentifier": "atlast:entity:retired-billing"
+  }
+}

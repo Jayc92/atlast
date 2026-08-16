@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "atlast-overlay-v1",
+  "identifier": "atlast:overlay-frame:demo-company/baseline",
+  "scenarioIdentifier": "demo-company",
+  "effectiveAt": "2026-04-01T12:00:00.000Z",
+  "entries": [
+    {
+      "identifier": "atlast:overlay-entry:demo-company/baseline/api",
+      "targetEntityIdentifier": "atlast:entity:api",
+      "directCondition": "healthy"
+    },
+    {
+      "identifier": "atlast:overlay-entry:demo-company/baseline/archive",
+      "targetEntityIdentifier": "atlast:entity:archive",
+      "directCondition": "disconnected"
+    },
+    {
+      "identifier": "atlast:overlay-entry:demo-company/baseline/notifications",
+      "targetEntityIdentifier": "atlast:entity:notifications",
+      "directCondition": "expiring-certificate"
+    }
+  ]
+}

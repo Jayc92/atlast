@@ -472,6 +472,64 @@ describe("errorResponseSchema (ADR-0024 § 9)", () => {
     ).toBe(true);
   });
 
+  it("accepts OVERLAY_FRAME_NOT_FOUND with one typed frame identifier", () => {
+    expect(
+      errorResponseSchema.safeParse({
+        code: "OVERLAY_FRAME_NOT_FOUND",
+        message: "Overlay frame not found.",
+        details: {
+          overlayFrame: "atlast:overlay-frame:demo-company/baseline",
+        },
+      }).success,
+    ).toBe(true);
+    expect(
+      errorResponseSchema.safeParse({
+        code: "OVERLAY_FRAME_NOT_FOUND",
+        message: "Overlay frame not found.",
+        details: { overlayFrame: "baseline" },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("accepts both exact INVALID_OVERLAY_COORDINATE variants", () => {
+    expect(
+      errorResponseSchema.safeParse({
+        code: "INVALID_OVERLAY_COORDINATE",
+        message: "No overlay frame exists at this snapshot.",
+        details: {
+          reason: "NO_FRAME_AT_OR_BEFORE_SNAPSHOT",
+          topologyAsOf: "2026-03-01T00:00:00.000Z",
+        },
+      }).success,
+    ).toBe(true);
+    expect(
+      errorResponseSchema.safeParse({
+        code: "INVALID_OVERLAY_COORDINATE",
+        message: "Overlay frame is newer than the topology snapshot.",
+        details: {
+          reason: "FRAME_AFTER_TOPOLOGY_SNAPSHOT",
+          topologyAsOf: "2026-03-01T00:00:00.000Z",
+          overlayFrame: "atlast:overlay-frame:demo-company/baseline",
+          frameEffectiveAt: "2026-04-01T00:00:00.000Z",
+        },
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects mixed INVALID_OVERLAY_COORDINATE detail variants", () => {
+    expect(
+      errorResponseSchema.safeParse({
+        code: "INVALID_OVERLAY_COORDINATE",
+        message: "Invalid coordinate.",
+        details: {
+          reason: "NO_FRAME_AT_OR_BEFORE_SNAPSHOT",
+          topologyAsOf: "2026-03-01T00:00:00.000Z",
+          overlayFrame: "atlast:overlay-frame:demo-company/baseline",
+        },
+      }).success,
+    ).toBe(false);
+  });
+
   it("accepts an INTERNAL_ERROR only with empty details, never the triggering exception's own fields", () => {
     expect(
       errorResponseSchema.safeParse({
