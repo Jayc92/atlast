@@ -8,15 +8,16 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0, M1, and M2 are complete. M3-A and M3-B are complete.** M3-B merged through PR #58 at `98beb46` on 2026-08-16 and is closed at checkpoint `m3-b-overlay-model-merged`. No implementation slice is active. **M3-C through M3-F and M4+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
+**M0, M1, and M2 are complete. M3-A and M3-B are complete.** M3-B closed through PR #59 at `b932539` on 2026-08-16. Joseph Carfagno then explicitly authorized **M3-C only** on 2026-08-16. That release becomes operational only after this authorization record merges and local `main` is synchronized cleanly. **M3-D through M3-F and M4+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
 
 Permitted work right now, and nothing beyond it:
 
 - **Maintenance and corrections to the completed M0 foundation and the merged, formally complete S1–S8 slices** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — the S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, S5 reconciliation engine, S6 snapshot layer and in-memory repositories, S7 query API v1 routes and error contract in `apps/api`, and S8's boundary re-audit, exhaustive API traceability test, and documentation closeout.
 - **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0025) and of the checkpoint documentation ([HANDOFF.md](HANDOFF.md), per the checkpoint protocol below).
 - **Maintenance and corrections to the completed M3-A and M3-B slices** within accepted ADRs 0029-0031 and without extending product behavior.
+- **M3-C health-in-context API work**, strictly limited to the exact route, query coercion, response validation, dependency injection, closed errors, directly corresponding integration tests, directly required build plumbing, and factual `TASKS.md` measurements. It must prove one traversal resolution, one frame resolution, no redundant in-scope target reads, at most 100 exact out-of-scope existence reads at the same identity, deterministic ordering, historical compatibility, and no topology mutation. No browser behavior or M3-D+ behavior is authorized. This permission becomes operational only after the authorization record merges and `main` is synchronized cleanly.
 
-**No implementation slice is active. M3-C and every later slice or milestone remain unauthorized**, each gated on an explicit human release.
+**M3-C is the only authorized implementation slice, pending the documentation merge gate. M3-D and every later slice or milestone remain unauthorized**, each gated on an explicit human release.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -29,10 +30,10 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**M0, M1, and M2 are complete. The M3 baseline is accepted, and M3-A and M3-B are complete:**
+**M0, M1, and M2 are complete. The M3 baseline is accepted, M3-A and M3-B are complete, and M3-C alone is separately authorized pending activation:**
 
 - Maintenance, corrections, and explicitly released M1 slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod, named by accepted ADR-0005, was introduced in S1 with its justification-at-PR).
-- **M1 and M2 are formally complete, and M3-A and M3-B are merged and closed.** Do NOT implement M3-C+ or M4+ work before separate authorization.
+- **M1 and M2 are formally complete, and M3-A and M3-B are merged and closed.** M3-C may begin only after its authorization record merges and `main` is synchronized cleanly, and only within the exact boundary above and in [docs/m3-plan.md](docs/m3-plan.md). Do NOT implement M3-D+ or M4+ work before separate authorization.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
 - Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
 

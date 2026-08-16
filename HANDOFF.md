@@ -6,10 +6,10 @@ The canonical, model-neutral resume document for Atlast. A replacement conductor
 
 - **Last updated:** 2026-08-16
 - **Checkpoint name:** `m3-b-overlay-model-merged`
-- **Latest merged checkpoint commit:** `98beb46` (`feat: add M3 overlay model (#58)`), squash-merged through [PR #58](https://github.com/Jayc92/atlast/pull/58) on 2026-08-16.
-- **Verification:** PR #58 GitHub Actions `verify` passed in 3m32s. The complete seven-stage local verifier passed: shared 419/419, overlay-model 22/22, graph-model 372/372, API 69/69, web 154/154, production builds, and browser acceptance 24/24.
-- **Milestone state:** M0, M1, and M2 are formally complete. M3-A and M3-B are complete. No implementation slice is active. M3-C through M3-F and M4+ remain unauthorized.
-- **Branch state while recording M3-B closeout:** `docs/m3-b-closeout`, based on synchronized, clean `main` at `98beb46`.
+- **Latest merged checkpoint commit:** `b932539` (`docs: close M3 implementation slice B (#59)`), squash-merged through [PR #59](https://github.com/Jayc92/atlast/pull/59) on 2026-08-16.
+- **Verification:** PR #59 GitHub Actions `verify` passed in 3m28s. The complete seven-stage local verifier passed: shared 419/419, overlay-model 22/22, graph-model 372/372, API 69/69, web 154/154, production builds, and browser acceptance 24/24.
+- **Milestone state:** M0, M1, and M2 are formally complete. M3-A and M3-B are complete. Joseph Carfagno explicitly authorized M3-C only on 2026-08-16; activation requires this authorization record to merge and local `main` to synchronize cleanly. M3-D through M3-F and M4+ remain unauthorized.
+- **Branch state while recording M3-C authorization:** `docs/m3-c-authorization`, based on synchronized, clean `main` at `b932539`.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves prior versions.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved implementation plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
@@ -41,7 +41,7 @@ Binding principles:
 - [docs/milestones.md](docs/milestones.md): M0–M5 sequence and exit criteria.
 - [docs/m1-plan.md](docs/m1-plan.md): completed M1 baseline.
 - [docs/m2-plan.md](docs/m2-plan.md): completed M2 baseline and slice record.
-- [docs/m3-plan.md](docs/m3-plan.md): approved M3 implementation baseline and exact slice boundaries; M3-A and M3-B are complete.
+- [docs/m3-plan.md](docs/m3-plan.md): approved M3 implementation baseline and exact slice boundaries; M3-A and M3-B are complete and M3-C is separately authorized pending activation.
 - [docs/adr/README.md](docs/adr/README.md): Accepted ADRs 0001-0031 and amendment map.
 - [docs/audits/m0-synthetic-boundary-audit.md](docs/audits/m0-synthetic-boundary-audit.md): synthetic-boundary history; § 17 is the M2 closure revalidation.
 - `fixtures/demo-company`: seven-scenario, 20-Evidence synthetic catalog.
@@ -55,14 +55,14 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 
 ## 4. Roadmap Position
 
-| Milestone | State                          | Evidence                                 |
-| --------- | ------------------------------ | ---------------------------------------- |
-| M0        | Complete — 2026-07-22          | Foundation and closure audit             |
-| M1        | Complete — 2026-08-12          | S1–S8; checkpoint `m1-complete`          |
-| M2        | Complete — 2026-08-16          | M2-A–F; PR #51; checkpoint `m2-complete` |
-| M3        | M3-B complete; no active slice | M3-B merged through PR #58 at `98beb46`  |
-| M4        | Unauthorized                   | No work may begin                        |
-| M5        | Unauthorized                   | No work may begin                        |
+| Milestone | State                              | Evidence                                         |
+| --------- | ---------------------------------- | ------------------------------------------------ |
+| M0        | Complete — 2026-07-22              | Foundation and closure audit                     |
+| M1        | Complete — 2026-08-12              | S1–S8; checkpoint `m1-complete`                  |
+| M2        | Complete — 2026-08-16              | M2-A–F; PR #51; checkpoint `m2-complete`         |
+| M3        | M3-C authorized pending activation | M3-B closed through PR #59; bounded M3-C release |
+| M4        | Unauthorized                       | No work may begin                                |
+| M5        | Unauthorized                       | No work may begin                                |
 
 M1 delivered the synthetic topology model and read-only query API. M2 separately delivered the browser interface, one bounded slice at a time:
 
@@ -95,22 +95,30 @@ Both M2 exit criteria are closed:
 At the product checkpoint before this documentation commit:
 
 ```text
-98beb46 (HEAD -> main, origin/main, origin/HEAD) feat: add M3 overlay model (#58)
+b932539 (HEAD -> main, origin/main, origin/HEAD) docs: close M3 implementation slice B (#59)
+98beb46 feat: add M3 overlay model (#58)
 8213d7d docs: authorize M3 implementation slice B (#57)
 a767c93 docs: close M3 implementation slice A (#56)
 e9afcd5 feat: add M3 overlay contracts and fixtures (#55)
-e5da808 docs: authorize M3 implementation slice A (#54)
 ```
 
-M3-B merged through PR #58 at `98beb46`, and local `main` was synchronized cleanly. Always inspect real Git state before trusting this snapshot.
+M3-B closed through PR #59 at `b932539`, and local `main` was synchronized cleanly. Joseph Carfagno then explicitly authorized M3-C only on 2026-08-16. Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-**No implementation slice is active.** Maintenance and corrections within the accepted contracts are permitted; M3-C and every later slice require a separate explicit release.
+**M3-C is the only authorized implementation slice, pending activation.** After this authorization record merges and local `main` is synchronized cleanly, permitted work is strictly limited to:
+
+- the exact health-in-context API route and query coercion;
+- response validation, dependency injection, and closed errors;
+- directly corresponding integration tests proving the accepted § 6 M3-C resolution/read/ordering/history/no-mutation requirements;
+- directly required build plumbing and factual `TASKS.md` measurements.
+
+No browser behavior, fixture, external dependency, graph schema/storage change, topology mutation, or M3-D+ behavior is authorized.
 
 ## 8. Prohibited Work
 
-- Any M3-C through M3-F implementation before a separate explicit release.
+- Any M3-C implementation before this authorization record merges and local `main` is synchronized cleanly.
+- Any M3-D through M3-F implementation before a separate explicit release.
 - Any M4+ planning or implementation before separate authorization.
 - Real systems, credentials, employer/customer data, connectors, authentication, deployment, or external publication.
 - Product writes or mutation routes.
