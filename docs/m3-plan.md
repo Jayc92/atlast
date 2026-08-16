@@ -1,6 +1,6 @@
 # Atlast M3 Implementation Plan - Operational Health Overlays
 
-**Status:** Approved - M3 implementation baseline; M3-A complete
+**Status:** Approved - M3 implementation baseline; M3-A complete; M3-B separately authorized pending activation
 **Date:** 2026-08-16
 
 > **Approval and authorization boundary (2026-08-16):** Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved this plan as the M3 implementation baseline after independent architecture review, correction, and focused re-review. Approval becomes operational only after this record merges to `main` and local `main` is synchronized cleanly. It authorizes no product implementation, dependency, fixture, schema, API, or UI change. M3-A requires a separate bounded slice release. M4+ remain unauthorized.
@@ -8,6 +8,8 @@
 > **Review state:** Independent architecture review and correction completed on 2026-08-16 against the merged M1/M2 contracts and implementation. Joseph Carfagno then explicitly approved the corrected baseline. Neither review completion nor baseline approval releases M3-A.
 
 > **M3-A release and closeout (2026-08-16):** After the accepted baseline merged through PR #53 at `b85be38`, Joseph Carfagno explicitly authorized M3-A within the exact boundary in § 6. The authorization merged through PR #54 at `e5da808`; the independently reviewed implementation merged through PR #55 at `e9afcd5` with GitHub Actions and the complete local verifier passing. M3-A is complete. M3-B through M3-F and M4+ remain unauthorized.
+
+> **M3-B release (2026-08-16):** After the M3-A closeout merged through PR #56 at `a767c93` and local `main` synchronized cleanly, Joseph Carfagno explicitly authorized M3-B within the exact provider-and-projector boundary in § 6. The release becomes operational only after its authorization record merges to `main` and local `main` is synchronized cleanly. M3-C through M3-F and M4+ remain unauthorized.
 
 ## 1. Objective
 
@@ -133,7 +135,7 @@ An Entity without a frame entry is `unreported`, not healthy. `unreported` is an
 
 ## 6. Exact Implementation Slices
 
-The baseline is approved and M3-A is complete. Every successor slice remains dormant until separately released.
+The baseline is approved, M3-A is complete, and M3-B is separately authorized subject to its authorization-record merge and clean-synchronization activation gate. Every successor slice remains dormant until separately released.
 
 ### M3-A - contracts and fixture catalog
 
@@ -208,4 +210,4 @@ Before M3-A may begin:
 4. the approval record merges to `main` and local `main` is synchronized cleanly - complete through PR #53 at `b85be38`;
 5. M3-A receives a separate explicit implementation authorization - complete through PR #54 at `e5da808` on 2026-08-16.
 
-M3-A subsequently merged through PR #55 at `e9afcd5` and is complete. Approval of the baseline did not release M3-A, and completion of M3-A does not release its successor. M3-B through M3-F and M4+ remain unauthorized.
+M3-A subsequently merged through PR #55 at `e9afcd5` and closed through PR #56 at `a767c93`. Its completion did not release M3-B; the separate M3-B release above does. Completion of M3-B will not release its successor. M3-C through M3-F and M4+ remain unauthorized.
