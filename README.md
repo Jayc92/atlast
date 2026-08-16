@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0, M1, and M2 complete; M3-A complete.** M3-A closed through PR #56 at `a767c93`. **Joseph Carfagno separately authorized M3-B only on 2026-08-16; it becomes operational after this authorization record merges and `main` is synchronized cleanly. M3-C through M3-F and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0, M1, and M2 complete; M3-A and M3-B complete.** M3-B merged through PR #58 at `98beb46` and is closed at checkpoint `m3-b-overlay-model-merged`. **No implementation slice is active. M3-C through M3-F and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -129,7 +129,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-The M0 foundation, M1 synthetic topology model, and M2 interactive topology interface are formally complete ([TASKS.md](TASKS.md)). M3-A is also complete and closed through PR #56 at `a767c93`; M3-B is separately authorized within its exact provider-and-projector boundary, pending the authorization merge gate. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M3-C through M3-F and M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+The M0 foundation, M1 synthetic topology model, and M2 interactive topology interface are formally complete ([TASKS.md](TASKS.md)). M3-A and M3-B are also complete; M3-B merged through PR #58 at `98beb46`. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **No implementation slice is active. M3-C through M3-F and M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
