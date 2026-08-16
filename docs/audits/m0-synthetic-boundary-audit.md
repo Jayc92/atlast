@@ -7,6 +7,8 @@
 
 **§ 14 addendum (2026-08-12):** the M1 synthetic-boundary re-audit (§ 14) extends this document. § 14 itself records the pre-merge S8 candidate audit (one finding, found and resolved within that same candidate — § 14.5/§ 14.10). **§ 15 records the post-merge M1 closure revalidation** — S8 merged through PR #31 at `0477cbd` on 2026-08-12, and this document's own § 14.2/§ 13 revalidation convention was then executed against that real merge commit. **M1 is formally complete as of § 15.**
 
+**§ 16 addendum (2026-08-15):** the M2-F synthetic-boundary and no-side-door re-audit (§ 16) extends this document, covering the complete M2-A through M2-F delta. It is a **pre-merge candidate audit**, exactly like § 14 was for S8 — a post-merge revalidation against the real merge commit remains required before M2 can close, per this document's own established § 13/§ 15 convention. M2-F has been independently reviewed and remediated but is not yet human-QA approved, merged, or closed; this section audits the working-tree candidate only.
+
 This audit verifies the M0 exit criterion "nothing in the repository connects to, or holds credentials for, any external system" ([docs/milestones.md M0](../milestones.md#m0--safe-project-foundation-active)) and the synthetic-data-only constraint ([PROJECT_SPEC.md § 6](../../PROJECT_SPEC.md#6-constraints--assumptions)) against the Git-tracked content of the repository at the commit above. The criterion is evaluated in its product/runtime intent: what Atlast connects to and what credentials the repository holds — while recognizing the permitted developer-tooling connections (package-manager and browser-download) documented as explicit exceptions in § 9.
 
 ---
@@ -261,3 +263,83 @@ Performed at M1 closeout against the real merged S8 commit, exactly as § 13 rev
 - **The complete, unmodified `./scripts/verify.sh` passed all seven stages locally at `0477cbd`**: whitespace, formatting, lint, types, tests (shared 373/373 in 14 files, graph-model 372/372 in 19 files, web 6/6, api 65/65 in 7 files), builds, and browser acceptance (2/2) — matching the counts § 14 recorded pre-merge, confirming the merge introduced no regression.
 
 **Conclusion of revalidation:** at `0477cbdb0af40aaa31e03501244780c23313bdd5`, within the same § 11/§ 14.12 limitations: every Atlast product/runtime network path remains loopback-only; the environment-variable surface is unchanged from M0; no credentials, sensitive files, or high-confidence secret patterns exist in tracked content; no employer or customer material exists anywhere; the dependency surface is unchanged from § 14.7; no connector, credential, mutation endpoint, or external-system code path exists anywhere in the merged tree; and the one finding § 14.5/§ 14.10 recorded is confirmed resolved in the merged commit, not merely in the pre-merge working tree. **All four M1 exit criteria are satisfied and closed as project facts**, not candidate findings: (1) the model and query API run wholly from fixtures in CI with no external dependencies; (2) every fact in the graph is traceable to its synthetic evidence via the API, proven exhaustively (§ 14.11 row 2); (3) graph/evidence representation decisions are recorded as ADRs and human-approved (ADRs 0014–0025 Accepted); (4) the no-real-systems constraint is verified — this M1 boundary re-audit, revalidated against the real merge commit, passes clean. **M1 is formally complete as of 2026-08-12, checkpoint `m1-complete`.** The § 11 M0 re-audit trigger for M5 (the first real connector) remains in force and unaffected by this closure; no M2+ work is authorized by this conclusion — M2 and every later milestone remain gated on their own separate, explicit human authorization.
+
+---
+
+## 16. M2-F Synthetic-Boundary and No-Side-Door Re-Audit (M2-F release candidate, 2026-08-15)
+
+**Status:** Candidate finding — passed. Not yet a closed project fact; per this document's own § 13/§ 15 convention, a brief post-merge revalidation against the real merge commit is required before M2 can close on this dimension.
+
+**Base commit audited:** `a7e0f212eb495b60218e4a9f8aaee3df4ad6e6f3` (`main`/`origin/main`, "docs: close M2 implementation slice E (#50)") — the complete tracked M2-A through M2-E repository state.
+
+**Plus:** the exact M2-F candidate working-tree delta on branch `feat/m2-f-hardening-closeout`: two new browser-acceptance specs (`tests/acceptance/specs/trust-inspection.spec.ts`, `tests/acceptance/specs/accessibility-hardening.spec.ts`), one accessibility fix and its colocated test (`apps/web/src/topology/GraphViewport.tsx`, `GraphViewport.test.tsx`), one CSS-only accessibility fix (`apps/web/src/styles.css`), this audit section, and the corresponding `TASKS.md` M2-F progress documentation. **No other file is in the delta** — confirmed by `git status --porcelain` and `git diff --stat` against the base commit.
+
+This re-audit satisfies the trigger this document's own § 11 named ("Any change adding dependencies, network code, environment access, or fixture data moves the boundary and warrants re-audit") for the cumulative M2-A through M2-E delta this section covers for the first time, plus the M2-F candidate's own additions, and the [docs/m2-plan.md § 10 M2-F boundary](../m2-plan.md#exact-m2-f-contingent-authorization-boundary)'s "final synthetic-boundary and no-side-door audit."
+
+### 16.1 Scope and Exclusions
+
+**In scope:** every Git-tracked file at `a7e0f21` plus the stated M2-F candidate delta. Same exclusions as § 1/§ 14.1 (`node_modules/`, generated `dist/`/`test-results/`/Playwright artifacts, third-party runtime behavior beyond declared manifest surface).
+
+**Network-request disclosure:** no Atlast product/runtime network request was made during this audit's own inspection. Separately, this M2-F implementation work ran `pnpm --filter @atlast/web build`, `pnpm --filter @atlast/api build`, `pnpm --filter @atlast/shared build`, `pnpm --filter @atlast/graph-model build` (local compilation only, no registry access under an existing `node_modules/` install — frozen-lockfile install was not re-run), the built API server bound to `127.0.0.1` on developer-chosen local ports for direct `curl`/`ps` measurement (§ 16.5 below), and `npx playwright test` against the same loopback-only webServer stack the existing suite already boots and tears down. No non-loopback network request occurred.
+
+### 16.2 Method
+
+The same § 2/§ 14.2 pattern categories, re-run over the complete current tree (not only the delta), because five product slices (M2-A–E) have landed since § 15's M1 closure revalidation without their own dedicated re-audit section — each M2 slice's own TASKS.md/HANDOFF.md entries recorded scope-boundary compliance narratively, but this is the first dedicated boundary-audit pass covering their cumulative delta. A byte-safe NUL-byte/binary-classification sweep (§ 16.5's method, per § 14.5's precedent) and a direct scan of the five new/changed M2-F files for credential formats, URLs, environment access, and shell-execution primitives (§ 16.6) were both run.
+
+### 16.3 Network-Capable First-Party Locations (delta since § 14.3)
+
+Unchanged in kind: every location § 3/§ 14.3 found remains loopback-only bind, loopback-only proxy target, or loopback-only test infrastructure. M2-A through M2-E added no new network-capable first-party location; M2-E's one new API route, `GET /api/v1/snapshot-anchors`, is an in-process read composed from the existing public `EvidenceStore`/`TopologyGraphStore` interfaces, and no new client-side network primitive was added beyond the existing `fetch`/`AbortController` pattern § 3 already documented. Every `apps/web/src/api/client.ts` function call resolves against the same relative `/api/v1`/`/api/health` paths the M2-A proxy correction established. A complete scan of every route-registration call in `apps/api/src/routes/*.ts` and `apps/api/src/app.ts` at this candidate's working tree finds exactly **eight `GET` routes plus the unchanged `GET /health`** (the seven M1 routes plus M2-E's `snapshot-anchors`), and zero `POST`/`PUT`/`PATCH`/`DELETE` registrations anywhere in first-party code — the query API remains read-only at the transport level.
+
+M2-F's own delta adds no server route and no new client fetch call: the two new acceptance specs call only the existing `fetchEntityInventory`-backed `/api/v1/entities`, `/api/v1/search`, and `/api/v1/snapshot-anchors` endpoints (via the app itself or the Playwright `request` fixture against the same loopback `baseURL`), and `GraphViewport.tsx`'s keyboard fix adds a `keydown` DOM listener with no network access of any kind.
+
+### 16.4 Environment-Variable Access (delta since § 14.4)
+
+Unchanged: the sole first-party `process.env` read remains `apps/api/src/server.ts`'s `ATLAST_API_PORT`; the sole write remains `tests/acceptance/playwright.config.ts`'s test-infrastructure `env` object for the same variable. No M2-A through M2-F code introduced any new environment-variable read or write. `import.meta.env` does not appear anywhere in `apps/web/src/**`, including the M2-F additions.
+
+### 16.5 Credentials and Sensitive Files (delta since § 14.5) — Result: none found
+
+The full § 2 sensitive-filename and high-confidence-credential-format scans were re-run across the complete current tree. Zero matches beyond this document's own description of the patterns it searches for. No suspicious `password`/`api key`/`client secret`/`access token`/`private key` assignment pattern exists anywhere in the delta.
+
+**NUL-byte sweep, rerun with the same byte-safe method § 14.5/§ 15 established:** every git-tracked file plus the five new/modified M2-F files was read as raw bytes in Python (`open(path, "rb").read()`, `b"\x00" in data`) — **zero files contain a literal `0x00` byte.** The one finding § 14.5/§ 15 resolved (`packages/graph-model/src/reconciliation.ts`) remains resolved and untouched by this candidate.
+
+### 16.6 Employer / Customer Material (delta since § 14.6) — Result: none found
+
+The five new/changed M2-F files were read in full and scanned for employer names, internal domains, real email addresses, ticket-ID shapes, and git-remote/internal-tool references — none found. The only identifiers they introduce are the pre-existing fictional fixture-catalog identifiers already audited in § 14.8 (`atlast:entity:checkout`, `atlast:relationship:*` discovered dynamically at test time, never hardcoded) and generic technology/library names (`@xyflow/react`, Chromium, WCAG).
+
+### 16.7 Dependency and Tooling Capabilities (delta since § 14.7) — Result: two new dependencies, both already justified by their own accepted ADR; no external-integration capability
+
+Every M2-A through M2-E dependency addition was re-confirmed against the current `apps/web/package.json`: **`react-router@8.3.0`** (ADR-0026, M2-A) and the exact pinned **`@xyflow/react@12.11.3`**/**`elkjs@0.12.0`** (ADR-0027, M2-C) — the same three additions each slice's own TASKS.md entry already recorded, re-confirmed here as the complete delta since § 14.7's baseline. `git diff --stat` against `a7e0f21` for every manifest and `pnpm-lock.yaml` is empty — **the M2-F candidate itself adds, removes, or upgrades no dependency.** None of the three provides cloud, Kubernetes, database, telemetry, LLM, identity, or CI-provider integration capability: `react-router` is client-side route matching; `@xyflow/react`/`elkjs` are browser rendering/layout libraries with no network or filesystem access. No child-process, shell-execution, or external-command capability exists anywhere in the M2-F delta — confirmed by the § 16.1 network-request disclosure and a direct read of both new spec files and the `GraphViewport.tsx` diff.
+
+### 16.8 Fixtures (delta since § 14.8) — Result: unchanged, no fixture file touched
+
+`git diff --stat a7e0f21 -- fixtures/` is empty. The M2-F candidate reads the same unchanged 20-Evidence-record, seven-scenario `fixtures/demo-company/` catalog every M2 slice has read since M1; no fixture file was added, removed, or modified.
+
+### 16.9 Permitted Tooling and Reference Exceptions (delta since § 14.9)
+
+Unchanged from § 9/§ 13/§ 14.9: pnpm registry access under a frozen lockfile (not exercised this session — no install was run), the one-time pinned Playwright Chromium download (not exercised this session — the existing installed browser was reused), and the `kind.sigs.k8s.io` documentation hyperlink. No new tooling exception was introduced by M2-A through M2-F.
+
+### 16.10 No-Side-Door Check (new in this re-audit, per [GUARDRAILS.md § 1.1](../../GUARDRAILS.md#11-product-boundaries-are-hard-constraints)/§ 2 and [docs/m2-plan.md § 6](../m2-plan.md#6-read-consistency))
+
+A direct read of every `apps/web/src/**` import statement (cross-checked against the M2-A ESLint restricted-import boundary's own proof in `apps/web/src/eslint-boundary.test.ts`, unchanged by this candidate) confirms: no file under `apps/web/src/**` imports `packages/graph-model`, any path into `fixtures/`, or any `apps/api` server module. Every graph-fact-bearing value the UI renders — the two new acceptance specs' assertions included — is read exclusively through `apps/web/src/api/client.ts`'s validated query-client functions, which themselves call only `/api/v1/*`/`/api/health`. Re-running `pnpm --filter @atlast/web lint` (part of the repository-wide `pnpm lint` this candidate's own verification ran) re-confirms the restricted-import rule is still active and unweakened. **No side door exists in the M2-A through M2-F delta.**
+
+### 16.11 Findings Requiring Remediation
+
+**None.** No synthetic-boundary violation, no side door, no credential, no employer/customer material, and no unjustified dependency was found in the complete M2-A through M2-F delta.
+
+### 16.12 M2 Exit-Criteria Evaluation, Boundary Dimension Only (mapped to [docs/milestones.md M2](../milestones.md#m2--interactive-topology-interface-authorized-2026-08-12--phase-gated))
+
+This audit evaluates only the boundary/no-side-door dimension of M2's second exit criterion ("The UI reads exclusively through the query API (no side doors)") — it does not evaluate, and does not claim to close, M2's first exit criterion (the complete user journey) or the milestone as a whole, both of which remain for the M2 closeout decision itself, outside this audit's scope and outside this M2-F implementation prompt's authorized boundary.
+
+| Dimension                                                   | Evaluation                                                                                                                                        |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No-side-door (query-API-only reads)                         | **Satisfied**, § 16.10 — no `apps/web/src/**` file imports fixtures, `packages/graph-model`, or API server modules; the ESLint boundary is intact |
+| Loopback-only / no real-system contact                      | **Satisfied**, § 16.3 — eight `GET` routes plus `/health`, zero mutation endpoints, no new network primitive                                      |
+| No credential, employer material, or unjustified dependency | **Satisfied**, § 16.5–16.7                                                                                                                        |
+
+### 16.13 Residual Limitations (delta since § 14.12)
+
+The § 11/§ 14.12 limitations apply unchanged. One M2-F-specific addition: this section audits a **working-tree candidate**, not a merged commit — exactly the same limitation § 14 disclosed for the S8 candidate before § 15's post-merge revalidation. A short revalidation against the real M2-F merge commit, re-running § 16.2's method, is required before this section is treated as a closed project fact — this document's own established convention, not a new one.
+
+### 16.14 Conclusion (M2-F re-audit, release candidate)
+
+At `a7e0f212eb495b60218e4a9f8aaee3df4ad6e6f3` plus the stated M2-F candidate delta, within the limitations stated in § 11/§ 14.12/§ 16.13: every Atlast product/runtime network path remains loopback-only, including the M2-E `snapshot-anchors` route, all of which are `GET`-only; the environment-variable surface is unchanged from M0; no credentials, sensitive files, or high-confidence secret patterns exist in tracked content; no employer or customer material exists anywhere; the M2-A through M2-C dependency additions (`react-router`, `@xyflow/react`, `elkjs`) carry no external-integration capability and the M2-F candidate itself adds none; no fixture file was touched; and the no-side-door boundary (§ 16.10) holds across the complete `apps/web/src/**` tree, proven both by direct import inspection and by the still-active, unweakened M2-A ESLint restricted-import rule. **No findings requiring remediation.** This re-audit satisfies the [docs/m2-plan.md § 10 M2-F boundary](../m2-plan.md#exact-m2-f-contingent-authorization-boundary)'s "final synthetic-boundary and no-side-door audit" obligation, subject to the post-merge revalidation named in § 16.13 — **M2 is not yet formally complete; that decision, and any further M2 exit-criteria closure, remains outside this audit's scope and this M2-F implementation prompt's authorized boundary.**

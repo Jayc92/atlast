@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactElement,
+} from "react";
 import {
   Background,
   Controls,
@@ -113,11 +119,38 @@ export function GraphViewport({
       ...(edge.conflicted ? { style: { strokeDasharray: "6 5" } } : {}),
     }));
 
+  /**
+   * @xyflow/react gives every node/edge `tabIndex=0` and its own internal
+   * Enter/Space keydown handler, but that internal handler only updates
+   * xyflow's own selection store — it never calls the `onNodeClick`/
+   * `onEdgeClick` callback below, so a keyboard user who tabs onto a node
+   * and presses Enter sees nothing happen. This delegated listener restores
+   * the same selection behavior the mouse handlers already trigger, keyed
+   * off the same `data-id` attribute xyflow renders on every node and edge.
+   */
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    const origin = event.target;
+    if (!(origin instanceof Element)) {
+      return;
+    }
+    const identifier =
+      origin.closest("[data-id]")?.getAttribute("data-id") ?? undefined;
+    if (identifier === undefined) {
+      return;
+    }
+    event.preventDefault();
+    onSelect(identifier);
+  };
+
   return (
     <div
       ref={viewportRef}
       className="topology-graph"
       aria-label="Interactive topology graph"
+      onKeyDown={handleKeyDown}
     >
       <ReactFlow
         nodes={nodes}

@@ -934,6 +934,22 @@ body {
   }
 }
 
+/*
+ * @xyflow/react's own stylesheet (imported by GraphViewport) sets
+ * `outline: none` on focused selectable elements. Restore an outline for
+ * HTML node wrappers and a visible stroke for SVG edge wrappers, where CSS
+ * outlines do not render reliably.
+ */
+.topology-graph .react-flow__node.selectable:focus-visible {
+  outline: 3px solid var(--rust);
+  outline-offset: 3px;
+}
+
+.topology-graph .react-flow__edge.selectable:focus .react-flow__edge-path {
+  stroke: var(--rust);
+  stroke-width: 3;
+}
+
 /* ---------- M2-D trust inspector ---------- */
 
 .topology-inline-inspect {

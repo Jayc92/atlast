@@ -62,18 +62,20 @@ vi.mock("@xyflow/react", () => ({
         </button>
       ))}
       {edges.map((edge) => (
-        <button
-          key={edge.id}
-          type="button"
-          data-id={edge.id}
-          data-class={edge.className}
-          aria-pressed={edge.selected}
-          onClick={(event) => {
-            onEdgeClick(event.nativeEvent, edge);
-          }}
-        >
-          {edge.label}
-        </button>
+        <svg key={edge.id}>
+          <g
+            role="button"
+            tabIndex={0}
+            data-id={edge.id}
+            data-class={edge.className}
+            aria-pressed={edge.selected}
+            onClick={(event) => {
+              onEdgeClick(event.nativeEvent, edge);
+            }}
+          >
+            <text>{edge.label}</text>
+          </g>
+        </svg>
       ))}
     </div>
   ),
@@ -169,6 +171,38 @@ describe("GraphViewport", () => {
     fireEvent.click(screen.getByRole("button", { name: /checkout/ }));
     expect(onSelect).toHaveBeenCalledWith("atlast:entity:checkout");
     expect(screen.queryByText("boundary-edge")).toBeNull();
+  });
+
+  it("selects a node or edge on Enter/Space, not only on click", async () => {
+    layoutTopologyMock.mockResolvedValue({
+      nodes: [
+        { id: "atlast:entity:checkout", x: 0, y: 0 },
+        { id: "atlast:entity:payments", x: 300, y: 0 },
+      ],
+      width: 510,
+      height: 76,
+    });
+    const onSelect = vi.fn();
+
+    render(
+      <GraphViewport view={VIEW} selected={undefined} onSelect={onSelect} />,
+    );
+
+    const paymentsNode = await screen.findByRole("button", {
+      name: /payments/,
+    });
+    fireEvent.keyDown(paymentsNode, { key: "Enter" });
+    expect(onSelect).toHaveBeenCalledWith("atlast:entity:payments");
+
+    const conflictedEdge = screen.getByRole("button", {
+      name: "calls · conflicted",
+    });
+    fireEvent.keyDown(conflictedEdge, { key: " " });
+    expect(onSelect).toHaveBeenCalledWith("candidate-edge");
+
+    onSelect.mockClear();
+    fireEvent.keyDown(paymentsNode, { key: "Tab" });
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
   it("offers the structured-view fallback when layout fails", async () => {
