@@ -46,16 +46,16 @@ test("the M0 shell renders and connects to the local API", async ({ page }) => {
     page.getByText("The living map of your engineering organization."),
   ).toBeVisible();
 
-  // The current-state section names the active milestone.
+  // The current-state section names the latest delivered milestone.
   await expect(
-    page.getByRole("heading", { name: /M0 — Safe project foundation/ }),
+    page.getByRole("heading", { name: /M2 — Interactive topology interface/ }),
   ).toBeVisible();
 
-  // The shell must not overclaim its own scope: M0 and M1 both show
-  // delivered, every later milestone still shows gated, and M1 is named
-  // as delivered behind the API — not as UI this page provides.
+  // The shell must not overclaim its own scope: M0 through M2 show delivered,
+  // every later product milestone remains gated, and the current-state copy
+  // names the complete M2 boundary.
   await expect(page.getByText("delivered").first()).toBeVisible();
-  await expect(page.getByText(/M1 is delivered behind that API/)).toBeVisible();
+  await expect(page.getByText(/M0, M1, and M2 are delivered/)).toBeVisible();
 
   // The health indicator must reach "connected" through the real proxied
   // round trip (browser → Vite preview /api proxy → built API /health).
