@@ -5,7 +5,7 @@
 
 > **Approval note (2026-08-16):** Explicitly accepted by Joseph Carfagno after independent architecture review, correction, and focused re-review. Acceptance establishes the M3 overlay-model and temporal-semantics decision and approves it as part of the [M3 implementation baseline](../m3-plan.md). It becomes operational only after the acceptance record merges to `main` and local `main` is synchronized cleanly. Acceptance does not release M3-A or authorize M4+.
 
-> **Implementation authorization note (2026-08-16):** After the accepted baseline merged through PR #53 at `b85be38`, Joseph Carfagno separately authorized M3-A only within [the plan's exact contract-and-fixture boundary](../m3-plan.md#m3-a---contracts-and-fixture-catalog). That release becomes operational only after its authorization record merges and local `main` is synchronized cleanly. This metadata note does not alter the decision below. M3-B through M3-F and M4+ remain unauthorized.
+> **Implementation authorization note (2026-08-16):** After the accepted baseline merged through PR #53 at `b85be38`, Joseph Carfagno separately authorized M3-A within [the plan's exact contract-and-fixture boundary](../m3-plan.md#m3-a---contracts-and-fixture-catalog); M3-A later closed through PR #56 at `a767c93`. Joseph then separately authorized M3-B only within [the plan's exact provider-and-projector boundary](../m3-plan.md#m3-b---overlay-provider-and-deterministic-projection). The M3-B release becomes operational only after its authorization record merges and local `main` is synchronized cleanly. This metadata note does not alter the decision below. M3-C through M3-F and M4+ remain unauthorized.
 
 ## Context
 
