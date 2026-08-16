@@ -24,6 +24,7 @@ import {
   evidenceChainResultSchema,
   evidenceDetailResultSchema,
   healthCheckResultSchema,
+  snapshotAnchorsResultSchema,
   snapshotDetailResultSchema,
   subjectDetailResultSchema,
   subjectPageSchema,
@@ -33,6 +34,7 @@ import {
   type EvidenceDetailResult,
   type HealthCheckResult,
   type SnapshotDetailResult,
+  type SnapshotAnchorsResult,
   type SnapshotIdentity,
   type SubjectDetailResult,
   type SubjectPage,
@@ -281,6 +283,17 @@ export function fetchSnapshotSummary(
   return fetchValidated(
     `/api/v1/snapshots?${query.toString()}`,
     snapshotDetailResultSchema,
+    signal,
+  );
+}
+
+/** `GET /api/v1/snapshot-anchors` — bounded discovery with no query parameters. */
+export function fetchSnapshotAnchors(
+  signal: AbortSignal,
+): Promise<ClientQueryResult<SnapshotAnchorsResult>> {
+  return fetchValidated(
+    "/api/v1/snapshot-anchors",
+    snapshotAnchorsResultSchema,
     signal,
   );
 }

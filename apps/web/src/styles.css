@@ -957,6 +957,73 @@ body {
   box-shadow: 0.65rem 0.65rem 0 rgba(30, 95, 90, 0.14);
 }
 
+.snapshot-history {
+  margin: 1.5rem 0;
+  border: 1px solid var(--hairline);
+  border-left: 0.35rem solid var(--teal);
+  padding: 1rem;
+  background: rgba(255, 252, 245, 0.7);
+}
+
+.snapshot-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.snapshot-history-header h2,
+.snapshot-history-header p,
+.snapshot-history-requested p {
+  margin: 0;
+}
+
+.snapshot-history-header h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
+}
+
+.snapshot-history-requested,
+.snapshot-history-loaded {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.snapshot-history-requested button {
+  justify-self: start;
+}
+
+.snapshot-history-coordinate,
+.snapshot-history-details {
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.snapshot-history-loaded select {
+  width: 100%;
+  min-height: 2.7rem;
+}
+
+.snapshot-history-details {
+  display: grid;
+  grid-template-columns: minmax(7rem, auto) minmax(0, 1fr);
+  margin: 0;
+}
+
+.snapshot-history-details dt,
+.snapshot-history-details dd {
+  margin: 0;
+  border-top: 1px solid var(--hairline);
+  padding: 0.45rem;
+}
+
+.snapshot-history-truncated {
+  border-left: 0.25rem solid var(--rust);
+  padding-left: 0.75rem;
+}
+
 .trust-inspector-header {
   display: flex;
   align-items: start;

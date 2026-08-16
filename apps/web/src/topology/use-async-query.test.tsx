@@ -182,4 +182,35 @@ describe("useAsyncQuery", () => {
       data: "second",
     });
   });
+
+  it("hides loaded data synchronously when the query coordinate changes", async () => {
+    const secondDeferred = createDeferred<ClientQueryResult<string>>();
+    const run = vi.fn((): Promise<ClientQueryResult<string>> =>
+      run.mock.calls.length === 1
+        ? Promise.resolve({ ok: true, data: "old coordinate" })
+        : secondDeferred.promise,
+    );
+    const { result, rerender } = renderHook(
+      ({ queryKey }: { queryKey: string }) =>
+        useAsyncQuery<string>({ queryKey, cache: false, run }),
+      { initialProps: { queryKey: "coordinate-old" } },
+    );
+    await waitFor(() => {
+      expect(result.current.state).toEqual({
+        status: "loaded",
+        data: "old coordinate",
+      });
+    });
+
+    rerender({ queryKey: "coordinate-new" });
+    expect(result.current.state).toEqual({ status: "loading" });
+
+    secondDeferred.resolve({ ok: true, data: "new coordinate" });
+    await waitFor(() => {
+      expect(result.current.state).toEqual({
+        status: "loaded",
+        data: "new coordinate",
+      });
+    });
+  });
 });

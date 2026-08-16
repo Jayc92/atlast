@@ -30,6 +30,7 @@ import {
   topologySessionCoordinator,
 } from "./session.ts";
 import { TopologyShell } from "./TopologyShell.tsx";
+import { SnapshotHistory } from "./SnapshotHistory.tsx";
 import { TraversalWorkspace } from "./TraversalWorkspace.tsx";
 import { TrustInspector } from "./TrustInspector.tsx";
 import { resolveTrustSelection } from "./trust-selection.ts";
@@ -260,6 +261,9 @@ export function EntityDetailPage(): ReactElement {
       <p>
         <Link to={backToTopologyHref}>Back to topology</Link>
       </p>
+      <SnapshotHistory
+        {...(identity !== undefined ? { resolvedIdentity: identity } : {})}
+      />
       {identityQuery.state.status === "loading" && (
         <LoadingStatus label="Resolving the current topology snapshot…" />
       )}
