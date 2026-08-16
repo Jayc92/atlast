@@ -8,7 +8,7 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0, M1, and M2 are complete.** M2-F merged through PR #51 at `5aeb11d` on 2026-08-16 with GitHub Actions `verify` passing in 3m9s; post-merge revalidation and this checkpoint formally close M2. Joseph Carfagno's contingent authorization now releases **M3 planning and pre-release architecture/ADR review only**. **M3 product implementation and M4+ remain unauthorized.** See [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md).
+**M0, M1, and M2 are complete.** M2 closed through PR #52 at `b8cd2ee` on 2026-08-16 after M2-F and post-merge revalidation passed. Joseph Carfagno's contingent authorization releases **M3 planning and pre-release architecture/ADR review only**. The first planning candidate is [docs/m3-plan.md](docs/m3-plan.md) with Proposed ADRs 0029-0031; none is approved or implementation authority. **M3 product implementation and M4+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
 
 Permitted work right now, and nothing beyond it:
 

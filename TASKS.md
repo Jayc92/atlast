@@ -244,6 +244,14 @@ M1 exit criteria (below) are now all checked and closed as project facts, per [d
 
 Joseph Carfagno explicitly pre-authorized **M3 planning and pre-release architecture/ADR review only** on 2026-08-13. M2 is now formally complete, so that planning phase is active. M3 product implementation requires an independently reviewed architecture baseline, explicit human approval of that baseline, a separately recorded implementation release, and a clean synchronized checkpoint. **No M3 product implementation is authorized; M4+ remain unauthorized.**
 
+**M3-P planning candidate (2026-08-16):** [docs/m3-plan.md](docs/m3-plan.md) and Proposed ADRs [0029](docs/adr/0029-m3-overlay-model-and-temporal-semantics.md)-[0031](docs/adr/0031-m3-overlay-presentation-and-accessibility.md) define the first complete baseline candidate: separate immutable overlay frames; deterministic direct/effective state and latent-risk semantics; explicit topology/frame coordinates; a bounded health-in-context API join; unknown-target gaps; query-only graph/structured UI presentation; six implementation slices; and verification/release gates. **The candidate is unreviewed and unapproved. It authorizes no product code, dependency, fixture, schema, API, or UI change.**
+
+- [x] Inventory the completed topology, snapshot, API, browser, accessibility, and synthetic-boundary seams.
+- [x] Draft the M3 implementation plan and Proposed ADRs 0029-0031.
+- [ ] Complete independent architecture review and correction.
+- [ ] Obtain explicit human approval of the complete baseline.
+- [ ] Separately authorize M3-A after the approval record merges and `main` is synchronized cleanly.
+
 - [ ] Overlay model + synthetic state generator (healthy, degraded, down, disconnected, expiring certificate, latent downstream risk)
 - [ ] Health-in-context queries and UI overlay toggles
 - [ ] Unknown-entity overlays surface as gaps, not phantom nodes

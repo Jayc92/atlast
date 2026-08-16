@@ -88,7 +88,7 @@
 
 ## M3 — Operational Health Overlays (planning authorized; implementation gated)
 
-> **Authorization status:** Joseph Carfagno explicitly pre-authorized M3 planning and pre-release architecture/ADR review on 2026-08-13. M2 is now formally complete, so that planning phase is operational. M3 product implementation requires an independently reviewed and explicitly human-approved baseline plus its own implementation release. **M3 product implementation and M4+ remain unauthorized.**
+> **Authorization status:** Joseph Carfagno explicitly pre-authorized M3 planning and pre-release architecture/ADR review on 2026-08-13. M2 is formally complete, so that planning phase is operational. [m3-plan.md](m3-plan.md) and Proposed ADRs 0029-0031 are the first baseline candidate; they remain unreviewed and unapproved. M3 product implementation requires an independently reviewed and explicitly human-approved baseline plus its own implementation release. **M3 product implementation and M4+ remain unauthorized.**
 
 **Goal:** Synthetic operational state projected onto the graph so topology and health are one picture.
 

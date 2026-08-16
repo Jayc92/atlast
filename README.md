@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0, M1, and M2 complete.** M2-F merged through PR #51 at `5aeb11d`; post-merge revalidation and checkpoint `m2-complete` close the interactive topology milestone. **M3 planning and pre-release architecture/ADR review are authorized; M3 product implementation and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0, M1, and M2 complete.** M2 closed through PR #52 at `b8cd2ee`. **M3 planning and pre-release architecture/ADR review are active; [docs/m3-plan.md](docs/m3-plan.md) and ADRs 0029-0031 are Proposed, not approved or implementation authority. M3 product implementation and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -36,6 +36,7 @@ Atlast has deliberate boundaries. It is **not** a monitoring system, an incident
 | [PROJECT_SPEC.md](PROJECT_SPEC.md)                         | Vision, goals, guiding principles, scope, and non-goals                                                                                                                                                                       |
 | [docs/architecture.md](docs/architecture.md)               | Architecture philosophy and conceptual system design                                                                                                                                                                          |
 | [docs/milestones.md](docs/milestones.md)                   | Synthetic-first delivery plan (M0 foundation → M1 synthetic topology model → M2 interactive interface → M3 health overlays → M4 change-impact simulation → M5 read-only local Kubernetes connector); predictive AI is post-M5 |
+| [docs/m3-plan.md](docs/m3-plan.md)                         | Proposed M3 operational-health-overlay architecture, slices, and release gates; implementation remains unauthorized                                                                                                           |
 | [TASKS.md](TASKS.md)                                       | Current work breakdown and task tracking                                                                                                                                                                                      |
 | [HANDOFF.md](HANDOFF.md)                                   | Canonical checkpoint and model-neutral handoff document — how a replacement assistant or engineer resumes the project safely                                                                                                  |
 | [GUARDRAILS.md](GUARDRAILS.md)                             | Engineering, coding, repository, documentation, and testing standards                                                                                                                                                         |
