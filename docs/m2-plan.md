@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational; M2-A through M2-D complete; M2-E active through PR #47 at `f9d441e`; M2-F contingently pre-authorized but dormant until M2-E closes
+**Status:** Approved and operational; M2-A through M2-E complete; M2-F released by the M2-E closeout and active only from synchronized `main` containing it
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e`. Joseph explicitly pre-authorized M2-F on 2026-08-13, contingent on M2-E's independent review, verification, merge, and closeout. M2-F is not active now. M3 planning is separately pre-authorized after M2 closes; M3 product implementation and M4+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` on 2026-08-15 after independent review, complete verification, and human browser QA. Joseph explicitly pre-authorized M2-F on 2026-08-13; this M2-E closeout releases it only after the closeout merges and `main` is synchronized cleanly. M3 planning is separately pre-authorized after M2 closes; M3 product implementation and M4+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -196,7 +196,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e`. M2-F was contingently pre-authorized by Joseph Carfagno on 2026-08-13 but remains dormant until M2-E is independently reviewed, verified, merged, and closed.
+M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684`. M2-F was contingently pre-authorized by Joseph Carfagno on 2026-08-13 and is released by this closeout only after it merges and `main` is synchronized cleanly.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -324,6 +324,8 @@ M2-D must not add or change shared contracts, API production code/routes, graph-
 
 ### Exact M2-E authorization boundary
 
+**Implementation status:** complete. M2-E was independently reviewed with no blockers, passed human desktop/mobile browser QA and the complete repository verifier, and merged through PR #49 at `62eb684` on 2026-08-15 with GitHub Actions `verify` passing in 3m16s. This closeout releases M2-F only after it merges and `main` is synchronized cleanly.
+
 M2-E may implement only:
 
 - additive shared HTTP schemas and browser client validation for the accepted ADR-0028 `GET /api/v1/snapshot-anchors` request/response contract;
@@ -336,7 +338,7 @@ M2-E must not add a repository method; alter graph-model/repository/reconciliati
 
 ### Exact M2-F contingent authorization boundary
 
-M2-F remains dormant until M2-E is independently reviewed, verified, merged, and closed. Once that precondition is satisfied and this contingent authorization record is merged and synchronized cleanly, M2-F may implement only:
+M2-F becomes operational only after this M2-E closeout is merged and `main` is synchronized cleanly. It may implement only:
 
 - browser-acceptance expansion for the accepted M2 primary journeys, complete-pin history playback, trust inspection, honest failures, keyboard operation, responsive behavior, and reduced motion across the supported desktop and mobile viewports;
 - accessibility and responsive hardening of the existing M2 interface without adding new product capabilities or widening the query API;
