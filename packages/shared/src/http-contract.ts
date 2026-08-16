@@ -1,6 +1,7 @@
 /**
- * S7 HTTP-boundary contract additions (ADR-0024, accepted 2026-08-11 — the
- * binding S7 runtime contract): the route 7 snapshot-summary response
+ * HTTP-boundary contract additions: S7 query contracts under ADR-0024 and
+ * additive M3 overlay-coordinate errors under ADR-0030. The S7 surface
+ * includes the route 7 snapshot-summary response
  * reshape (§ 6), the Evidence-lookup envelope (§ 7), and the complete closed
  * external error-response contract (§ 9). These schemas exist so
  * `apps/api`'s future S7-B route handlers validate their HTTP-facing shapes
@@ -22,12 +23,14 @@ import {
   entityIdentifierSchema,
   evidenceIdentifierSchema,
 } from "./identifiers.ts";
+import { overlayFrameIdentifierSchema } from "./operational-overlays.ts";
 import {
   resolvedReadMetadataSchema,
   snapshotIdentitySchema,
 } from "./read-contract.ts";
 import { snapshotSummarySchema } from "./read-results.ts";
 import { schemaVersionSchema } from "./schema-version.ts";
+import { utcMillisecondTimestampSchema } from "./timestamps.ts";
 
 /**
  * Route 7's `data` object (ADR-0024 § 6): the repository-level
@@ -258,6 +261,29 @@ export const errorResponseSchema = z.discriminatedUnion("code", [
       endpointIdentifier: entityIdentifierSchema,
       resolvedIdentity: snapshotIdentitySchema,
     }),
+  }),
+  z.strictObject({
+    code: z.literal("OVERLAY_FRAME_NOT_FOUND"),
+    message: z.string(),
+    details: z.strictObject({
+      overlayFrame: overlayFrameIdentifierSchema,
+    }),
+  }),
+  z.strictObject({
+    code: z.literal("INVALID_OVERLAY_COORDINATE"),
+    message: z.string(),
+    details: z.discriminatedUnion("reason", [
+      z.strictObject({
+        reason: z.literal("NO_FRAME_AT_OR_BEFORE_SNAPSHOT"),
+        topologyAsOf: utcMillisecondTimestampSchema,
+      }),
+      z.strictObject({
+        reason: z.literal("FRAME_AFTER_TOPOLOGY_SNAPSHOT"),
+        topologyAsOf: utcMillisecondTimestampSchema,
+        overlayFrame: overlayFrameIdentifierSchema,
+        frameEffectiveAt: utcMillisecondTimestampSchema,
+      }),
+    ]),
   }),
   z.strictObject({
     code: z.literal("INTERNAL_ERROR"),

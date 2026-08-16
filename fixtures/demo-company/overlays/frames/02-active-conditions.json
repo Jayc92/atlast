@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "atlast-overlay-v1",
+  "identifier": "atlast:overlay-frame:demo-company/active-conditions",
+  "scenarioIdentifier": "demo-company",
+  "effectiveAt": "2026-04-20T12:00:00.000Z",
+  "entries": [
+    {
+      "identifier": "atlast:overlay-entry:demo-company/active-conditions/checkout",
+      "targetEntityIdentifier": "atlast:entity:checkout",
+      "directCondition": "healthy"
+    },
+    {
+      "identifier": "atlast:overlay-entry:demo-company/active-conditions/fulfillment",
+      "targetEntityIdentifier": "atlast:entity:fulfillment",
+      "directCondition": "down"
+    },
+    {
+      "identifier": "atlast:overlay-entry:demo-company/active-conditions/orders",
+      "targetEntityIdentifier": "atlast:entity:orders",
+      "directCondition": "degraded"
+    },
+    {
+      "identifier": "atlast:overlay-entry:demo-company/active-conditions/retired-billing",
+      "targetEntityIdentifier": "atlast:entity:retired-billing",
+      "directCondition": "disconnected"
+    }
+  ]
+}
