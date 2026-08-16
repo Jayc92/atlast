@@ -1,7 +1,9 @@
 # ADR-0031: M3 Overlay Presentation and Accessibility
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-08-16
+
+> **Approval note (2026-08-16):** Explicitly accepted by Joseph Carfagno after independent architecture review, correction, and focused re-review. Acceptance establishes the M3 overlay-presentation and accessibility decision and approves it as part of the [M3 implementation baseline](../m3-plan.md). It becomes operational only after the acceptance record merges to `main` and local `main` is synchronized cleanly. Acceptance does not release M3-A or authorize M4+.
 
 ## Context
 
@@ -82,4 +84,4 @@ The UI says `Synthetic operational overlay`, not live, real-time, alert, inciden
 
 Revisit before polling, streaming, notifications, alert acknowledgement, incident workflow, real data, or any state-based topology mutation.
 
-This Proposed ADR authorizes no implementation.
+This Accepted ADR does not authorize implementation. M3-A requires a separate explicit release.

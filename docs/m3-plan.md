@@ -1,11 +1,11 @@
 # Atlast M3 Implementation Plan - Operational Health Overlays
 
-**Status:** Proposed - planning candidate; implementation not authorized
+**Status:** Approved - M3 implementation baseline; implementation not authorized
 **Date:** 2026-08-16
 
-> **Authorization boundary:** M3 planning and pre-release architecture/ADR review are authorized after checkpoint `m2-complete`. This plan and ADRs 0029-0031 are Proposed. They authorize no product implementation, dependency, fixture, schema, API, or UI change. M3 implementation requires independent review, explicit human approval of the complete baseline, and a separate bounded slice release. M4+ remain unauthorized.
+> **Approval and authorization boundary (2026-08-16):** Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved this plan as the M3 implementation baseline after independent architecture review, correction, and focused re-review. Approval becomes operational only after this record merges to `main` and local `main` is synchronized cleanly. It authorizes no product implementation, dependency, fixture, schema, API, or UI change. M3-A requires a separate bounded slice release. M4+ remain unauthorized.
 
-> **Review state:** Independent architecture review and correction completed on 2026-08-16 against the merged M1/M2 contracts and implementation. This plan remains Proposed pending explicit human approval; review completion does not release M3-A.
+> **Review state:** Independent architecture review and correction completed on 2026-08-16 against the merged M1/M2 contracts and implementation. Joseph Carfagno then explicitly approved the corrected baseline. Neither review completion nor baseline approval releases M3-A.
 
 ## 1. Objective
 
@@ -27,7 +27,7 @@ The milestone exit criteria remain those in [docs/milestones.md](milestones.md):
 7. **Deterministic projection.** Equal topology, frame, and bounds produce byte-equivalent ordered health results.
 8. **Fail honestly.** Missing frames, invalid frame/topology combinations, unknown targets, truncation, and unavailable data remain visible.
 
-## 3. Proposed Architecture
+## 3. Approved Architecture
 
 ### 3.1 Shared contracts
 
@@ -200,9 +200,9 @@ No new third-party dependency is proposed. M3 reuses TypeScript, Zod, Fastify, R
 
 Before M3-A may begin:
 
-1. this plan and ADRs 0029-0031 are independently reviewed;
-2. every blocking finding is corrected and re-reviewed;
-3. Joseph Carfagno explicitly approves the complete M3 baseline;
+1. this plan and ADRs 0029-0031 are independently reviewed - complete 2026-08-16;
+2. every blocking finding is corrected and re-reviewed - complete 2026-08-16;
+3. Joseph Carfagno explicitly approves the complete M3 baseline - complete 2026-08-16;
 4. the approval record merges to `main` and local `main` is synchronized cleanly;
 5. M3-A receives a separate explicit implementation authorization.
 
