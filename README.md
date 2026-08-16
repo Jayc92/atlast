@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 and M1 complete; M2 explicitly authorized and phase-gated.** M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e`. M2-F is pre-authorized but dormant until M2-E closes; M3 planning is pre-authorized but dormant until M2 closes. **M3 product implementation and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 and M1 complete; M2 explicitly authorized and phase-gated.** M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684`. M2-F is released by the M2-E closeout and becomes operational only from synchronized `main` containing it; M3 planning remains dormant until M2 closes. **M3 product implementation and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -128,7 +128,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-The M0 foundation and M1 synthetic topology model are formally complete ([TASKS.md](TASKS.md)); M1 closed through PR #32 at `cff0545` on 2026-08-12. **M2-A through M2-D are complete and M2-E is the only active implementation slice through PR #47 at `f9d441e`.** M2-F and M3 planning are contingently pre-authorized but remain dormant behind their predecessor checkpoints. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M3 product implementation and M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+The M0 foundation and M1 synthetic topology model are formally complete ([TASKS.md](TASKS.md)); M1 closed through PR #32 at `cff0545` on 2026-08-12. **M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` on 2026-08-15.** M2-F is released by this closeout and becomes operational only after it merges and `main` is synchronized cleanly. M3 planning remains dormant until M2 closes. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M3 product implementation and M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 

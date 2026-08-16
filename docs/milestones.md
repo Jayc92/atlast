@@ -1,6 +1,6 @@
 # Atlast — Milestones
 
-**Status:** Current. M0 and M1 are complete. M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e`. Joseph Carfagno pre-authorized M2-F and M3 planning on 2026-08-13, but both remain dormant behind their predecessor closeouts. M3 product implementation and M4+ remain unauthorized.
+**Status:** Current. M0 and M1 are complete. M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` on 2026-08-15. M2-F is released by the M2-E closeout and becomes operational only after that closeout merges and `main` is synchronized cleanly. M3 planning remains dormant until M2 closes. M3 product implementation and M4+ remain unauthorized.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
@@ -62,13 +62,13 @@
 - [x] Every fact in the graph is traceable to its synthetic evidence via the API — _proven exhaustively by `apps/api/src/routes/evidence.test.ts` (all 20 valid Evidence records dereferenced through `GET /api/v1/evidence/{evidenceId}` alone, across all seven valid fixture scenarios)._
 - [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0025, all Accepted._
 
-**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, and its accepted baseline merged through PR #34 at `106b1e7`. M2-A through M2-D were each separately authorized, implemented, independently reviewed and remediated, merged, and closed; M2-E is active through PR #47 at `f9d441e`. Joseph then pre-authorized M2-F and M3 planning, each contingent on its predecessor milestone checkpoint. M3 product implementation and M4+ remain unauthorized.
+**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, and its accepted baseline merged through PR #34 at `106b1e7`. M2-A through M2-E were separately authorized, implemented, independently reviewed, verified, merged, and closed; M2-E merged through PR #49 at `62eb684`. Joseph pre-authorized M2-F and M3 planning on 2026-08-13. This M2-E closeout releases M2-F only after it merges and `main` is synchronized cleanly; M3 planning remains dormant until M2 closes. M3 product implementation and M4+ remain unauthorized.
 
 ---
 
 ## M2 — Interactive Topology Interface (authorized 2026-08-12 — phase-gated)
 
-> **Authorization status:** M2-A through M2-D are complete and M2-E is active through PR #47 at `f9d441e` within [docs/m2-plan.md's exact boundary](m2-plan.md#exact-m2-e-authorization-boundary). M2-F is pre-authorized but dormant until M2-E closes. **M3 planning is pre-authorized but dormant until M2 closes; M3 product implementation and M4+ remain gated and unauthorized.**
+> **Authorization status:** M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` within [docs/m2-plan.md's exact boundary](m2-plan.md#exact-m2-e-authorization-boundary). M2-F is the next authorized slice and becomes operational only from synchronized `main` containing the M2-E closeout. **M3 planning is pre-authorized but dormant until M2 closes; M3 product implementation and M4+ remain gated and unauthorized.**
 
 **Goal:** People who don't write queries can explore the graph.
 
