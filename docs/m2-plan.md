@@ -1,9 +1,9 @@
 # Atlast M2 Implementation Plan — Interactive Topology Interface
 
-**Status:** Approved and operational; M2-A through M2-E complete; M2-F released by the M2-E closeout and active only from synchronized `main` containing it
+**Status:** Complete — 2026-08-16; checkpoint `m2-complete`
 **Date:** 2026-08-12
 
-> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` on 2026-08-15 after independent review, complete verification, and human browser QA. Joseph explicitly pre-authorized M2-F on 2026-08-13; this M2-E closeout releases it only after the closeout merges and `main` is synchronized cleanly. M3 planning is separately pre-authorized after M2 closes; M3 product implementation and M4+ remain gated and unauthorized.
+> **Approval and authorization boundary:** Joseph Carfagno explicitly approved this plan and accepted ADRs 0026–0028 on 2026-08-12 after independent architecture review, correction, and focused re-review found no remaining blockers. M2-A through M2-F are complete. M2-F merged through PR #51 at `5aeb11d` on 2026-08-16 with GitHub Actions `verify` passing in 3m9s; the post-merge revalidation in the boundary audit and checkpoint `m2-complete` formally close M2. Joseph's contingent authorization now releases M3 planning and pre-release architecture/ADR review only. M3 product implementation and M4+ remain gated and unauthorized.
 
 ## 1. Objective
 
@@ -66,14 +66,7 @@ Every successful graph response includes `meta.resolvedIdentity`. Every subject 
 
 ### ADR-0018 storage forcing-point re-evaluation
 
-ADR-0018 requires M2 planning to re-evaluate fixture-backed in-memory storage against measured interactive query patterns. The planning decision is to **retain the accepted in-memory implementation provisionally through M2**: all state remains synthetic and regenerable, every existing collection read is bounded, the repository contract suite remains storage-agnostic, and M2 introduces no durable writes or concurrency requirement that currently justifies SQLite or another engine.
-
-That conclusion is conditional rather than open-ended. M2-A through M2-E must record the fixture catalog size, retained Evidence count, result cardinalities, traversal truncation, snapshot-anchor candidate count, route latency, and peak process/browser memory for the primary desktop and mobile journeys. ADR-0028's retained-Evidence scan is an explicit measurement target. Before M2-F closeout, an independent storage review must compare those measurements with ADR-0018's change conditions and record one of two outcomes:
-
-1. retain in-memory storage for the measured M2 workload, with the evidence recorded in the M2 closeout; or
-2. propose a separate storage ADR and explicitly authorized migration slice before M2 can close.
-
-Durable non-regenerable state, fixture or interactive latency/memory exceeding comfortable local use, or measured traversal/temporal patterns materially better served by another engine trigger option 2. A storage migration is not authorized by this plan.
+ADR-0018 required M2 to re-evaluate fixture-backed in-memory storage against measured interactive query patterns. M2-A through M2-F recorded fixture cardinality, retained Evidence count, result cardinalities, traversal truncation, snapshot-anchor candidate count, route latency, process memory, browser heap signals, and bundle measurements. The independent M2-F review compared those measurements with every ADR-0018 change condition and reached **Outcome 1: retain the accepted in-memory implementation for the measured M2 workload**. The catalog remains 20 Evidence records and 11 entities; measured server-side routes remain comfortably interactive; state remains fixture-regenerable; and no measured traversal or temporal pattern warrants a relational or graph engine. Joseph Carfagno explicitly approved that conclusion on 2026-08-16. No storage ADR or migration slice is required for M2.
 
 ## 4. Primary Journeys
 
@@ -196,7 +189,7 @@ These are semantic requirements, not styling suggestions:
 
 ## 10. Proposed Implementation Slices
 
-M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684`. M2-F was contingently pre-authorized by Joseph Carfagno on 2026-08-13 and is released by this closeout only after it merges and `main` is synchronized cleanly.
+M2-A through M2-F are complete. M2-F merged through PR #51 at `5aeb11d` on 2026-08-16 and passed post-merge revalidation before checkpoint `m2-complete` closed the milestone.
 
 | Slice | Deliverable                                                                                             | Primary paths                                                                |
 | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -324,7 +317,7 @@ M2-D must not add or change shared contracts, API production code/routes, graph-
 
 ### Exact M2-E authorization boundary
 
-**Implementation status:** complete. M2-E was independently reviewed with no blockers, passed human desktop/mobile browser QA and the complete repository verifier, and merged through PR #49 at `62eb684` on 2026-08-15 with GitHub Actions `verify` passing in 3m16s. This closeout releases M2-F only after it merges and `main` is synchronized cleanly.
+**Implementation status:** complete. M2-E was independently reviewed with no blockers, passed human desktop/mobile browser QA and the complete repository verifier, and merged through PR #49 at `62eb684` on 2026-08-15 with GitHub Actions `verify` passing in 3m16s. Its closeout through PR #50 subsequently released M2-F.
 
 M2-E may implement only:
 
@@ -338,7 +331,9 @@ M2-E must not add a repository method; alter graph-model/repository/reconciliati
 
 ### Exact M2-F contingent authorization boundary
 
-M2-F becomes operational only after this M2-E closeout is merged and `main` is synchronized cleanly. It may implement only:
+**Implementation status:** complete. M2-F was independently reviewed and remediated, passed complete local verification and human keyboard, reduced-motion, responsive, failure-recovery, and VoiceOver QA, and merged through PR #51 at `5aeb11d` on 2026-08-16 with GitHub Actions `verify` passing in 3m9s. Post-merge revalidation reran the complete verifier and boundary checks directly against that merge commit.
+
+M2-F became operational only after the M2-E closeout merged and `main` synchronized cleanly. Its completed work was limited to:
 
 - browser-acceptance expansion for the accepted M2 primary journeys, complete-pin history playback, trust inspection, honest failures, keyboard operation, responsive behavior, and reduced motion across the supported desktop and mobile viewports;
 - accessibility and responsive hardening of the existing M2 interface without adding new product capabilities or widening the query API;
@@ -346,7 +341,7 @@ M2-F becomes operational only after this M2-E closeout is merged and `main` is s
 - the mandatory independent ADR-0018 retain-or-migrate storage review using recorded M2-A through M2-E measurements, with any migration requiring a new ADR and separate authorization rather than implementation inside M2-F;
 - the final synthetic-boundary and no-side-door audit, factual exit-criterion updates, M2 milestone closeout, and directly corresponding tests and documentation.
 
-M2-F must not change domain semantics, repository/reconciliation/snapshot behavior, fixtures, accepted ADR text, dependencies, package manifests, the lockfile, or query API behavior except for a separately authorized correction; add new product features, routes, connectors, authentication, deployment, infrastructure, real-system access, or M3+ behavior; weaken `scripts/verify.sh`, `scripts/bootstrap.sh`, or CI; or declare M2 complete before independent review, the full verifier, human browser/accessibility QA, PR/CI approval, merge, post-merge audit, and checkpoint update all succeed. M3 planning remains dormant until M2 is formally complete, and M3 product implementation requires its own approved baseline and explicit release.
+M2-F did not change domain semantics, repository/reconciliation/snapshot behavior, fixtures, accepted ADR text, dependencies, package manifests, the lockfile, query API behavior, scripts, or CI. It added no product feature, route, connector, authentication, deployment, infrastructure, real-system access, or M3+ behavior. Independent review, the full verifier, human browser/accessibility QA, PR/CI approval, merge, post-merge audit, and checkpoint update have all succeeded. M3 planning is now operational; M3 product implementation still requires its own approved baseline and explicit release.
 
 ## 13. Exit Criteria for M2-P
 
@@ -354,7 +349,17 @@ M2-F must not change domain semantics, repository/reconciliation/snapshot behavi
 - [x] Primary journeys, information architecture, URL model, and snapshot coordination are settled.
 - [x] Graph rendering, layout, accessibility, and responsive strategy are settled.
 - [x] Trust metadata and failure-state presentation are settled.
+
 - [x] Snapshot playback has an API-only, bounded design.
 - [x] ADR-0018's mandatory M2 storage re-evaluation is accepted with an explicit measurement and closeout decision gate.
 - [x] Proposed slices and verification obligations were independently reviewed.
 - [x] ADRs 0026–0028 and this plan were explicitly human-approved on 2026-08-12.
+
+## 14. M2 Closeout
+
+M2 formally closed on 2026-08-16 at checkpoint `m2-complete` after PR #51 merged at `5aeb11d`, GitHub Actions passed, and the post-merge audit revalidated the exact merged scope, synthetic boundary, no-side-door rule, source hygiene, and complete verifier.
+
+- [x] A user can navigate a synthetic topology, search for entities, and inspect the Evidence behind any edge from the UI alone — proven by the merged inventory, search, entity detail, graph/structured traversal, trust inspector, direct Evidence dereferencing, history playback, and 24 browser acceptance cases across desktop and mobile.
+- [x] The UI reads exclusively through the query API, with no fixture, repository, graph-model, or storage side door — proven by the enforced browser import boundary, direct import audit, and post-merge revalidation in [the synthetic-boundary audit § 17](audits/m0-synthetic-boundary-audit.md).
+
+No M2 implementation slice remains active. M3 planning and pre-release architecture/ADR review are authorized; M3 product implementation and M4+ remain unauthorized.

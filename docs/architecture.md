@@ -1,6 +1,6 @@
 # Atlast — Architecture
 
-**Status:** Current. M0 and M1 are implemented and complete; M2 was explicitly authorized by Joseph Carfagno on 2026-08-12 and is phase-gated, with planning and pre-release architecture/ADR review as its only initially released phase. The M2 exploration UI and all M3+ architecture remain conceptual until their respective implementation gates are released. This document defines the architecture _philosophy_ and conceptual system shape; design positions bind only through human-approved ADRs in `docs/adr/`, and tooling choices require approval before use.
+**Status:** Current. M0, M1, and M2 are implemented and complete; M2 closed at checkpoint `m2-complete` after M2-F merged through PR #51 at `5aeb11d` and passed post-merge revalidation. M3 planning and pre-release architecture/ADR review are authorized, but M3 product implementation and M4+ remain gated. This document defines the architecture _philosophy_ and conceptual system shape; design positions bind only through human-approved ADRs in `docs/adr/`, and tooling choices require approval before use.
 
 ---
 

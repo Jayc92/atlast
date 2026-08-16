@@ -1,6 +1,6 @@
 # Atlast — Milestones
 
-**Status:** Current. M0 and M1 are complete. M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` on 2026-08-15. M2-F is released by the M2-E closeout and becomes operational only after that closeout merges and `main` is synchronized cleanly. M3 planning remains dormant until M2 closes. M3 product implementation and M4+ remain unauthorized.
+**Status:** Current. M0, M1, and M2 are complete. M2 closed at checkpoint `m2-complete` after M2-F merged through PR #51 at `5aeb11d` on 2026-08-16 and passed post-merge revalidation. M3 planning and pre-release architecture/ADR review are active. M3 product implementation and M4+ remain unauthorized.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
@@ -62,13 +62,13 @@
 - [x] Every fact in the graph is traceable to its synthetic evidence via the API — _proven exhaustively by `apps/api/src/routes/evidence.test.ts` (all 20 valid Evidence records dereferenced through `GET /api/v1/evidence/{evidenceId}` alone, across all seven valid fixture scenarios)._
 - [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0025, all Accepted._
 
-**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, and its accepted baseline merged through PR #34 at `106b1e7`. M2-A through M2-E were separately authorized, implemented, independently reviewed, verified, merged, and closed; M2-E merged through PR #49 at `62eb684`. Joseph pre-authorized M2-F and M3 planning on 2026-08-13. This M2-E closeout releases M2-F only after it merges and `main` is synchronized cleanly; M3 planning remains dormant until M2 closes. M3 product implementation and M4+ remain unauthorized.
+**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, and its accepted baseline merged through PR #34 at `106b1e7`. M2-A through M2-F were separately released, implemented, independently reviewed, verified, merged, and closed. M2-F merged through PR #51 at `5aeb11d`; checkpoint `m2-complete` closed M2 after post-merge revalidation. Joseph's contingent authorization now releases M3 planning and pre-release architecture/ADR review only. M3 product implementation and M4+ remain unauthorized.
 
 ---
 
-## M2 — Interactive Topology Interface (authorized 2026-08-12 — phase-gated)
+## M2 — Interactive Topology Interface (complete — 2026-08-16)
 
-> **Authorization status:** M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` within [docs/m2-plan.md's exact boundary](m2-plan.md#exact-m2-e-authorization-boundary). M2-F is the next authorized slice and becomes operational only from synchronized `main` containing the M2-E closeout. **M3 planning is pre-authorized but dormant until M2 closes; M3 product implementation and M4+ remain gated and unauthorized.**
+> **Completion status:** M2-A through M2-F are complete. M2-F merged through PR #51 at `5aeb11d` and the post-merge audit revalidated the exact scope, full verifier, synthetic boundary, and no-side-door rule. Checkpoint `m2-complete` formally closes the milestone. **M3 planning is active; M3 product implementation and M4+ remain gated and unauthorized.**
 
 **Goal:** People who don't write queries can explore the graph.
 
@@ -81,14 +81,14 @@
 
 **Exit criteria:**
 
-- [ ] A user can navigate a synthetic topology, search for entities, and inspect the evidence behind any edge from the UI alone.
-- [ ] The UI reads exclusively through the query API (no side doors).
+- [x] A user can navigate a synthetic topology, search for entities, and inspect the Evidence behind any edge from the UI alone — _proven by the merged M2-A through M2-F interface and the 24-case desktop/mobile browser acceptance suite, including direct Evidence dereferencing and keyboard-only trust inspection._
+- [x] The UI reads exclusively through the query API (no side doors) — _proven by the lint-enforced browser import boundary and the direct post-merge audit in [§ 17](audits/m0-synthetic-boundary-audit.md)._
 
 ---
 
-## M3 — Operational Health Overlays (planning pre-authorized; implementation gated)
+## M3 — Operational Health Overlays (planning authorized; implementation gated)
 
-> **Authorization status:** Joseph Carfagno explicitly pre-authorized M3 planning and pre-release architecture/ADR review on 2026-08-13. This phase cannot become operational before M2 is formally complete. M3 product implementation requires an independently reviewed and explicitly human-approved baseline plus its own implementation release. **M3 product implementation and M4+ remain unauthorized.**
+> **Authorization status:** Joseph Carfagno explicitly pre-authorized M3 planning and pre-release architecture/ADR review on 2026-08-13. M2 is now formally complete, so that planning phase is operational. M3 product implementation requires an independently reviewed and explicitly human-approved baseline plus its own implementation release. **M3 product implementation and M4+ remain unauthorized.**
 
 **Goal:** Synthetic operational state projected onto the graph so topology and health are one picture.
 

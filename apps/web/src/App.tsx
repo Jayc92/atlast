@@ -1,10 +1,9 @@
 /**
- * Atlast foundation page — the M0 web application shell (ADR-0003).
+ * Atlast foundation page and milestone landing page (ADR-0003).
  *
  * This page communicates the product vision and the current foundation
- * status. It deliberately contains no graph exploration, topology data,
- * search, routing, or query UI — the exploration interface is M2 scope and
- * gated on its own authorization (docs/milestones.md).
+ * status. The delivered M2 exploration interface lives at `/topology`; this
+ * route remains a compact project landing page rather than duplicating it.
  *
  * The only data access is a single health check against the backend API
  * shell, requested through the relative path `/api/health` (proxied by Vite
@@ -56,11 +55,9 @@ const MILESTONE_STATUS_LABELS: Record<MilestoneStatus, string> = {
 
 /**
  * The authorized milestone sequence (docs/milestones.md), displayed as
- * roadmap context only. M0 and M1 are formally delivered; every later
- * milestone is gated and unbuilt. This page must never imply otherwise,
- * and "delivered" status here still means only "the model and API exist"
- * — this page remains a status shell with no graph exploration UI of its
- * own.
+ * roadmap context only. M0 through M2 are formally delivered; every later
+ * product milestone remains gated. This page must never imply otherwise and
+ * remains a status shell rather than duplicating the topology workspace.
  */
 const MILESTONE_ROUTE: readonly {
   id: string;
@@ -79,7 +76,7 @@ const MILESTONE_ROUTE: readonly {
     id: "M1",
     title: "Synthetic topology model",
     summary:
-      "Entities, Relationships, and Evidence with provenance, confidence, and freshness, modeled and queryable from fixtures — delivered as a query API, not yet as an exploration UI.",
+      "Entities, Relationships, and Evidence with provenance, confidence, and freshness, modeled and queryable from fixtures.",
     status: "delivered",
   },
   {
@@ -87,7 +84,7 @@ const MILESTONE_ROUTE: readonly {
     title: "Interactive topology interface",
     summary:
       "Graph exploration, search, and the evidence behind every displayed fact.",
-    status: "gated",
+    status: "delivered",
   },
   {
     id: "M3",
@@ -286,21 +283,20 @@ export function App(): ReactElement {
         >
           <h2 id="status-heading" className="atlas-section-heading">
             <span className="atlas-section-kicker">Current state</span>
-            M0 — Safe project foundation
+            M2 — Interactive topology interface
           </h2>
           <p>
-            This page is the M0 web application shell — the surveyed base camp,
-            not the map. The repository holds the TypeScript monorepo, the
-            localhost-only backend API shell, shared package boundaries, and
-            this foundation page. It runs on synthetic data only and connects to
-            nothing beyond the local API shell.
+            M0, M1, and M2 are delivered. The repository now includes the safe
+            TypeScript foundation, fixture-driven topology and query API, and a
+            complete interactive topology workspace at /topology. It remains
+            synthetic-only and connects to nothing beyond the local API.
           </p>
           <p>
-            M1 is delivered behind that API — a fixture-driven model with
-            reconciliation, versioned snapshots, and a query API — but this page
-            does not consume it: it still shows only foundation status, with no
-            graph exploration UI. That interface, and every milestone after M1,
-            remains gated on its own explicit authorization.
+            M2 adds inventory and identifier search, bounded graph traversal,
+            equivalent structured navigation, trust and Evidence inspection, and
+            reproducible snapshot history. M3 planning is authorized, but M3
+            product implementation and every later milestone remain gated on
+            their own reviewed baseline and explicit release.
           </p>
         </section>
       </main>

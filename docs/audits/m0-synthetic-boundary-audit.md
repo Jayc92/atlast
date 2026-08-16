@@ -343,3 +343,55 @@ The § 11/§ 14.12 limitations apply unchanged. One M2-F-specific addition: this
 ### 16.14 Conclusion (M2-F re-audit, release candidate)
 
 At `a7e0f212eb495b60218e4a9f8aaee3df4ad6e6f3` plus the stated M2-F candidate delta, within the limitations stated in § 11/§ 14.12/§ 16.13: every Atlast product/runtime network path remains loopback-only, including the M2-E `snapshot-anchors` route, all of which are `GET`-only; the environment-variable surface is unchanged from M0; no credentials, sensitive files, or high-confidence secret patterns exist in tracked content; no employer or customer material exists anywhere; the M2-A through M2-C dependency additions (`react-router`, `@xyflow/react`, `elkjs`) carry no external-integration capability and the M2-F candidate itself adds none; no fixture file was touched; and the no-side-door boundary (§ 16.10) holds across the complete `apps/web/src/**` tree, proven both by direct import inspection and by the still-active, unweakened M2-A ESLint restricted-import rule. **No findings requiring remediation.** This re-audit satisfies the [docs/m2-plan.md § 10 M2-F boundary](../m2-plan.md#exact-m2-f-contingent-authorization-boundary)'s "final synthetic-boundary and no-side-door audit" obligation, subject to the post-merge revalidation named in § 16.13 — **M2 is not yet formally complete; that decision, and any further M2 exit-criteria closure, remains outside this audit's scope and this M2-F implementation prompt's authorized boundary.**
+
+## 17. M2 Closure Revalidation (2026-08-16)
+
+**Status: complete — pass.** This section revalidates § 16 directly against the real M2-F merge commit and closes the candidate limitation recorded in § 16.13. M2-F squash-merged through [PR #51](https://github.com/Jayc92/atlast/pull/51) at `5aeb11d3d900b52eb29edadf8d76febfb61e496a` on 2026-08-16. GitHub Actions `verify` passed in 3m9s ([run 31927783613](https://github.com/Jayc92/atlast/actions/runs/31927783613), job `95117920131`).
+
+### 17.1 Exact merged scope
+
+`git diff --name-status a7e0f21..5aeb11d` contains exactly the seven approved M2-F paths:
+
+- modified: `TASKS.md`
+- modified: `apps/web/src/styles.css`
+- modified: `apps/web/src/topology/GraphViewport.test.tsx`
+- modified: `apps/web/src/topology/GraphViewport.tsx`
+- modified: `docs/audits/m0-synthetic-boundary-audit.md`
+- added: `tests/acceptance/specs/accessibility-hardening.spec.ts`
+- added: `tests/acceptance/specs/trust-inspection.spec.ts`
+
+No manifest, dependency, lockfile, fixture, shared contract, API production route, graph-model/repository/reconciliation/snapshot/storage implementation, accepted ADR, verification script, bootstrap script, or CI workflow changed.
+
+### 17.2 Boundary and source-hygiene revalidation
+
+The § 16 method was repeated against `5aeb11d` rather than trusting the pre-merge branch:
+
+- the complete tracked tree contains **238 files**;
+- a byte-safe scan of every tracked file found **zero literal NUL bytes**;
+- every product/runtime network path remains loopback-only and read-only;
+- `apps/web/src/**` still has no import from fixtures, graph-model, repository/storage code, or API server modules;
+- the lint-enforced browser import boundary remains active and unweakened;
+- every graph fact displayed by the browser continues to arrive through the validated query client and query API;
+- no credential, employer/customer material, real-system connector, mutation endpoint, or external publication capability was introduced.
+
+**No finding requires remediation.** The synthetic-first and no-side-door boundaries remain intact.
+
+### 17.3 Complete post-merge verification
+
+The complete, unmodified `./scripts/verify.sh` was rerun directly on `5aeb11d` after stopping the separate manual-QA servers that had occupied the acceptance ports. All seven stages passed:
+
+- shared: **387/387** tests in 15 files;
+- graph-model: **372/372** tests in 19 files;
+- API: **69/69** tests in 7 files;
+- web: **154/154** tests in 23 files;
+- production builds: pass;
+- browser acceptance: **24/24** across desktop and mobile;
+- formatting, lint, typecheck, and whitespace validation: pass.
+
+The production output remained within the recorded M2-F measurements: eager JS **416.01 kB / 125.41 kB gzip**, eager CSS **16.11 kB / 3.77 kB gzip**, lazy graph JS **1,615.25 kB / 501.57 kB gzip**, and lazy graph CSS **15.41 kB / 2.56 kB gzip**.
+
+### 17.4 Closure conclusion
+
+The merged M2-A through M2-F product satisfies both M2 exit criteria. The browser can navigate and search the synthetic topology, traverse it in graph and structured forms, inspect Entity and Relationship trust, directly dereference Evidence, and reproduce historical snapshots. The browser reads graph facts exclusively through the query API, with the no-side-door rule enforced and audited. The independent ADR-0018 review reached approved **Outcome 1: retain the accepted in-memory implementation for the measured M2 workload**.
+
+This revalidation closes § 16's candidate limitation and establishes checkpoint `m2-complete`. **M2 is formally complete as of 2026-08-16.** Joseph Carfagno's contingent authorization now releases M3 planning and pre-release architecture/ADR review only. M3 product implementation and M4+ remain unauthorized.

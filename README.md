@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 and M1 complete; M2 explicitly authorized and phase-gated.** M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684`. M2-F is released by the M2-E closeout and becomes operational only from synchronized `main` containing it; M3 planning remains dormant until M2 closes. **M3 product implementation and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0, M1, and M2 complete.** M2-F merged through PR #51 at `5aeb11d`; post-merge revalidation and checkpoint `m2-complete` close the interactive topology milestone. **M3 planning and pre-release architecture/ADR review are authorized; M3 product implementation and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -128,7 +128,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-The M0 foundation and M1 synthetic topology model are formally complete ([TASKS.md](TASKS.md)); M1 closed through PR #32 at `cff0545` on 2026-08-12. **M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` on 2026-08-15.** M2-F is released by this closeout and becomes operational only after it merges and `main` is synchronized cleanly. M3 planning remains dormant until M2 closes. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M3 product implementation and M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+The M0 foundation, M1 synthetic topology model, and M2 interactive topology interface are formally complete ([TASKS.md](TASKS.md)). M2-F merged through PR #51 at `5aeb11d` on 2026-08-16; the post-merge audit revalidation and checkpoint `m2-complete` close M2. M3 planning and pre-release architecture/ADR review are now operational under Joseph Carfagno's contingent authorization. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M3 product implementation and M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 

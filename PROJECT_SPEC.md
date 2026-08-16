@@ -2,7 +2,7 @@
 
 **Version:** 0.2.1
 **Date:** 2026-07-21 (metadata corrected 2026-07-30)
-**Status:** Approved — the product baseline, approved by human review 2026-07-22 with the documentation set. M0 and M1 are complete; M2 is explicitly authorized and phase-gated. The accepted M2 baseline is operational through PR #34 at `106b1e7`; M2-A was separately authorized on 2026-08-12 and is pending its authorization-record merge checkpoint ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md)). No slice or milestone is authorized by this document. Implementation details are governed by human-approved ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining here; the vision, goals, principles, scope, and non-goals below remain the approved product baseline.
+**Status:** Approved — the product baseline, approved by human review 2026-07-22 with the documentation set. M0, M1, and M2 are complete; M2 closed at checkpoint `m2-complete` after M2-F merged through PR #51 at `5aeb11d` and passed post-merge revalidation. M3 planning and pre-release architecture/ADR review are separately authorized; M3 product implementation and M4+ remain gated ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md)). No slice or milestone is authorized by this document. Implementation details are governed by human-approved ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining here; the vision, goals, principles, scope, and non-goals below remain the approved product baseline.
 
 ---
 

@@ -8,15 +8,15 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 and M1 are complete. M2 was explicitly authorized by Joseph Carfagno on 2026-08-12 and is phase-gated.** M2-A through M2-E are complete; M2-E merged through PR #49 at `62eb684` on 2026-08-15 with GitHub Actions `verify` passing in 3m16s. This closeout releases M2-F as the next active implementation slice only from synchronized `main` containing the closeout. M3 planning remains dormant until M2 closes. **M3 product implementation and M4+ remain unauthorized.** See [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md).
+**M0, M1, and M2 are complete.** M2-F merged through PR #51 at `5aeb11d` on 2026-08-16 with GitHub Actions `verify` passing in 3m9s; post-merge revalidation and this checkpoint formally close M2. Joseph Carfagno's contingent authorization now releases **M3 planning and pre-release architecture/ADR review only**. **M3 product implementation and M4+ remain unauthorized.** See [TASKS.md](TASKS.md), [docs/m2-plan.md](docs/m2-plan.md), and [HANDOFF.md](HANDOFF.md).
 
 Permitted work right now, and nothing beyond it:
 
 - **Maintenance and corrections to the completed M0 foundation and the merged, formally complete S1–S8 slices** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — the S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, S5 reconciliation engine, S6 snapshot layer and in-memory repositories, S7 query API v1 routes and error contract in `apps/api`, and S8's boundary re-audit, exhaustive API traceability test, and documentation closeout.
 - **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0025) and of the checkpoint documentation ([HANDOFF.md](HANDOFF.md), per the checkpoint protocol below).
-- **M2-E is complete and closed. M2-F is the next authorized slice** and is restricted to the exact M2-F boundary in [docs/m2-plan.md](docs/m2-plan.md); it becomes operational only after this closeout merges and `main` is synchronized cleanly. M3 planning/architecture review is pre-authorized but dormant until M2 closes; M3 product implementation remains gated on an independently reviewed and explicitly human-approved baseline. **M4+ remain unauthorized.**
+- **M2 is formally complete. M3 planning and pre-release architecture/ADR review are now authorized**, but M3 product implementation remains gated on an independently reviewed, explicitly human-approved baseline and a separate implementation release. **M4+ remain unauthorized.**
 
-**M2 has been explicitly authorized but remains phase-gated as described above. M3 planning is contingently authorized; M3 product implementation and every later milestone remain unauthorized**, each gated on its own approved baseline and explicit human release.
+**M3 planning is the only active milestone phase. M3 product implementation and every later milestone remain unauthorized**, each gated on its own approved baseline and explicit human release.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -29,10 +29,10 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**M0 and M1 are complete. M2 is explicitly authorized but phase-gated; M3 and every later milestone remain unauthorized:**
+**M0, M1, and M2 are complete. M3 planning is authorized; M3 product implementation and every later milestone remain unauthorized:**
 
 - Maintenance, corrections, and explicitly released M1 slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod, named by accepted ADR-0005, was introduced in S1 with its justification-at-PR).
-- **M1 is formally complete, the M2 baseline is operational through PR #34 at `106b1e7`, and M2-A through M2-E are complete.** M2-F is released only from synchronized `main` containing this closeout and must remain inside its exact boundary. Do NOT begin M3 planning before M2 closes or implement M3 product behavior before its baseline is independently reviewed and explicitly approved. Do NOT implement M4+ work before separate authorization.
+- **M1 and M2 are formally complete.** M3 planning may now develop and independently review its architecture baseline and Proposed ADRs. Do NOT implement M3 product behavior before that baseline is independently reviewed, explicitly approved, and separately released. Do NOT implement M4+ work before separate authorization.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
 - Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
 
