@@ -2,7 +2,7 @@
 
 **Version:** 0.2.1
 **Date:** 2026-07-21 (metadata corrected 2026-07-30)
-**Status:** Approved — the product baseline, approved by human review 2026-07-22 with the documentation set. M0, M1, and M2 are complete; M2 closed through PR #52 at checkpoint `m2-complete`. Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved [docs/m3-plan.md](docs/m3-plan.md) as the M3 implementation baseline on 2026-08-16. Baseline acceptance does not release M3-A; M3-A and M4+ remain gated ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md)). No slice or milestone is authorized by this document. Implementation details are governed by human-approved ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining here; the vision, goals, principles, scope, and non-goals below remain the approved product baseline.
+**Status:** Approved — the product baseline, approved by human review 2026-07-22 with the documentation set. M0, M1, and M2 are complete. The accepted M3 baseline merged through PR #53 at `b85be38`; Joseph Carfagno separately authorized M3-A only on 2026-08-16, subject to its documentation merge and clean synchronization gates. M3-B through M3-F and M4+ remain gated ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md)). This document itself authorizes no slice or milestone. Implementation details are governed by human-approved ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining here; the vision, goals, principles, scope, and non-goals below remain the approved product baseline.
 
 ---
 
