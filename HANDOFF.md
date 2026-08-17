@@ -5,11 +5,11 @@ The canonical, model-neutral resume document for Atlast. A replacement conductor
 ## 1. Document Control
 
 - **Last updated:** 2026-08-17
-- **Checkpoint name:** `m3-d-topology-overlay-ui-merged`
-- **Latest merged implementation commit:** `a2c2d92` (`feat: add M3 operational health overlay UI (#64)`), squash-merged through [PR #64](https://github.com/Jayc92/atlast/pull/64) on 2026-08-17.
-- **Verification:** PR #64 GitHub Actions `verify` passed in 3m52s. The complete seven-stage local verifier passed: shared 419/419, overlay-model 22/22, graph-model 372/372, API 88/88, web 227/227, production builds, and browser acceptance 24/24. Joseph Carfagno explicitly approved human browser QA.
-- **Milestone state:** M0, M1, and M2 are formally complete. M3-A through M3-D are complete. Joseph Carfagno explicitly authorized M3-E only on 2026-08-17; activation requires the combined M3-D closeout/M3-E authorization record to merge and local `main` to synchronize cleanly. M3-F and M4+ remain unauthorized.
-- **Branch state while recording M3-D closeout and M3-E authorization:** `docs/m3-d-closeout-m3-e-authorization`, based on synchronized, clean `main` at `a2c2d92`.
+- **Checkpoint name:** `m3-e-accessibility-hardening-merged`
+- **Latest merged implementation commit:** `9b4343e` (`test: harden M3 health overlay acceptance (#66)`), squash-merged through [PR #66](https://github.com/Jayc92/atlast/pull/66) on 2026-08-17.
+- **Verification:** PR #66 GitHub Actions `verify` passed in 4m28s. The complete seven-stage local verifier passed: shared 419/419, overlay-model 22/22, graph-model 372/372, API 88/88, web 227/227, production builds, and browser acceptance 34/34. Product bundles were unchanged, and Joseph Carfagno explicitly approved human browser and VoiceOver QA.
+- **Milestone state:** M0, M1, and M2 are formally complete. M3-A through M3-E are complete. Joseph Carfagno explicitly authorized M3-F only on 2026-08-17; activation requires the combined M3-E closeout/M3-F authorization record to merge and local `main` to synchronize cleanly. M4+ remain unauthorized.
+- **Branch state while recording M3-E closeout and M3-F authorization:** `docs/m3-e-closeout-m3-f-authorization`, based on synchronized, clean `main` at `9b4343e`.
 - **Version history:** this file is updated in place at every checkpoint; Git history preserves prior versions.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved implementation plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
@@ -41,7 +41,7 @@ Binding principles:
 - [docs/milestones.md](docs/milestones.md): M0–M5 sequence and exit criteria.
 - [docs/m1-plan.md](docs/m1-plan.md): completed M1 baseline.
 - [docs/m2-plan.md](docs/m2-plan.md): completed M2 baseline and slice record.
-- [docs/m3-plan.md](docs/m3-plan.md): approved M3 implementation baseline and exact slice boundaries; M3-A through M3-D are complete and M3-E is separately authorized pending activation.
+- [docs/m3-plan.md](docs/m3-plan.md): approved M3 implementation baseline and exact slice boundaries; M3-A through M3-E are complete and M3-F is separately authorized pending activation.
 - [docs/adr/README.md](docs/adr/README.md): Accepted ADRs 0001-0031 and amendment map.
 - [docs/audits/m0-synthetic-boundary-audit.md](docs/audits/m0-synthetic-boundary-audit.md): synthetic-boundary history; § 17 is the M2 closure revalidation.
 - `fixtures/demo-company`: seven-scenario, 20-Evidence synthetic catalog.
@@ -60,7 +60,7 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 | M0        | Complete — 2026-07-22              | Foundation and closure audit                     |
 | M1        | Complete — 2026-08-12              | S1–S8; checkpoint `m1-complete`                  |
 | M2        | Complete — 2026-08-16              | M2-A–F; PR #51; checkpoint `m2-complete`         |
-| M3        | M3-E authorized pending activation | M3-D merged through PR #64; bounded M3-E release |
+| M3        | M3-F authorized pending activation | M3-E merged through PR #66; bounded M3-F release |
 | M4        | Unauthorized                       | No work may begin                                |
 | M5        | Unauthorized                       | No work may begin                                |
 
@@ -95,29 +95,29 @@ Both M2 exit criteria are closed:
 At the product checkpoint before this documentation commit:
 
 ```text
-a2c2d92 (HEAD -> main, origin/main, origin/HEAD) feat: add M3 operational health overlay UI (#64)
+9b4343e (HEAD -> main, origin/main, origin/HEAD) test: harden M3 health overlay acceptance (#66)
+ce6c146 docs: close M3-D and authorize M3-E (#65)
+a2c2d92 feat: add M3 operational health overlay UI (#64)
 3b55c05 docs: authorize M3 implementation slice D (#63)
 5f2d038 docs: close M3 implementation slice C (#62)
-e177fc0 feat: add M3 health-in-context API (#61)
-8695a2b docs: authorize M3 implementation slice C (#60)
 ```
 
-M3-D merged through PR #64 at `a2c2d92`, and local `main` was synchronized cleanly. Joseph Carfagno then explicitly authorized M3-E only on 2026-08-17. Always inspect real Git state before trusting this snapshot.
+M3-E merged through PR #66 at `9b4343e`, and local `main` was synchronized cleanly. Joseph Carfagno then explicitly authorized M3-F only on 2026-08-17. Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-**M3-E is the only authorized implementation slice, pending activation.** After the combined M3-D closeout/M3-E authorization record merges and local `main` is synchronized cleanly, permitted work is strictly limited to:
+**M3-F is the only authorized implementation slice, pending activation.** After the combined M3-E closeout/M3-F authorization record merges and local `main` is synchronized cleanly, permitted work is strictly limited to:
 
-- built-preview desktop/mobile journeys for all six health states, explicit gaps, historical frames, and retry;
-- keyboard operation, graph/structured equivalence, reduced motion, zoom/reflow, and non-color semantics;
-- representative VoiceOver QA and factual measurements.
+- re-running the synthetic-boundary and no-side-door audits;
+- proving overlay removal loses no topology;
+- recording bundle, latency, memory, frame, gap, and result cardinalities;
+- correcting factual documentation and closing M3 only after the bounded work merges and post-merge verification passes.
 
-No new product behavior, data source, API behavior, fixture, schema, dependency, overlay-model behavior, or topology mutation is authorized.
+No new product behavior, data source, API behavior, fixture, schema, dependency, overlay-model behavior, topology mutation, or M4+ work is authorized.
 
 ## 8. Prohibited Work
 
-- Any M3-E implementation before the combined closeout/authorization record merges and local `main` is synchronized cleanly.
-- Any M3-F implementation before a separate explicit release.
+- Any M3-F implementation before the combined closeout/authorization record merges and local `main` is synchronized cleanly.
 - Any M4+ planning or implementation before separate authorization.
 - Real systems, credentials, employer/customer data, connectors, authentication, deployment, or external publication.
 - Product writes or mutation routes.
@@ -166,24 +166,24 @@ ADR index. Inspect git status and git log; real Git state overrides stale text.
 
 M0, M1, and M2 are formally complete. The accepted M3 baseline merged through
 PR #53 at b85be38. M3-A closed through PR #56 at a767c93, M3-B closed through
-PR #59 at b932539, M3-C closed through PR #62 at 5f2d038, and M3-D merged
-through PR #64 at a2c2d92 after independent review and explicit human browser
-QA approval. Checkpoint m3-d-topology-overlay-ui-merged records the validated
-operational-health overlay UI, canonical URL state, equivalent graph and
-structured presentation, explicit gaps, historical coordination, and
-fail-honest recovery. Joseph Carfagno explicitly authorized M3-E only on
+PR #59 at b932539, M3-C closed through PR #62 at 5f2d038, M3-D merged through
+PR #64 at a2c2d92, and M3-E merged through PR #66 at 9b4343e after independent
+review, complete verification, and explicit human browser and VoiceOver QA
+approval. Checkpoint m3-e-accessibility-hardening-merged records the complete
+built-preview coverage for all six health states, gaps, historical frames,
+retry, keyboard operation, structured equivalence, reduced motion, zoom/reflow,
+and non-color semantics. Joseph Carfagno explicitly authorized M3-F only on
 2026-08-17. Its activation requires the combined closeout/authorization record
-to merge and local main to synchronize cleanly. M3-F and M4+ remain
-unauthorized.
+to merge and local main to synchronize cleanly. M4+ remain unauthorized.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic, read-only,
-and fail-honest boundaries. M3-E is test-and-hardening-only: add built-preview
-desktop/mobile journeys for all six states, gaps, historical frames, retry,
-keyboard operation, structured equivalence, reduced motion, zoom/reflow, and
-non-color semantics; complete representative VoiceOver QA; and record factual
-measurements. Do not add product behavior, API behavior, data sources, fixtures,
-schemas, dependencies, overlay-model behavior, topology mutations, or M3-F+ work.
+and fail-honest boundaries. M3-F is audit-and-closeout-only: re-run the
+synthetic-boundary and no-side-door audits; prove overlay removal loses no
+topology; record bundle, latency, memory, frame, gap, and result cardinalities;
+and correct factual documentation. Do not add product behavior, API behavior,
+data sources, fixtures, schemas, dependencies, overlay-model behavior, topology
+mutations, or M4+ work.
 
 Begin by reporting your understanding of checkpoint
-m3-d-topology-overlay-ui-merged and the M3-E activation preconditions.
+m3-e-accessibility-hardening-merged and the M3-F activation preconditions.
 ```
