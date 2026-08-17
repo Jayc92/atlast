@@ -1,6 +1,6 @@
 # Atlast — Milestones
 
-**Status:** Current. M0, M1, and M2 are complete. M3-A through M3-E are complete; M3-E merged through PR #66 at `9b4343e`. Joseph Carfagno separately authorized M3-F only on 2026-08-17; activation requires the combined M3-E closeout/M3-F authorization record to merge and local `main` to synchronize cleanly. M4+ remain unauthorized.
+**Status:** Current. M0 through M3 are complete. M3-F merged through PR #68 at `6103ced`; checkpoint `m3-complete` records formal closure after passing post-merge verification. No implementation slice is active. M4+ remain unauthorized.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
@@ -62,7 +62,7 @@
 - [x] Every fact in the graph is traceable to its synthetic evidence via the API — _proven exhaustively by `apps/api/src/routes/evidence.test.ts` (all 20 valid Evidence records dereferenced through `GET /api/v1/evidence/{evidenceId}` alone, across all seven valid fixture scenarios)._
 - [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0025, all Accepted._
 
-**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, and its accepted baseline merged through PR #34 at `106b1e7`. M2-A through M2-F were separately released, implemented, independently reviewed, verified, merged, and closed. M2-F merged through PR #51 at `5aeb11d`; checkpoint `m2-complete` closed M2 after post-merge revalidation. Joseph subsequently accepted the independently reviewed M3 baseline. M3-A was separately authorized, merged through PR #55 at `e9afcd5`, and closed through PR #56 at `a767c93`. M3-B was separately authorized, merged through PR #58 at `98beb46`, and closed through PR #59 at `b932539`. M3-C was separately authorized, merged through PR #61 at `e177fc0`, and closed through PR #62 at `5f2d038`. M3-D was separately authorized, independently reviewed, human-QA-approved, and merged through PR #64 at `a2c2d92`. M3-E was separately authorized, independently reviewed, human-QA-approved, and merged through PR #66 at `9b4343e`. Joseph then separately authorized M3-F only on 2026-08-17, subject to the combined documentation merge and clean synchronization gate. M4+ remain unauthorized.
+**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, whose six slices closed at checkpoint `m2-complete`. Joseph subsequently accepted the independently reviewed M3 baseline and separately released each M3 slice. M3-A through M3-E merged through PRs #55, #58, #61, #64, and #66. M3-F was released through PR #67, independently reviewed, explicitly human-approved, and merged through PR #68 at `6103ced`; post-merge verification passed. Checkpoint `m3-complete` formally closes M3. M4+ remain unauthorized.
 
 ---
 
@@ -86,9 +86,9 @@
 
 ---
 
-## M3 — Operational Health Overlays (M3-F authorized pending activation)
+## M3 — Operational Health Overlays (complete — 2026-08-17)
 
-> **Authorization status:** The accepted M3 baseline merged through PR #53 at `b85be38`; M3-A was separately authorized, implemented, and closed through PR #56 at `a767c93`. M3-B was separately authorized, implemented, and closed through PR #59 at `b932539`. M3-C was separately authorized, implemented through PR #61 at `e177fc0`, and closed through PR #62 at `5f2d038`. M3-D was separately authorized, independently reviewed, human-QA-approved, and merged through PR #64 at `a2c2d92`. M3-E was separately authorized, independently reviewed, human-QA-approved, and merged through PR #66 at `9b4343e`. Joseph Carfagno then explicitly authorized M3-F only within [m3-plan.md's exact audit and milestone-closeout boundary](m3-plan.md#m3-f---audit-and-milestone-closeout). That release becomes operational only after the combined closeout/authorization record merges and local `main` is synchronized cleanly. **M4+ remain unauthorized.**
+> **Completion status:** The accepted M3 baseline merged through PR #53 at `b85be38`; M3-A through M3-F were separately authorized, implemented, reviewed, verified, and merged. M3-F merged through PR #68 at `6103ced` after explicit human approval, and post-merge verification passed. Checkpoint `m3-complete` formally closes M3. **M4+ remain unauthorized.**
 
 **Goal:** Synthetic operational state projected onto the graph so topology and health are one picture.
 
@@ -106,8 +106,8 @@
 
 **Exit criteria:**
 
-- [ ] All six states are representable, visually distinguishable, and queryable in context.
-- [ ] Overlay data loss loses no topology (overlays proven ephemeral).
+- [x] All six states are representable, visually distinguishable, and queryable in context - _proved by the M3-C API, M3-D UI, M3-E browser/VoiceOver acceptance, and complete 34-case browser suite._
+- [x] Overlay data loss loses no topology (overlays proven ephemeral) - _proved at request and empty-store startup boundaries by audit §§ 18-19; health and topology remain operational while health-context fails honestly._
 
 ---
 

@@ -418,7 +418,7 @@ This re-audit satisfies the M3-F boundary's "re-run the synthetic-boundary and n
 
 ### 18.2 Method
 
-The same § 2/§ 14.2/§ 16.2 pattern categories, re-run over the complete current tree. Additional M3-specific checks: a direct scan of every route-registration call for the M3-C health-context route's effect on the read-only route surface (§ 18.3); a direct read of `eslint.config.mjs`'s restricted-import rule against the new `packages/overlay-model` package (§ 18.6); and a direct, reproduced test of the overlay-removal property at both the query-time and composition-root layers (§ 18.7), since [docs/architecture.md § 3.5](../architecture.md#35-overlay-layer) and [docs/milestones.md M3](../milestones.md#m3--operational-health-overlays-m3-f-authorized-pending-activation) exit criterion 2 both assert it and the M3-F boundary requires proving it rather than assuming it.
+The same § 2/§ 14.2/§ 16.2 pattern categories, re-run over the complete current tree. Additional M3-specific checks: a direct scan of every route-registration call for the M3-C health-context route's effect on the read-only route surface (§ 18.3); a direct read of `eslint.config.mjs`'s restricted-import rule against the new `packages/overlay-model` package (§ 18.6); and a direct, reproduced test of the overlay-removal property at both the query-time and composition-root layers (§ 18.7), since [docs/architecture.md § 3.5](../architecture.md#35-overlay-layer) and [docs/milestones.md M3](../milestones.md#m3--operational-health-overlays-complete--2026-08-17) exit criterion 2 both assert it and the M3-F boundary requires proving it rather than assuming it.
 
 ### 18.3 Network-Capable First-Party Locations (delta since § 16.3)
 
@@ -444,7 +444,7 @@ The full § 2 sensitive-filename, high-confidence-credential-format, and employe
 
 ### 18.7 Overlay-Removal Property — Result: proven at query/runtime and composition-root/startup layers after remediation
 
-[docs/architecture.md § 3.5](../architecture.md#35-overlay-layer) states overlays "are ephemeral or externally sourced — losing an overlay loses no topology," and [docs/milestones.md M3](../milestones.md#m3--operational-health-overlays-m3-f-authorized-pending-activation) exit criterion 2 is "Overlay data loss loses no topology (overlays proven ephemeral)." The M3-F boundary requires this be _proven_, not assumed. Two distinct layers were tested directly; the startup-layer test found the narrow defect documented below, which was then remediated under explicit authorization.
+[docs/architecture.md § 3.5](../architecture.md#35-overlay-layer) states overlays "are ephemeral or externally sourced — losing an overlay loses no topology," and [docs/milestones.md M3](../milestones.md#m3--operational-health-overlays-complete--2026-08-17) exit criterion 2 is "Overlay data loss loses no topology (overlays proven ephemeral)." The M3-F boundary requires this be _proven_, not assumed. Two distinct layers were tested directly; the startup-layer test found the narrow defect documented below, which was then remediated under explicit authorization.
 
 **(a) Query/runtime layer — proven true, exhaustively.** A structural scan of every base-topology route handler (`entities.ts`, `search.ts`, `traversal.ts`, `evidence.ts`, `snapshots.ts`) confirms **none references `operationalOverlayStore`**; the only route file that does is `health-context.ts` itself (`snapshots.test.ts`'s one match is test scaffolding constructing the required `ApplicationDependencies` shape, not an actual dependency of snapshot logic). This means no overlay failure, absence, or misconfiguration can alter a base topology read at the routing layer — it is structurally impossible, not merely untested. Direct reproduction against the real compiled server confirms this: `GET /api/v1/snapshots` returned checksum `fc00fd22baf07e4c77f2a3b2c543e78d9d508c5bea92c385bc7c33b9faa52d22` / subject count `15` both immediately before and immediately after a real `GET .../health-context` call at the same pinned identity — byte-identical — reconfirming at the real running server the same invariant `apps/api/src/routes/health-context.test.ts`'s existing "does not mutate the topology snapshot checksum or subject count" test already proves at the `fastify.inject()` layer. Every overlay failure path (`OVERLAY_FRAME_NOT_FOUND`, `INVALID_OVERLAY_COORDINATE`, an unexpected exception) is a closed error on the health-context route alone and cannot propagate to any other route, by construction. At the browser layer, ADR-0031 § 1's client-side publish gate and the M3-D/E acceptance suite (`tests/acceptance/specs/health-overlay.spec.ts`'s "overlay failure surfaces a distinct retryable error while base topology remains visible" test) already prove the identical property end-to-end in a real browser: an intercepted overlay failure leaves the `TraversalWorkspace` ("Relationship workspace") fully visible and interactive. **This half of the property holds unconditionally and is proven both structurally and by direct reproduction.**
 
@@ -500,7 +500,7 @@ All measurements below were taken directly against a clean rebuild of this candi
 
 **Final candidate verification:** the complete unmodified seven-stage repository verifier passes: shared **420/420**, overlay-model **23/23**, graph-model **372/372**, API **89/89**, web **229/229**, and browser acceptance **34/34**, with whitespace, formatting, lint, types, and production builds also clean.
 
-### 18.12 M3 Exit-Criteria Evaluation, Boundary and Overlay-Removal Dimensions Only (mapped to [docs/milestones.md M3](../milestones.md#m3--operational-health-overlays-m3-f-authorized-pending-activation))
+### 18.12 M3 Exit-Criteria Evaluation, Boundary and Overlay-Removal Dimensions Only (mapped to [docs/milestones.md M3](../milestones.md#m3--operational-health-overlays-complete--2026-08-17))
 
 Exactly as § 16.12 scoped itself to M2's boundary dimension only, this table evaluates only the dimensions this audit itself measures — it does not evaluate, and does not claim to close, M3's first exit criterion ("All six states are representable, visually distinguishable, and queryable in context"), which is a product/UI completeness question already evidenced by the M3-C/D/E checkpoints and outside this audit's scope.
 
@@ -518,3 +518,37 @@ The § 11/§ 14.12/§ 16.13 limitations apply unchanged. Two M3-F-specific addit
 ### 18.14 Conclusion (M3 re-audit, release candidate)
 
 At `5aeb11d3d900b52eb29edadf8d76febfb61e496a` plus the complete M3-A through M3-F delta, within the limitations stated in § 11/§ 14.12/§ 16.13/§ 18.13: every Atlast product/runtime network path remains loopback-only, including the new nine-route surface, all of which are `GET`-only; the environment-variable surface is unchanged; no credentials, sensitive files, high-confidence secret patterns, or employer/customer material exist anywhere in the complete 273-file tracked tree; zero literal NUL bytes exist anywhere; the one M3 dependency change is a fully internal `workspace:*` link carrying no external-integration capability; the M1 Evidence fixture catalog is byte-for-byte unchanged; and the new, separate, synthetic overlay-frame catalog is confirmed fictional end-to-end. **Two findings were recorded rather than swept under this conclusion, and both were resolved under an explicit narrow remediation extension:** the browser's automated no-side-door guard now rejects direct and deep overlay-model imports (§ 18.6/§ 18.10.1), and an empty immutable overlay collection no longer prevents the application from serving health and topology routes while health-context fails honestly (§ 18.7/§ 18.10.2). **This re-audit fully satisfies the M3-F "re-run the synthetic-boundary and no-side-door audits" and "prove overlay removal loses no topology" obligations**, subject to the post-merge revalidation named in § 18.13. **M3 is not yet formally complete; formal closure remains a separate post-merge checkpoint.**
+
+## 19. M3 Post-Merge Revalidation and Formal Closure (2026-08-17)
+
+This section closes the candidate-only limitation in § 18.13 by revalidating the real squash merge rather than the working-tree candidate.
+
+### 19.1 Merge and Scope
+
+PR #68, `chore: complete M3 hardening audit`, squash-merged at `6103ced` after independent review and Joseph Carfagno's explicit publication approval. The changed-file set independently re-derived from `71f0e7e..6103ced` is exactly the eight approved files:
+
+- `TASKS.md`
+- `apps/api/src/app.test.ts`
+- `apps/web/src/eslint-boundary.test.ts`
+- `docs/audits/m0-synthetic-boundary-audit.md`
+- `eslint.config.mjs`
+- `packages/overlay-model/src/in-memory-overlay-store.test.ts`
+- `packages/shared/src/operational-overlays.test.ts`
+- `packages/shared/src/operational-overlays.ts`
+
+No dependency, manifest, lockfile, fixture, accepted ADR, topology semantic, verification script, bootstrap script, or CI workflow changed.
+
+### 19.2 Verification
+
+GitHub Actions `verify` passed in 3m56s. The complete unmodified seven-stage verifier then passed again directly on `6103ced`: shared **420/420**, overlay-model **23/23**, graph-model **372/372**, API **89/89**, web **229/229**, browser acceptance **34/34**, plus whitespace, formatting, lint, type checking, and production builds. A byte-safe scan found zero literal NUL bytes across all **273 tracked files**.
+
+### 19.3 Closed Findings and Exit Criteria
+
+The two § 18 findings remain closed on the merged commit: browser lint enforcement rejects direct and deep overlay-model imports, and an empty immutable overlay collection preserves `/health` and topology routes while health-context fails honestly through the existing typed error. Together with the M3-C/D/E evidence, both milestone exit criteria are satisfied:
+
+1. all six accepted states are representable, visually distinguishable, and queryable in context with equivalent accessible views;
+2. overlay data loss loses no topology at either request-time or empty-store startup boundaries.
+
+### 19.4 Conclusion
+
+The release-candidate conclusions in § 18 are now closed facts of the real merge commit. M3-A through M3-F are complete, checkpoint `m3-complete` formally closes M3, and no implementation slice is active. M4 and later milestones remain gated and unauthorized; this closure grants no successor permission.
