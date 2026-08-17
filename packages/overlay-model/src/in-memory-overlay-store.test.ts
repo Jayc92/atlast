@@ -119,8 +119,29 @@ describe("InMemoryOperationalOverlayStore", () => {
     } satisfies Partial<NoOverlayFrameAtOrBeforeError>);
   });
 
-  it("rejects empty, duplicate, malformed, disordered-entry, and over-bound input", () => {
-    expect(() => new InMemoryOperationalOverlayStore([])).toThrow();
+  it("accepts an empty immutable store and fails reads with typed errors", async () => {
+    const store = new InMemoryOperationalOverlayStore([]);
+    const unknown =
+      "atlast:overlay-frame:demo-company/missing" as OverlayFrameIdentifier;
+    const topologyAsOf = "2026-04-01T00:00:00.000Z" as UtcMillisecondTimestamp;
+
+    expect(store.frames).toStrictEqual([]);
+    expect(Object.isFrozen(store.frames)).toBe(true);
+    await expect(store.getFrameByIdentifier(unknown)).rejects.toMatchObject({
+      name: "OverlayFrameNotFoundError",
+      code: "OVERLAY_FRAME_NOT_FOUND",
+      frameIdentifier: unknown,
+    } satisfies Partial<OverlayFrameNotFoundError>);
+    await expect(
+      store.getLatestFrameAtOrBefore(topologyAsOf),
+    ).rejects.toMatchObject({
+      name: "NoOverlayFrameAtOrBeforeError",
+      code: "NO_OVERLAY_FRAME_AT_OR_BEFORE",
+      topologyAsOf,
+    } satisfies Partial<NoOverlayFrameAtOrBeforeError>);
+  });
+
+  it("rejects duplicate, malformed, disordered-entry, and over-bound input", () => {
     const baseline = frame("baseline", "2026-04-01T12:00:00.000Z");
     expect(
       () => new InMemoryOperationalOverlayStore([baseline, baseline]),
