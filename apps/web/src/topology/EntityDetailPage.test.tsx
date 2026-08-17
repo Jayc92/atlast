@@ -18,6 +18,7 @@ import { topologyRequestCache, topologySessionCoordinator } from "./session.ts";
 import {
   buildEvidenceDetailResult,
   buildEntityPage,
+  buildEntityReadResult,
   buildRelationshipSubjectReadResult,
   buildSubjectDetailResult,
   buildTraversalResult,
@@ -25,6 +26,66 @@ import {
   FIXTURE_EVIDENCE_IDENTIFIER,
 } from "./test-support/fixtures.ts";
 import { jsonRoute, stubApiFetch } from "./test-support/stub-fetch.ts";
+
+const OVERLAY_META = {
+  schemaVersion: "atlast-overlay-v1" as const,
+  frameIdentifier: "atlast:overlay-frame:demo-company/active-conditions",
+  effectiveAt: "2026-08-01T00:00:00.000Z",
+};
+
+/**
+ * Builds a schema-valid `HealthContextResult` payload whose `items` and
+ * `projections` are self-consistent (every origin/returned Entity gets
+ * exactly one ordered projection, per `healthContextResultSchema`'s own
+ * cross-field validation) — the same shape the real M3-C route returns.
+ */
+function healthContextPayload(options: {
+  readonly originEntityIdentifier: string;
+  readonly items?: readonly {
+    readonly subject: { readonly identifier: string };
+  }[];
+  readonly directConditions?: Readonly<Record<string, string>>;
+  readonly gaps?: readonly unknown[];
+  readonly overlay?: typeof OVERLAY_META;
+}): unknown {
+  const items = options.items ?? [];
+  const projections = [
+    options.originEntityIdentifier,
+    ...items.map((item) => item.subject.identifier),
+  ]
+    .sort()
+    .map((entityIdentifier) => {
+      const directCondition = options.directConditions?.[entityIdentifier];
+      if (directCondition === undefined || directCondition === "unreported") {
+        return {
+          reportStatus: "unreported",
+          entityIdentifier,
+          contextCompleteness: "complete-within-requested-bounds",
+        };
+      }
+      return {
+        reportStatus: "reported",
+        entityIdentifier,
+        directCondition,
+        effectiveState: directCondition,
+        contextCompleteness: "complete-within-requested-bounds",
+      };
+    });
+  return {
+    data: {
+      originEntityIdentifier: options.originEntityIdentifier,
+      items,
+      projections,
+      gaps: options.gaps ?? [],
+    },
+    traversal: { truncated: false, subjectCount: items.length },
+    meta: {
+      resolvedIdentity: FIXTURE_IDENTITY,
+      schemaVersion: "atlast-domain-v1",
+      overlay: options.overlay ?? OVERLAY_META,
+    },
+  };
+}
 
 afterEach(() => {
   cleanup();
@@ -371,5 +432,556 @@ describe("EntityDetailPage", () => {
     expect(params.has("asOf")).toBe(false);
     expect(params.has("horizon")).toBe(false);
     expect(params.has("derivationVersion")).toBe(false);
+  });
+
+  describe("M3-D operational health overlay", () => {
+    // The latest-mode identity probe (`GET /api/v1/entities?limit=1`) and the
+    // real health-context path (`/entities/<id>/health-context?...`, which
+    // shares the plain entity-detail URL as a literal prefix) both need their
+    // own routes ordered *before* the loose entity-detail matcher, exactly
+    // like the pre-existing `/traversal?` route above — `stubApiFetch` always
+    // returns the first matching route.
+    const inventoryProbeRoute = jsonRoute(
+      (url) => url.includes("/api/v1/entities?"),
+      buildEntityPage([]),
+    );
+
+    it("issues no health-context request and shows no overlay controls' status when health is off (overlay-off continuity)", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      const fetchStub = stubApiFetch([
+        inventoryProbeRoute,
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      renderEntityDetail("/entities/atlast%3Aentity%3Acheckout");
+
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Relationship workspace",
+      });
+      expect(
+        fetchStub.mock.calls.some(([url]) => url.includes("/health-context")),
+      ).toBe(false);
+      expect(
+        screen.getByRole("checkbox", {
+          name: "Show synthetic operational overlay",
+        }),
+      ).toBeDefined();
+    });
+
+    it("renders all six states plus unreported with non-color labels, and keeps every entity present under a state-emphasis filter", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      const down = buildEntityReadResult({
+        identifier: "atlast:entity:down-service",
+        entityType: "service",
+      });
+      const degraded = buildEntityReadResult({
+        identifier: "atlast:entity:degraded-service",
+        entityType: "service",
+      });
+      const disconnected = buildEntityReadResult({
+        identifier: "atlast:entity:disconnected-service",
+        entityType: "service",
+      });
+      const expiring = buildEntityReadResult({
+        identifier: "atlast:entity:expiring-service",
+        entityType: "service",
+      });
+      const healthyOther = buildEntityReadResult({
+        identifier: "atlast:entity:healthy-service",
+        entityType: "service",
+      });
+      const unreported = buildEntityReadResult({
+        identifier: "atlast:entity:unreported-service",
+        entityType: "service",
+      });
+      const traversal = buildTraversalResult([
+        down,
+        degraded,
+        disconnected,
+        expiring,
+        healthyOther,
+        unreported,
+      ]);
+
+      stubApiFetch([
+        inventoryProbeRoute,
+        jsonRoute(
+          (url) => url.includes("/health-context?"),
+          healthContextPayload({
+            originEntityIdentifier: "atlast:entity:checkout",
+            items: [
+              down,
+              degraded,
+              disconnected,
+              expiring,
+              healthyOther,
+              unreported,
+            ],
+            directConditions: {
+              "atlast:entity:checkout": "healthy",
+              "atlast:entity:down-service": "down",
+              "atlast:entity:degraded-service": "degraded",
+              "atlast:entity:disconnected-service": "disconnected",
+              "atlast:entity:expiring-service": "expiring-certificate",
+              "atlast:entity:healthy-service": "healthy",
+            },
+          }),
+        ),
+        jsonRoute((url) => url.includes("/traversal?"), traversal),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      renderEntityDetail(
+        "/entities/atlast%3Aentity%3Acheckout?view=list&health=on&healthStates=down",
+      );
+
+      await screen.findByRole("checkbox", {
+        name: "Show synthetic operational overlay",
+        checked: true,
+      });
+      await screen.findByRole("button", { name: /down-service.*Down/ });
+
+      expect(
+        screen.getByRole("button", { name: /degraded-service.*Degraded/ }),
+      ).toBeDefined();
+      expect(
+        screen.getByRole("button", {
+          name: /disconnected-service.*Disconnected/,
+        }),
+      ).toBeDefined();
+      expect(
+        screen.getByRole("button", {
+          name: /expiring-service.*Expiring certificate/,
+        }),
+      ).toBeDefined();
+      expect(
+        screen.getByRole("button", {
+          name: /unreported-service.*No overlay report/,
+        }),
+      ).toBeDefined();
+
+      // The "down" emphasis filter only changes visual treatment: every
+      // entity remains present, and the nonmatching ones are explicitly
+      // labeled as not emphasized rather than removed.
+      expect(
+        screen.getByRole("button", {
+          name: /degraded-service.*Degraded.*not emphasized/,
+        }),
+      ).toBeDefined();
+      expect(
+        screen.getByRole("button", {
+          name: /down-service.*Down(?!.*not emphasized)/,
+        }),
+      ).toBeDefined();
+    });
+
+    it("names the trigger and canonical path for latent downstream risk", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      const fulfillment = buildEntityReadResult({
+        identifier: "atlast:entity:fulfillment",
+        entityType: "service",
+      });
+      const relationship = buildRelationshipSubjectReadResult({
+        identifier: "atlast:relationship:checkout-calls-fulfillment",
+        relationshipType: "calls",
+        sourceEntityIdentifier: "atlast:entity:checkout",
+        targetEntityIdentifier: "atlast:entity:fulfillment",
+      });
+      const traversal = buildTraversalResult([fulfillment, relationship]);
+
+      stubApiFetch([
+        inventoryProbeRoute,
+        jsonRoute((url) => url.includes("/health-context?"), {
+          data: {
+            originEntityIdentifier: "atlast:entity:checkout",
+            items: [fulfillment, relationship],
+            projections: [
+              {
+                reportStatus: "reported",
+                entityIdentifier: "atlast:entity:checkout",
+                directCondition: "healthy",
+                effectiveState: "latent-downstream-risk",
+                contextCompleteness: "complete-within-requested-bounds",
+                derivation: {
+                  triggerEntityIdentifier: "atlast:entity:fulfillment",
+                  triggerDirectCondition: "down",
+                  path: [
+                    {
+                      sourceEntityIdentifier: "atlast:entity:checkout",
+                      targetEntityIdentifier: "atlast:entity:fulfillment",
+                      relationshipIdentifier:
+                        "atlast:relationship:checkout-calls-fulfillment",
+                      assertionIdentifier: `atlast:assertion:${"c".repeat(64)}`,
+                    },
+                  ],
+                },
+              },
+              {
+                reportStatus: "reported",
+                entityIdentifier: "atlast:entity:fulfillment",
+                directCondition: "down",
+                effectiveState: "down",
+                contextCompleteness: "complete-within-requested-bounds",
+              },
+            ],
+            gaps: [],
+          },
+          traversal: { truncated: false, subjectCount: 2 },
+          meta: {
+            resolvedIdentity: FIXTURE_IDENTITY,
+            schemaVersion: "atlast-domain-v1",
+            overlay: OVERLAY_META,
+          },
+        }),
+        jsonRoute((url) => url.includes("/traversal?"), traversal),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      renderEntityDetail(
+        "/entities/atlast%3Aentity%3Acheckout?view=list&health=on",
+      );
+
+      const checkoutButton = await screen.findByRole("button", {
+        name: /checkout.*Latent downstream risk/,
+      });
+      expect(checkoutButton.textContent).toContain("atlast:entity:fulfillment");
+      expect(checkoutButton.textContent).toContain("Down");
+      expect(checkoutButton.textContent).toContain(
+        "atlast:entity:checkout → atlast:entity:fulfillment",
+      );
+    });
+
+    it("presents an unknown overlay target as a keyboard-reachable gap, never as a phantom graph node", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      const traversal = buildTraversalResult([]);
+
+      stubApiFetch([
+        inventoryProbeRoute,
+        jsonRoute(
+          (url) => url.includes("/health-context?"),
+          healthContextPayload({
+            originEntityIdentifier: "atlast:entity:checkout",
+            items: [],
+            gaps: [
+              {
+                entryIdentifier:
+                  "atlast:overlay-entry:demo-company/active-conditions/mystery",
+                targetEntityIdentifier: "atlast:entity:unknown-target",
+                directCondition: "degraded",
+                reason: "UNKNOWN_ENTITY_AT_TOPOLOGY_SNAPSHOT",
+              },
+            ],
+          }),
+        ),
+        jsonRoute((url) => url.includes("/traversal?"), traversal),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      renderEntityDetail(
+        "/entities/atlast%3Aentity%3Acheckout?view=list&health=on",
+      );
+
+      const gapsHeading = await screen.findByRole("heading", {
+        name: "Unknown overlay targets",
+      });
+      expect(gapsHeading).toBeDefined();
+      expect(screen.getByText("atlast:entity:unknown-target")).toBeDefined();
+      // Never a graph/structured entity row.
+      expect(
+        screen.queryByRole("button", { name: /unknown-target/ }),
+      ).toBeNull();
+    });
+
+    it("keeps topology visible and offers a separately labeled overlay error with successful retry", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      const traversal = buildTraversalResult([]);
+      let healthRequests = 0;
+
+      stubApiFetch([
+        inventoryProbeRoute,
+        {
+          test: (url) => url.includes("/health-context?"),
+          respond: () => {
+            healthRequests += 1;
+            return healthRequests === 1
+              ? {
+                  ok: false,
+                  jsonPayload: {
+                    code: "OVERLAY_FRAME_NOT_FOUND",
+                    message: "The requested overlay frame does not exist.",
+                    details: {
+                      overlayFrame: "atlast:overlay-frame:demo-company/gone",
+                    },
+                  },
+                }
+              : {
+                  ok: true,
+                  jsonPayload: healthContextPayload({
+                    originEntityIdentifier: "atlast:entity:checkout",
+                  }),
+                };
+          },
+        },
+        jsonRoute((url) => url.includes("/traversal?"), traversal),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      renderEntityDetail(
+        "/entities/atlast%3Aentity%3Acheckout?view=list&health=on",
+      );
+
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Relationship workspace",
+      });
+      const overlayError = await screen.findByRole("alert");
+      expect(overlayError.textContent).toContain(
+        "The requested overlay frame does not exist.",
+      );
+      // Base topology remains visible and usable during the overlay failure.
+      expect(
+        screen.getByRole("heading", {
+          level: 2,
+          name: "Relationship workspace",
+        }),
+      ).toBeDefined();
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Try the overlay again" }),
+      );
+      await waitFor(() => {
+        expect(screen.queryByRole("alert")).toBeNull();
+      });
+      expect(healthRequests).toBe(2);
+    });
+
+    it("clears an invalid copied frame and requests a compatible historical frame explicitly", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      const healthRequestUrls: string[] = [];
+      stubApiFetch([
+        {
+          test: (url) => url.includes("/health-context?"),
+          respond: (url) => {
+            healthRequestUrls.push(url);
+            return healthRequestUrls.length === 1
+              ? {
+                  ok: false,
+                  jsonPayload: {
+                    code: "OVERLAY_FRAME_NOT_FOUND",
+                    message: "The requested overlay frame does not exist.",
+                    details: {
+                      overlayFrame: "atlast:overlay-frame:demo-company/gone",
+                    },
+                  },
+                }
+              : {
+                  ok: true,
+                  jsonPayload: healthContextPayload({
+                    originEntityIdentifier: "atlast:entity:checkout",
+                  }),
+                };
+          },
+        },
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      const router = renderEntityDetail(
+        `/entities/atlast%3Aentity%3Acheckout?view=list&health=on&asOf=${encodeURIComponent(
+          FIXTURE_IDENTITY.asOf,
+        )}&horizon=${String(FIXTURE_IDENTITY.horizon)}&derivationVersion=${FIXTURE_IDENTITY.derivationVersion}&overlayFrame=${encodeURIComponent(
+          "atlast:overlay-frame:demo-company/gone",
+        )}`,
+      );
+
+      fireEvent.click(
+        await screen.findByRole("button", {
+          name: "Select a compatible overlay frame",
+        }),
+      );
+      await waitFor(() => {
+        expect(healthRequestUrls).toHaveLength(2);
+      });
+      expect(
+        new URL(
+          healthRequestUrls[1] ?? "",
+          "http://localhost",
+        ).searchParams.has("overlayFrame"),
+      ).toBe(false);
+      await waitFor(() => {
+        expect(
+          new URLSearchParams(router.state.location.search).get("overlayFrame"),
+        ).toBe(OVERLAY_META.frameIdentifier);
+      });
+    });
+
+    it("toggling the overlay checkbox writes and removes health= (and its dependents) in the URL", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      stubApiFetch([
+        inventoryProbeRoute,
+        jsonRoute(
+          (url) => url.includes("/health-context?"),
+          healthContextPayload({
+            originEntityIdentifier: "atlast:entity:checkout",
+          }),
+        ),
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      const router = renderEntityDetail(
+        "/entities/atlast%3Aentity%3Acheckout?view=list",
+      );
+
+      fireEvent.click(
+        await screen.findByRole("checkbox", {
+          name: "Show synthetic operational overlay",
+        }),
+      );
+      await waitFor(() => {
+        expect(router.state.location.search).toContain("health=on");
+      });
+
+      fireEvent.click(
+        screen.getByRole("checkbox", {
+          name: "Show synthetic operational overlay",
+        }),
+      );
+      await waitFor(() => {
+        expect(router.state.location.search).not.toContain("health=on");
+      });
+    });
+
+    it("auto-selects and pins the resolved overlay frame into a historical URL", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      stubApiFetch([
+        jsonRoute(
+          (url) => url.includes("/health-context?"),
+          healthContextPayload({
+            originEntityIdentifier: "atlast:entity:checkout",
+          }),
+        ),
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      const router = renderEntityDetail(
+        `/entities/atlast%3Aentity%3Acheckout?view=list&health=on&asOf=${encodeURIComponent(
+          FIXTURE_IDENTITY.asOf,
+        )}&horizon=${String(FIXTURE_IDENTITY.horizon)}&derivationVersion=${FIXTURE_IDENTITY.derivationVersion}`,
+      );
+
+      await waitFor(() => {
+        const params = new URLSearchParams(router.state.location.search);
+        expect(params.get("overlayFrame")).toBe(OVERLAY_META.frameIdentifier);
+      });
+    });
+
+    it("preserves Entity trust inspection while the overlay is on", async () => {
+      const checkout = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      stubApiFetch([
+        inventoryProbeRoute,
+        jsonRoute(
+          (url) =>
+            url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+          buildEvidenceDetailResult(),
+        ),
+        jsonRoute(
+          (url) => url.includes("/health-context?"),
+          healthContextPayload({
+            originEntityIdentifier: "atlast:entity:checkout",
+          }),
+        ),
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          checkout,
+        ),
+      ]);
+
+      renderEntityDetail(
+        "/entities/atlast%3Aentity%3Acheckout?view=list&health=on",
+      );
+
+      const invoker = await screen.findByRole("button", {
+        name: "Inspect entity trust",
+      });
+      fireEvent.click(invoker);
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "Trust inspector",
+        }),
+      ).toBeDefined();
+    });
   });
 });

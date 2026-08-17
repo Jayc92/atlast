@@ -5,9 +5,10 @@
  * entity-type claim (never collapsed to one "winner" — GUARDRAILS.md § 1.2),
  * and M2-D adds the query-API-only trust inspector for selected subjects.
  */
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router";
 import type {
+  EffectiveHealthState,
   SnapshotIdentity,
   SubjectDetailResult,
   TraversalDirection,
@@ -18,6 +19,15 @@ import { buildRequestCacheKey } from "../api/cache.ts";
 import type { ClientQueryResult } from "../api/errors.ts";
 import { serializeTopologyUrlState } from "../url/query-state.ts";
 import { projectEntityDetail } from "./entity-projection.ts";
+import { buildHealthOverlayView } from "./health-overlay-projection.ts";
+import { HealthOverlayControls } from "./HealthOverlayControls.tsx";
+import { HealthOverlayGaps } from "./HealthOverlayGaps.tsx";
+import {
+  HealthOverlayApiErrorStatus,
+  HealthOverlayInternalErrorStatus,
+  HealthOverlayLoadingStatus,
+  HealthOverlayMismatchStatus,
+} from "./HealthOverlayStatus.tsx";
 import {
   ApiErrorStatus,
   InternalErrorStatus,
@@ -36,6 +46,7 @@ import { TrustInspector } from "./TrustInspector.tsx";
 import { resolveTrustSelection } from "./trust-selection.ts";
 import { useAsyncQuery } from "./use-async-query.ts";
 import { useCanonicalTopologyUrlState } from "./use-topology-url-state.ts";
+import { useHealthContext } from "./use-health-context.ts";
 
 function pinFields(
   identity: SnapshotIdentity,
@@ -207,6 +218,88 @@ export function EntityDetailPage(): ReactElement {
     detailQuery.state.status === "loaded"
       ? detailQuery.state.data.data
       : undefined;
+
+  const healthOn = urlState.health === true;
+  const healthContext = useHealthContext({
+    enabled: healthOn,
+    entityId: trimmedEntityId ?? "",
+    direction,
+    depth,
+    minConfidence,
+    identity,
+    overlayFrame: urlState.overlayFrame,
+    // Health may publish only once it matches the traversal for these exact
+    // bounds — never a differently-bounded retained traversal kept visible
+    // only to avoid flicker (ADR-0031 § 1).
+    baseTraversal: currentTraversal,
+  });
+  const healthOverlayView = useMemo(
+    () =>
+      healthContext.state.status === "ready"
+        ? buildHealthOverlayView(
+            healthContext.state.result,
+            urlState.healthStates,
+          )
+        : undefined,
+    [healthContext.state, urlState.healthStates],
+  );
+
+  const setHealthOn = (on: boolean): void => {
+    if (on) {
+      setSearchParams(serializeTopologyUrlState({ ...urlState, health: true }));
+      return;
+    }
+    const next = { ...urlState };
+    delete next.health;
+    delete next.healthStates;
+    delete next.overlayFrame;
+    setSearchParams(serializeTopologyUrlState(next));
+  };
+  const setEmphasizedHealthStates = (
+    states: readonly EffectiveHealthState[] | undefined,
+  ): void => {
+    if (states === undefined) {
+      const next = { ...urlState };
+      delete next.healthStates;
+      setSearchParams(serializeTopologyUrlState(next));
+      return;
+    }
+    setSearchParams(
+      serializeTopologyUrlState({ ...urlState, healthStates: states }),
+    );
+  };
+  const recoverOverlayFrame = (): void => {
+    const next = { ...urlState };
+    delete next.overlayFrame;
+    setSearchParams(serializeTopologyUrlState(next));
+  };
+
+  // Changing a pinned historical URL auto-selects the greatest eligible
+  // frame server-side when no exact overlayFrame is present. Once resolved,
+  // pin that exact frame into the URL so a copied historical link stays
+  // reproducible (ADR-0031 § 2: "finally writes the exact returned frame
+  // identifier into the URL"). Latest mode intentionally stays unpinned.
+  useEffect(() => {
+    if (
+      urlState.health === true &&
+      urlState.pin !== undefined &&
+      urlState.overlayFrame === undefined &&
+      healthContext.state.status === "ready"
+    ) {
+      setSearchParams(
+        serializeTopologyUrlState({
+          ...urlState,
+          overlayFrame: healthContext.state.result.meta.overlay.frameIdentifier,
+        }),
+        { replace: true },
+      );
+    }
+  }, [
+    urlState.health,
+    urlState.pin,
+    urlState.overlayFrame,
+    healthContext.state,
+  ]);
   const trustSelection =
     loadedDetail === undefined || urlState.selected === undefined
       ? undefined
@@ -264,6 +357,47 @@ export function EntityDetailPage(): ReactElement {
       <SnapshotHistory
         {...(identity !== undefined ? { resolvedIdentity: identity } : {})}
       />
+      {identity !== undefined && (
+        <HealthOverlayControls
+          healthOn={healthOn}
+          emphasizedStates={urlState.healthStates}
+          onToggleHealth={setHealthOn}
+          onEmphasisChange={setEmphasizedHealthStates}
+        />
+      )}
+      {healthOn && healthContext.state.status === "loading" && (
+        <HealthOverlayLoadingStatus />
+      )}
+      {healthOn && healthContext.state.status === "api-error" && (
+        <HealthOverlayApiErrorStatus
+          error={healthContext.state.error}
+          onRetry={healthContext.retry}
+          {...(urlState.overlayFrame !== undefined
+            ? { onRecoverCoordinate: recoverOverlayFrame }
+            : {})}
+        />
+      )}
+      {healthOn && healthContext.state.status === "internal-error" && (
+        <HealthOverlayInternalErrorStatus onRetry={healthContext.retry} />
+      )}
+      {healthOn && healthContext.state.status === "identity-mismatch" && (
+        <HealthOverlayMismatchStatus onRetry={healthContext.retry} />
+      )}
+      {healthOn &&
+        healthContext.state.status === "ready" &&
+        healthOverlayView !== undefined && (
+          <>
+            <p className="health-overlay-coordinate">
+              Overlay frame{" "}
+              {healthContext.state.result.meta.overlay.frameIdentifier} ·
+              effective at {healthContext.state.result.meta.overlay.effectiveAt}
+            </p>
+            <HealthOverlayGaps
+              gaps={healthOverlayView.gaps}
+              frameIdentifier={healthOverlayView.overlay.frameIdentifier}
+            />
+          </>
+        )}
       {identityQuery.state.status === "loading" && (
         <LoadingStatus label="Resolving the current topology snapshot…" />
       )}
@@ -382,6 +516,9 @@ export function EntityDetailPage(): ReactElement {
               viewMode={urlState.view ?? (isNarrowViewport ? "list" : "graph")}
               selected={urlState.selected}
               updating={currentTraversal === undefined}
+              {...(healthOverlayView !== undefined
+                ? { healthOverlay: healthOverlayView }
+                : {})}
               onBoundsChange={(bounds) => {
                 updateUrl(bounds);
               }}

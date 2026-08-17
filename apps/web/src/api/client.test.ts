@@ -12,6 +12,7 @@ import {
   fetchEntityInventory,
   fetchEvidence,
   fetchHealth,
+  fetchHealthContext,
   fetchSearch,
   fetchSnapshotAnchors,
   fetchSnapshotSummary,
@@ -259,6 +260,81 @@ describe("fetchTraversal", () => {
     expect(requestedUrl.searchParams.get("direction")).toBe("downstream");
     expect(requestedUrl.searchParams.get("depth")).toBe("3");
     expect(requestedUrl.searchParams.get("minConfidence")).toBe("0.5");
+  });
+});
+
+describe("fetchHealthContext", () => {
+  it("sends traversal bounds, the pin, and overlayFrame, and validates the response", async () => {
+    const fetchStub = stubFetch({
+      ok: true,
+      jsonPayload: {
+        data: {
+          originEntityIdentifier: "atlast:entity:checkout",
+          items: [],
+          projections: [
+            {
+              reportStatus: "reported",
+              entityIdentifier: "atlast:entity:checkout",
+              directCondition: "healthy",
+              effectiveState: "healthy",
+              contextCompleteness: "complete-within-requested-bounds",
+            },
+          ],
+          gaps: [],
+        },
+        traversal: { truncated: false, subjectCount: 0 },
+        meta: {
+          ...VALID_META,
+          overlay: {
+            schemaVersion: "atlast-overlay-v1",
+            frameIdentifier:
+              "atlast:overlay-frame:demo-company/active-conditions",
+            effectiveAt: "2026-08-01T00:00:00.000Z",
+          },
+        },
+      },
+    });
+
+    const result = await fetchHealthContext(
+      "atlast:entity:checkout",
+      {
+        direction: "downstream",
+        depth: 2,
+        identity: VALID_META.resolvedIdentity,
+        overlayFrame: "atlast:overlay-frame:demo-company/active-conditions",
+      },
+      new AbortController().signal,
+    );
+
+    expect(result.ok).toBe(true);
+    const requestedUrl = new URL(
+      String(fetchStub.mock.calls[0]?.[0]),
+      "http://localhost",
+    );
+    expect(requestedUrl.pathname).toBe(
+      "/api/v1/entities/atlast%3Aentity%3Acheckout/health-context",
+    );
+    expect(requestedUrl.searchParams.get("direction")).toBe("downstream");
+    expect(requestedUrl.searchParams.get("depth")).toBe("2");
+    expect(requestedUrl.searchParams.get("asOf")).toBe(
+      VALID_META.resolvedIdentity.asOf,
+    );
+    expect(requestedUrl.searchParams.get("overlayFrame")).toBe(
+      "atlast:overlay-frame:demo-company/active-conditions",
+    );
+  });
+
+  it("collapses a malformed response into a redacted internal failure", async () => {
+    stubFetch({ ok: true, jsonPayload: { not: "a valid health context" } });
+    const result = await fetchHealthContext(
+      "atlast:entity:checkout",
+      { direction: "downstream", depth: 1 },
+      new AbortController().signal,
+    );
+    expect(result).toEqual({
+      ok: false,
+      error: { kind: "client-internal-failure" },
+    });
   });
 });
 

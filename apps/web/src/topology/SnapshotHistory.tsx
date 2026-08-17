@@ -57,12 +57,15 @@ function LoadedSnapshotHistory(): ReactElement {
         );
 
   const selectAnchor = (anchor: SnapshotAnchor): void => {
-    setSearchParams(
-      serializeTopologyUrlState({
-        ...urlState,
-        pin: anchor.identity,
-      }),
-    );
+    // Changing the history anchor first clears any prior exact overlayFrame
+    // pin (ADR-0031 § 2): the frame that was compatible with the old
+    // topology pin may not be compatible with the new one. The health query
+    // then auto-selects the greatest eligible frame for the new pin, and a
+    // separate canonicalization effect writes that resolved frame back into
+    // the URL once known.
+    const next = { ...urlState, pin: anchor.identity };
+    delete next.overlayFrame;
+    setSearchParams(serializeTopologyUrlState(next));
   };
 
   return (
@@ -126,6 +129,9 @@ export function SnapshotHistory({
   const returnToLatest = (): void => {
     const latestState = { ...urlState };
     delete latestState.pin;
+    // A complete pin plus overlayFrame are only valid together; returning to
+    // unpinned latest exploration drops the frame pin along with the pin.
+    delete latestState.overlayFrame;
     topologySessionCoordinator.beginNewGeneration();
     setSearchParams(serializeTopologyUrlState(latestState));
   };

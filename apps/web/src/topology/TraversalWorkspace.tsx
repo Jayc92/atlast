@@ -6,6 +6,7 @@ import type {
 } from "@atlast/shared";
 import type { TopologyViewMode } from "../url/query-state.ts";
 import { projectTraversalGraph } from "./graph-projection.ts";
+import type { HealthOverlayViewModel } from "./health-overlay-projection.ts";
 import { StructuredTopologyView } from "./StructuredTopologyView.tsx";
 
 const GraphViewport = lazy(() =>
@@ -30,6 +31,8 @@ export interface TraversalWorkspaceProps {
   }) => void;
   readonly onViewModeChange: (viewMode: TopologyViewMode) => void;
   readonly onSelect: (identifier: string) => void;
+  /** Absent when overlays are off — the workspace renders identically either way. */
+  readonly healthOverlay?: HealthOverlayViewModel;
 }
 
 export function TraversalWorkspace({
@@ -44,6 +47,7 @@ export function TraversalWorkspace({
   onBoundsChange,
   onViewModeChange,
   onSelect,
+  healthOverlay,
 }: TraversalWorkspaceProps): ReactElement {
   const view = useMemo(
     () => projectTraversalGraph(origin, traversal),
@@ -149,13 +153,19 @@ export function TraversalWorkspace({
 
       {viewMode === "graph" ? (
         <Suspense fallback={<p role="status">Loading graph viewport…</p>}>
-          <GraphViewport view={view} selected={selected} onSelect={onSelect} />
+          <GraphViewport
+            view={view}
+            selected={selected}
+            onSelect={onSelect}
+            {...(healthOverlay !== undefined ? { healthOverlay } : {})}
+          />
         </Suspense>
       ) : (
         <StructuredTopologyView
           view={view}
           selected={selected}
           onSelect={onSelect}
+          {...(healthOverlay !== undefined ? { healthOverlay } : {})}
         />
       )}
     </section>

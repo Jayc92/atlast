@@ -12,7 +12,10 @@
  * act on immediately.
  */
 import {
+  overlayFrameIdentifierSchema,
   snapshotIdentitySchema,
+  type EffectiveHealthState,
+  type OverlayFrameIdentifier,
   type SnapshotIdentity,
   type TraversalDirection,
 } from "@atlast/shared";
@@ -26,8 +29,14 @@ export interface TopologyUrlState {
   readonly minConfidence?: number;
   readonly view?: TopologyViewMode;
   readonly selected?: string;
+  /** `true` when `health=on`; absent means overlays are off (ADR-0031 § 1). */
+  readonly health?: true;
+  /** State-emphasis filter; absent means every reported state is emphasized. */
+  readonly healthStates?: readonly EffectiveHealthState[];
   /** The complete pin, or `undefined` for latest (unpinned) exploration. */
   readonly pin?: SnapshotIdentity;
+  /** Valid only alongside `health` and a complete `pin` (ADR-0031 § 2). */
+  readonly overlayFrame?: OverlayFrameIdentifier;
 }
 
 export interface ParsedTopologyUrlState {
@@ -50,10 +59,26 @@ const CANONICAL_PARAMETER_NAMES: ReadonlySet<string> = new Set([
   "minConfidence",
   "view",
   "selected",
+  "health",
+  "healthStates",
   "asOf",
   "horizon",
   "derivationVersion",
+  "overlayFrame",
 ]);
+
+/** Canonical write order for `healthStates` (ADR-0031 § 1). */
+const EFFECTIVE_HEALTH_STATES_IN_ORDER: readonly EffectiveHealthState[] = [
+  "healthy",
+  "degraded",
+  "down",
+  "disconnected",
+  "expiring-certificate",
+  "latent-downstream-risk",
+];
+const EFFECTIVE_HEALTH_STATE_SET: ReadonlySet<string> = new Set(
+  EFFECTIVE_HEALTH_STATES_IN_ORDER,
+);
 
 function hasNonCanonicalParameterShape(searchParams: URLSearchParams): boolean {
   const counts = new Map<string, number>();
@@ -133,6 +158,62 @@ function parseDecimalInRange(
     : { value: undefined, invalid: true };
 }
 
+/** `health=on` is the only valid value; any other value disables health (ADR-0031 § 1). */
+function parseHealthToggle(raw: string | null): {
+  readonly value: true | undefined;
+  readonly invalid: boolean;
+} {
+  if (raw === null) {
+    return { value: undefined, invalid: false };
+  }
+  return raw === "on"
+    ? { value: true, invalid: false }
+    : { value: undefined, invalid: true };
+}
+
+/**
+ * `healthStates` is one scalar comma-separated list drawn from the six
+ * effective states; an empty or unknown token invalidates the whole value
+ * (ADR-0031 § 1). Valid tokens are deduplicated and returned in the fixed
+ * canonical order regardless of input order.
+ */
+function parseHealthStatesList(raw: string | null): {
+  readonly value: readonly EffectiveHealthState[] | undefined;
+  readonly invalid: boolean;
+} {
+  if (raw === null) {
+    return { value: undefined, invalid: false };
+  }
+  if (raw.length === 0) {
+    return { value: undefined, invalid: true };
+  }
+  const tokens = raw.split(",");
+  const seen = new Set<string>();
+  for (const token of tokens) {
+    if (!EFFECTIVE_HEALTH_STATE_SET.has(token)) {
+      return { value: undefined, invalid: true };
+    }
+    seen.add(token);
+  }
+  return {
+    value: EFFECTIVE_HEALTH_STATES_IN_ORDER.filter((state) => seen.has(state)),
+    invalid: false,
+  };
+}
+
+function parseOverlayFrameToken(raw: string | null): {
+  readonly value: OverlayFrameIdentifier | undefined;
+  readonly invalid: boolean;
+} {
+  if (raw === null) {
+    return { value: undefined, invalid: false };
+  }
+  const parsed = overlayFrameIdentifierSchema.safeParse(raw);
+  return parsed.success
+    ? { value: parsed.data, invalid: false }
+    : { value: undefined, invalid: true };
+}
+
 /**
  * The complete-pin rule: `asOf`, `horizon`, and `derivationVersion` present
  * together validate through the shared `snapshotIdentitySchema`; one or two
@@ -189,7 +270,23 @@ export function parseTopologyUrlState(
   );
   const view = parseView(searchParams.get("view"));
   const selected = nonEmptyOrUndefined(searchParams.get("selected"));
+  const health = parseHealthToggle(searchParams.get("health"));
+  const healthStatesRaw = searchParams.get("healthStates");
+  const healthStatesRepeated = searchParams.getAll("healthStates").length > 1;
+  // ADR-0031 is stricter for this scalar list than the legacy safe-first
+  // handling used by other repeated fields: a repeated key drops the whole
+  // healthStates value rather than trusting either occurrence.
+  const healthStatesParsed = healthStatesRepeated
+    ? { value: undefined, invalid: true }
+    : parseHealthStatesList(healthStatesRaw);
+  const healthStatesDroppedByDependency =
+    healthStatesParsed.value !== undefined && health.value !== true;
   const pin = parsePin(searchParams);
+  const overlayFrameRaw = searchParams.get("overlayFrame");
+  const overlayFrameParsed = parseOverlayFrameToken(overlayFrameRaw);
+  const overlayFrameDroppedByDependency =
+    overlayFrameParsed.value !== undefined &&
+    (health.value !== true || pin.value === undefined);
 
   const state: TopologyUrlState = {
     ...(q !== undefined ? { q } : {}),
@@ -200,7 +297,16 @@ export function parseTopologyUrlState(
       : {}),
     ...(view.value !== undefined ? { view: view.value } : {}),
     ...(selected !== undefined ? { selected } : {}),
+    ...(health.value === true ? { health: health.value } : {}),
+    ...(health.value === true && healthStatesParsed.value !== undefined
+      ? { healthStates: healthStatesParsed.value }
+      : {}),
     ...(pin.value !== undefined ? { pin: pin.value } : {}),
+    ...(health.value === true &&
+    pin.value !== undefined &&
+    overlayFrameParsed.value !== undefined
+      ? { overlayFrame: overlayFrameParsed.value }
+      : {}),
   };
 
   const wasCanonicalized =
@@ -209,15 +315,24 @@ export function parseTopologyUrlState(
     depth.invalid ||
     minConfidence.invalid ||
     view.invalid ||
-    pin.invalid;
+    pin.invalid ||
+    health.invalid ||
+    healthStatesParsed.invalid ||
+    healthStatesDroppedByDependency ||
+    (overlayFrameRaw !== null && overlayFrameParsed.invalid) ||
+    overlayFrameDroppedByDependency;
 
   return { state, wasCanonicalized };
 }
 
 /**
- * Deterministic serialization in one fixed field order (docs/m2-plan.md
- * § 5's canonical order), so a copied URL and a freshly-built one for the
- * same state are byte-identical — the reproducibility a copied link needs.
+ * Deterministic serialization in one fixed field order — ADR-0031 § 2's
+ * exact canonical order `q, direction, depth, minConfidence, view, selected,
+ * health, healthStates, asOf, horizon, derivationVersion, overlayFrame` — so
+ * a copied URL and a freshly-built one for the same state are byte-identical.
+ * Dependency rules are re-enforced here defensively (never trusting a caller
+ * to have already dropped an invalid combination): `healthStates` requires
+ * `health`; `overlayFrame` requires both `health` and a complete `pin`.
  */
 export function serializeTopologyUrlState(
   state: TopologyUrlState,
@@ -241,10 +356,28 @@ export function serializeTopologyUrlState(
   if (state.selected !== undefined) {
     params.set("selected", state.selected);
   }
+  if (state.health === true) {
+    params.set("health", "on");
+    if (state.healthStates !== undefined) {
+      const ordered = EFFECTIVE_HEALTH_STATES_IN_ORDER.filter((candidate) =>
+        state.healthStates?.includes(candidate),
+      );
+      if (ordered.length > 0) {
+        params.set("healthStates", ordered.join(","));
+      }
+    }
+  }
   if (state.pin !== undefined) {
     params.set("asOf", state.pin.asOf);
     params.set("horizon", String(state.pin.horizon));
     params.set("derivationVersion", state.pin.derivationVersion);
+  }
+  if (
+    state.health === true &&
+    state.pin !== undefined &&
+    state.overlayFrame !== undefined
+  ) {
+    params.set("overlayFrame", state.overlayFrame);
   }
   return params;
 }
