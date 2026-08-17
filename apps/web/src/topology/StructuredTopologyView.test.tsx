@@ -12,6 +12,10 @@ import {
   buildTraversalResult,
 } from "./test-support/fixtures.ts";
 import { projectTraversalGraph } from "./graph-projection.ts";
+import {
+  presentationForCondition,
+  type HealthOverlayViewModel,
+} from "./health-overlay-projection.ts";
 import { StructuredTopologyView } from "./StructuredTopologyView.tsx";
 
 afterEach(cleanup);
@@ -95,6 +99,129 @@ describe("StructuredTopologyView", () => {
     expect(
       screen.getByRole("button", {
         name: "ambiguous, service, ambiguous identity",
+      }),
+    ).toBeDefined();
+  });
+
+  it("presents a non-color state label and explanation, distinguishing emphasized from neutral treatment", () => {
+    const healthOverlay: HealthOverlayViewModel = {
+      byEntityIdentifier: new Map([
+        [
+          "atlast:entity:fulfillment",
+          {
+            entityIdentifier: "atlast:entity:fulfillment",
+            projection: {
+              reportStatus: "reported",
+              entityIdentifier: "atlast:entity:fulfillment",
+              directCondition: "down",
+              effectiveState: "down",
+              contextCompleteness: "complete-within-requested-bounds",
+            },
+            presentation: presentationForCondition("down"),
+            emphasized: true,
+            explanation: "Direct condition: Down.",
+          },
+        ],
+      ]),
+      gaps: [],
+      overlay: {
+        schemaVersion: "atlast-overlay-v1",
+        frameIdentifier: "atlast:overlay-frame:demo-company/active-conditions",
+        effectiveAt: "2026-08-01T00:00:00.000Z",
+      },
+      topologyIdentity: {
+        asOf: "2026-08-12T00:00:00.000Z",
+        horizon: 20,
+        derivationVersion: "m1-v1",
+      },
+    };
+
+    render(
+      <StructuredTopologyView
+        view={{
+          nodes: [
+            {
+              id: "atlast:entity:fulfillment",
+              label: "fulfillment",
+              entityTypes: ["service"],
+              ambiguous: false,
+            },
+          ],
+          edges: [],
+          boundaryReferences: [],
+          truncated: false,
+          subjectCount: 1,
+        }}
+        selected={undefined}
+        onSelect={() => undefined}
+        healthOverlay={healthOverlay}
+      />,
+    );
+
+    const button = screen.getByRole("button", {
+      name: "fulfillment, service, Down",
+    });
+    expect(button.textContent).toContain("Direct condition: Down.");
+  });
+
+  it("labels a nonmatching emphasis filter as not emphasized while still stating the true state", () => {
+    const healthOverlay: HealthOverlayViewModel = {
+      byEntityIdentifier: new Map([
+        [
+          "atlast:entity:fulfillment",
+          {
+            entityIdentifier: "atlast:entity:fulfillment",
+            projection: {
+              reportStatus: "reported",
+              entityIdentifier: "atlast:entity:fulfillment",
+              directCondition: "down",
+              effectiveState: "down",
+              contextCompleteness: "complete-within-requested-bounds",
+            },
+            presentation: presentationForCondition("down"),
+            emphasized: false,
+            explanation: "Direct condition: Down.",
+          },
+        ],
+      ]),
+      gaps: [],
+      overlay: {
+        schemaVersion: "atlast-overlay-v1",
+        frameIdentifier: "atlast:overlay-frame:demo-company/active-conditions",
+        effectiveAt: "2026-08-01T00:00:00.000Z",
+      },
+      topologyIdentity: {
+        asOf: "2026-08-12T00:00:00.000Z",
+        horizon: 20,
+        derivationVersion: "m1-v1",
+      },
+    };
+
+    render(
+      <StructuredTopologyView
+        view={{
+          nodes: [
+            {
+              id: "atlast:entity:fulfillment",
+              label: "fulfillment",
+              entityTypes: ["service"],
+              ambiguous: false,
+            },
+          ],
+          edges: [],
+          boundaryReferences: [],
+          truncated: false,
+          subjectCount: 1,
+        }}
+        selected={undefined}
+        onSelect={() => undefined}
+        healthOverlay={healthOverlay}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "fulfillment, service, Down, not emphasized",
       }),
     ).toBeDefined();
   });

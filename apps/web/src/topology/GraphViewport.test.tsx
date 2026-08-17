@@ -82,6 +82,9 @@ vi.mock("@xyflow/react", () => ({
 }));
 
 import { GraphViewport } from "./GraphViewport.tsx";
+import type { HealthOverlayViewModel } from "./health-overlay-projection.ts";
+import { presentationForCondition } from "./health-overlay-projection.ts";
+import { StructuredTopologyView } from "./StructuredTopologyView.tsx";
 
 const VIEW: TopologyGraphViewModel = {
   nodes: [
@@ -203,6 +206,200 @@ describe("GraphViewport", () => {
     onSelect.mockClear();
     fireEvent.keyDown(paymentsNode, { key: "Tab" });
     expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("renders non-color state text and pattern for an emphasized health projection, without changing edges", async () => {
+    layoutTopologyMock.mockResolvedValue({
+      nodes: [
+        { id: "atlast:entity:checkout", x: 0, y: 0 },
+        { id: "atlast:entity:payments", x: 300, y: 0 },
+      ],
+      width: 510,
+      height: 76,
+    });
+    const healthOverlay: HealthOverlayViewModel = {
+      byEntityIdentifier: new Map([
+        [
+          "atlast:entity:payments",
+          {
+            entityIdentifier: "atlast:entity:payments",
+            projection: {
+              reportStatus: "reported",
+              entityIdentifier: "atlast:entity:payments",
+              directCondition: "down",
+              effectiveState: "down",
+              contextCompleteness: "complete-within-requested-bounds",
+            },
+            presentation: presentationForCondition("down"),
+            emphasized: true,
+            explanation: "Direct condition: Down.",
+          },
+        ],
+      ]),
+      gaps: [],
+      overlay: {
+        schemaVersion: "atlast-overlay-v1",
+        frameIdentifier: "atlast:overlay-frame:demo-company/active-conditions",
+        effectiveAt: "2026-08-01T00:00:00.000Z",
+      },
+      topologyIdentity: {
+        asOf: "2026-08-12T00:00:00.000Z",
+        horizon: 20,
+        derivationVersion: "m1-v1",
+      },
+    };
+
+    render(
+      <GraphViewport
+        view={VIEW}
+        selected={undefined}
+        onSelect={() => undefined}
+        healthOverlay={healthOverlay}
+      />,
+    );
+
+    const paymentsNode = await screen.findByRole("button", {
+      name: /payments/,
+    });
+    expect(paymentsNode.textContent).toContain("Down");
+    expect(paymentsNode.dataset.class).toContain("health-state-down");
+
+    const checkoutNode = screen.getByRole("button", { name: /checkout/ });
+    expect(checkoutNode.textContent).not.toContain("Down");
+    expect(checkoutNode.dataset.class).not.toContain("health-state-down");
+
+    // The disconnected/down health treatment never removes a topology edge.
+    expect(
+      screen.getByRole("button", { name: "calls · conflicted" }),
+    ).toBeDefined();
+  });
+
+  it("renders neutral treatment (not the state's own pattern) for a nonmatching emphasis filter", async () => {
+    layoutTopologyMock.mockResolvedValue({
+      nodes: [
+        { id: "atlast:entity:checkout", x: 0, y: 0 },
+        { id: "atlast:entity:payments", x: 300, y: 0 },
+      ],
+      width: 510,
+      height: 76,
+    });
+    const healthOverlay: HealthOverlayViewModel = {
+      byEntityIdentifier: new Map([
+        [
+          "atlast:entity:payments",
+          {
+            entityIdentifier: "atlast:entity:payments",
+            projection: {
+              reportStatus: "reported",
+              entityIdentifier: "atlast:entity:payments",
+              directCondition: "down",
+              effectiveState: "down",
+              contextCompleteness: "complete-within-requested-bounds",
+            },
+            presentation: presentationForCondition("down"),
+            emphasized: false,
+            explanation: "Direct condition: Down.",
+          },
+        ],
+      ]),
+      gaps: [],
+      overlay: {
+        schemaVersion: "atlast-overlay-v1",
+        frameIdentifier: "atlast:overlay-frame:demo-company/active-conditions",
+        effectiveAt: "2026-08-01T00:00:00.000Z",
+      },
+      topologyIdentity: {
+        asOf: "2026-08-12T00:00:00.000Z",
+        horizon: 20,
+        derivationVersion: "m1-v1",
+      },
+    };
+
+    render(
+      <GraphViewport
+        view={VIEW}
+        selected={undefined}
+        onSelect={() => undefined}
+        healthOverlay={healthOverlay}
+      />,
+    );
+
+    const paymentsNode = await screen.findByRole("button", {
+      name: /payments/,
+    });
+    // Text still reports the true state honestly even when not emphasized —
+    // only the visual pattern treatment recedes to neutral.
+    expect(paymentsNode.textContent).toContain("Down");
+    expect(paymentsNode.dataset.class).toContain("health-neutral");
+    expect(paymentsNode.dataset.class).not.toContain("health-state-down");
+  });
+
+  it("surfaces the same health state text as the structured view for the same input (graph/structured equivalence)", async () => {
+    layoutTopologyMock.mockResolvedValue({
+      nodes: [
+        { id: "atlast:entity:checkout", x: 0, y: 0 },
+        { id: "atlast:entity:payments", x: 300, y: 0 },
+      ],
+      width: 510,
+      height: 76,
+    });
+    const healthOverlay: HealthOverlayViewModel = {
+      byEntityIdentifier: new Map([
+        [
+          "atlast:entity:payments",
+          {
+            entityIdentifier: "atlast:entity:payments",
+            projection: {
+              reportStatus: "reported",
+              entityIdentifier: "atlast:entity:payments",
+              directCondition: "expiring-certificate",
+              effectiveState: "expiring-certificate",
+              contextCompleteness: "complete-within-requested-bounds",
+            },
+            presentation: presentationForCondition("expiring-certificate"),
+            emphasized: true,
+            explanation: "Direct condition: Expiring certificate.",
+          },
+        ],
+      ]),
+      gaps: [],
+      overlay: {
+        schemaVersion: "atlast-overlay-v1",
+        frameIdentifier: "atlast:overlay-frame:demo-company/active-conditions",
+        effectiveAt: "2026-08-01T00:00:00.000Z",
+      },
+      topologyIdentity: {
+        asOf: "2026-08-12T00:00:00.000Z",
+        horizon: 20,
+        derivationVersion: "m1-v1",
+      },
+    };
+
+    const { container: graphContainer } = render(
+      <GraphViewport
+        view={VIEW}
+        selected={undefined}
+        onSelect={() => undefined}
+        healthOverlay={healthOverlay}
+      />,
+    );
+    await screen.findByText("Expiring certificate");
+    const graphText = graphContainer.textContent;
+
+    cleanup();
+
+    const { container: structuredContainer } = render(
+      <StructuredTopologyView
+        view={VIEW}
+        selected={undefined}
+        onSelect={() => undefined}
+        healthOverlay={healthOverlay}
+      />,
+    );
+    const structuredText = structuredContainer.textContent;
+
+    expect(graphText).toContain("Expiring certificate");
+    expect(structuredText).toContain("Expiring certificate");
   });
 
   it("offers the structured-view fallback when layout fails", async () => {

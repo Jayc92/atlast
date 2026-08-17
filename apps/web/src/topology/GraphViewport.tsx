@@ -16,11 +16,14 @@ import {
 import "@xyflow/react/dist/style.css";
 import type { TopologyGraphViewModel } from "./graph-projection.ts";
 import { layoutTopology, type TopologyLayout } from "./graph-layout.ts";
+import type { HealthOverlayViewModel } from "./health-overlay-projection.ts";
 
 export interface GraphViewportProps {
   readonly view: TopologyGraphViewModel;
   readonly selected: string | undefined;
   readonly onSelect: (identifier: string) => void;
+  /** Absent when overlays are off — the graph renders identically either way. */
+  readonly healthOverlay?: HealthOverlayViewModel;
 }
 
 type LayoutState =
@@ -35,6 +38,7 @@ export function GraphViewport({
   view,
   selected,
   onSelect,
+  healthOverlay,
 }: GraphViewportProps): ReactElement {
   const [layoutState, setLayoutState] = useState<LayoutState>();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -89,23 +93,44 @@ export function GraphViewport({
   }
 
   const positions = new Map(layout.nodes.map((node) => [node.id, node]));
-  const nodes: Node[] = view.nodes.map((node) => ({
-    id: node.id,
-    position: positions.get(node.id) ?? { x: 0, y: 0 },
-    data: {
-      label: (
-        <span className="topology-node-label">
-          <strong>{node.label}</strong>
-          <small>{node.entityTypes.join(" · ") || "entity"}</small>
-          {node.ambiguous && <small>ambiguous identity</small>}
-        </span>
-      ),
-    },
-    selected: selected === node.id,
-    draggable: false,
-    className: node.ambiguous ? "topology-node ambiguous" : "topology-node",
-    style: { width: 210, minHeight: 76 },
-  }));
+  const nodes: Node[] = view.nodes.map((node) => {
+    const health = healthOverlay?.byEntityIdentifier.get(node.id);
+    const healthPatternClassName =
+      health === undefined
+        ? undefined
+        : health.emphasized
+          ? health.presentation.patternClassName
+          : "health-neutral";
+    return {
+      id: node.id,
+      position: positions.get(node.id) ?? { x: 0, y: 0 },
+      data: {
+        label: (
+          <span className="topology-node-label">
+            <strong>{node.label}</strong>
+            <small>{node.entityTypes.join(" · ") || "entity"}</small>
+            {node.ambiguous && <small>ambiguous identity</small>}
+            {health !== undefined && (
+              <small>
+                <span aria-hidden="true">{health.presentation.glyph}</span>{" "}
+                {health.presentation.label}
+              </small>
+            )}
+          </span>
+        ),
+      },
+      selected: selected === node.id,
+      draggable: false,
+      className: [
+        "topology-node",
+        node.ambiguous ? "ambiguous" : undefined,
+        healthPatternClassName,
+      ]
+        .filter((value): value is string => value !== undefined)
+        .join(" "),
+      style: { width: 210, minHeight: 76 },
+    };
+  });
   const edges: Edge[] = view.edges
     .filter((edge) => edge.renderable)
     .map((edge) => ({

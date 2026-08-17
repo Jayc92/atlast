@@ -1,16 +1,20 @@
 import { useEffect, useRef, type ReactElement } from "react";
 import type { TopologyGraphViewModel } from "./graph-projection.ts";
+import type { HealthOverlayViewModel } from "./health-overlay-projection.ts";
 
 export interface StructuredTopologyViewProps {
   readonly view: TopologyGraphViewModel;
   readonly selected: string | undefined;
   readonly onSelect: (identifier: string) => void;
+  /** Absent when overlays are off — the structured view renders identically either way. */
+  readonly healthOverlay?: HealthOverlayViewModel;
 }
 
 export function StructuredTopologyView({
   view,
   selected,
   onSelect,
+  healthOverlay,
 }: StructuredTopologyViewProps): ReactElement {
   const selectedRef = useRef<HTMLButtonElement>(null);
 
@@ -23,23 +27,41 @@ export function StructuredTopologyView({
       <section aria-labelledby="topology-entities-heading">
         <h3 id="topology-entities-heading">Entities</h3>
         <ul className="topology-structured-list">
-          {view.nodes.map((node) => (
-            <li key={node.id}>
-              <button
-                ref={selected === node.id ? selectedRef : undefined}
-                type="button"
-                aria-label={`${node.label}, ${node.entityTypes.join(", ") || "entity"}${node.ambiguous ? ", ambiguous identity" : ""}`}
-                aria-pressed={selected === node.id}
-                onClick={() => {
-                  onSelect(node.id);
-                }}
-              >
-                <strong>{node.label}</strong>
-                <span>{node.entityTypes.join(", ") || "entity"}</span>
-                {node.ambiguous && <span>Ambiguous identity</span>}
-              </button>
-            </li>
-          ))}
+          {view.nodes.map((node) => {
+            const health = healthOverlay?.byEntityIdentifier.get(node.id);
+            const healthLabelSuffix =
+              health === undefined
+                ? ""
+                : `, ${health.presentation.label}${health.emphasized ? "" : ", not emphasized"}`;
+            return (
+              <li key={node.id}>
+                <button
+                  ref={selected === node.id ? selectedRef : undefined}
+                  type="button"
+                  aria-label={`${node.label}, ${node.entityTypes.join(", ") || "entity"}${node.ambiguous ? ", ambiguous identity" : ""}${healthLabelSuffix}`}
+                  aria-pressed={selected === node.id}
+                  onClick={() => {
+                    onSelect(node.id);
+                  }}
+                >
+                  <strong>{node.label}</strong>
+                  <span>{node.entityTypes.join(", ") || "entity"}</span>
+                  {node.ambiguous && <span>Ambiguous identity</span>}
+                  {health !== undefined && (
+                    <span className="topology-structured-health">
+                      <span aria-hidden="true">
+                        {health.presentation.glyph}
+                      </span>{" "}
+                      {health.presentation.label}
+                      {!health.emphasized && " (not emphasized)"}
+                      <br />
+                      {health.explanation}
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </section>
       <section aria-labelledby="topology-relationships-heading">

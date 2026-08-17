@@ -129,6 +129,146 @@ describe("parseTopologyUrlState — other canonical fields", () => {
   });
 });
 
+describe("parseTopologyUrlState — M3-D health overlay fields", () => {
+  it("accepts health=on with no healthStates or overlayFrame", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams("health=on"),
+    );
+    expect(state.health).toBe(true);
+    expect(state.healthStates).toBeUndefined();
+    expect(state.overlayFrame).toBeUndefined();
+    expect(wasCanonicalized).toBe(false);
+  });
+
+  it.each([
+    ["off", "health=off"],
+    ["empty", "health="],
+    ["true", "health=true"],
+  ])(
+    "drops an invalid health value (%s) and flags canonicalization",
+    (_description, query) => {
+      const { state, wasCanonicalized } = parseTopologyUrlState(
+        new URLSearchParams(query),
+      );
+      expect(state.health).toBeUndefined();
+      expect(wasCanonicalized).toBe(true);
+    },
+  );
+
+  it("accepts a valid healthStates list and reorders it canonically", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams("health=on&healthStates=down%2Chealthy%2Cdegraded"),
+    );
+    expect(state.healthStates).toEqual(["healthy", "degraded", "down"]);
+    expect(wasCanonicalized).toBe(false);
+  });
+
+  it("deduplicates repeated valid tokens in healthStates", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams("health=on&healthStates=down%2Cdown"),
+    );
+    expect(state.healthStates).toEqual(["down"]);
+    expect(wasCanonicalized).toBe(false);
+  });
+
+  it.each([
+    ["an empty token", "health=on&healthStates=healthy%2C%2Cdown"],
+    ["an unknown token", "health=on&healthStates=healthy%2Cunreported"],
+    ["an entirely empty value", "health=on&healthStates="],
+  ])(
+    "drops healthStates for %s and flags canonicalization",
+    (_description, query) => {
+      const { state, wasCanonicalized } = parseTopologyUrlState(
+        new URLSearchParams(query),
+      );
+      expect(state.healthStates).toBeUndefined();
+      expect(wasCanonicalized).toBe(true);
+    },
+  );
+
+  it("drops a syntactically valid healthStates value when health is not on", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams("healthStates=down"),
+    );
+    expect(state.health).toBeUndefined();
+    expect(state.healthStates).toBeUndefined();
+    expect(wasCanonicalized).toBe(true);
+  });
+
+  it("drops the whole healthStates value when the key is repeated", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams("health=on&healthStates=healthy&healthStates=down"),
+    );
+    expect(state.health).toBe(true);
+    expect(state.healthStates).toBeUndefined();
+    expect(wasCanonicalized).toBe(true);
+  });
+
+  it("accepts overlayFrame only alongside health=on and a complete pin", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(
+        `health=on&overlayFrame=${encodeURIComponent(
+          "atlast:overlay-frame:demo-company/active-conditions",
+        )}&asOf=${encodeURIComponent(VALID_PIN.asOf)}&horizon=20&derivationVersion=m1-v1`,
+      ),
+    );
+    expect(state.overlayFrame).toBe(
+      "atlast:overlay-frame:demo-company/active-conditions",
+    );
+    expect(wasCanonicalized).toBe(false);
+  });
+
+  it("drops overlayFrame without health=on, flagging canonicalization", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(
+        `overlayFrame=${encodeURIComponent(
+          "atlast:overlay-frame:demo-company/active-conditions",
+        )}&asOf=${encodeURIComponent(VALID_PIN.asOf)}&horizon=20&derivationVersion=m1-v1`,
+      ),
+    );
+    expect(state.overlayFrame).toBeUndefined();
+    expect(state.pin).toEqual(VALID_PIN);
+    expect(wasCanonicalized).toBe(true);
+  });
+
+  it("drops overlayFrame without a complete pin, flagging canonicalization", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(
+        `health=on&overlayFrame=${encodeURIComponent(
+          "atlast:overlay-frame:demo-company/active-conditions",
+        )}`,
+      ),
+    );
+    expect(state.overlayFrame).toBeUndefined();
+    expect(state.health).toBe(true);
+    expect(wasCanonicalized).toBe(true);
+  });
+
+  it("drops a malformed overlayFrame token and flags canonicalization", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(
+        `health=on&overlayFrame=not-a-valid-frame&asOf=${encodeURIComponent(
+          VALID_PIN.asOf,
+        )}&horizon=20&derivationVersion=m1-v1`,
+      ),
+    );
+    expect(state.overlayFrame).toBeUndefined();
+    expect(wasCanonicalized).toBe(true);
+  });
+
+  it("an invalid health value drops both dependent overlay fields while preserving topology state", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(
+        `q=checkout&health=off&healthStates=down&overlayFrame=${encodeURIComponent(
+          "atlast:overlay-frame:demo-company/active-conditions",
+        )}&asOf=${encodeURIComponent(VALID_PIN.asOf)}&horizon=20&derivationVersion=m1-v1`,
+      ),
+    );
+    expect(state).toEqual({ q: "checkout", pin: VALID_PIN });
+    expect(wasCanonicalized).toBe(true);
+  });
+});
+
 describe("serializeTopologyUrlState", () => {
   it("round-trips a complete state deterministically", () => {
     const state: TopologyUrlState = {
@@ -160,5 +300,76 @@ describe("serializeTopologyUrlState", () => {
     expect(serialized.has("asOf")).toBe(false);
     expect(serialized.has("horizon")).toBe(false);
     expect(serialized.has("derivationVersion")).toBe(false);
+  });
+
+  it("writes every parameter in the exact ADR-0031 § 2 canonical order", () => {
+    const state: TopologyUrlState = {
+      q: "checkout",
+      direction: "downstream",
+      depth: 2,
+      minConfidence: 0.25,
+      view: "graph",
+      selected: "atlast:entity:service/checkout",
+      health: true,
+      healthStates: ["down", "healthy"],
+      pin: VALID_PIN,
+      overlayFrame: "atlast:overlay-frame:demo-company/active-conditions",
+    };
+    const serialized = serializeTopologyUrlState(state);
+    expect([...serialized.keys()]).toEqual([
+      "q",
+      "direction",
+      "depth",
+      "minConfidence",
+      "view",
+      "selected",
+      "health",
+      "healthStates",
+      "asOf",
+      "horizon",
+      "derivationVersion",
+      "overlayFrame",
+    ]);
+    // healthStates is deduplicated and reordered canonically at serialization,
+    // independent of the order supplied by the caller.
+    expect(serialized.get("healthStates")).toBe("healthy,down");
+  });
+
+  it("round-trips a complete health-overlay state deterministically", () => {
+    const state: TopologyUrlState = {
+      health: true,
+      healthStates: ["latent-downstream-risk", "down"],
+      pin: VALID_PIN,
+      overlayFrame: "atlast:overlay-frame:demo-company/active-conditions",
+    };
+    const serialized = serializeTopologyUrlState(state);
+    const { state: reparsed, wasCanonicalized } =
+      parseTopologyUrlState(serialized);
+    expect(reparsed).toEqual({
+      health: true,
+      healthStates: ["down", "latent-downstream-risk"],
+      pin: VALID_PIN,
+      overlayFrame: "atlast:overlay-frame:demo-company/active-conditions",
+    });
+    expect(wasCanonicalized).toBe(false);
+  });
+
+  it("never writes healthStates or overlayFrame when health is not true", () => {
+    const serialized = serializeTopologyUrlState({
+      healthStates: ["down"],
+      pin: VALID_PIN,
+      overlayFrame: "atlast:overlay-frame:demo-company/active-conditions",
+    } as unknown as TopologyUrlState);
+    expect(serialized.has("health")).toBe(false);
+    expect(serialized.has("healthStates")).toBe(false);
+    expect(serialized.has("overlayFrame")).toBe(false);
+  });
+
+  it("never writes overlayFrame without a complete pin", () => {
+    const serialized = serializeTopologyUrlState({
+      health: true,
+      overlayFrame: "atlast:overlay-frame:demo-company/active-conditions",
+    } as unknown as TopologyUrlState);
+    expect(serialized.has("overlayFrame")).toBe(false);
   });
 });

@@ -90,6 +90,52 @@ describe("SnapshotHistory", () => {
     );
   });
 
+  it("clears an exact overlayFrame pin when selecting a different history anchor", async () => {
+    stubApiFetch([
+      jsonRoute((url) => url === "/api/v1/snapshot-anchors", ANCHORS),
+    ]);
+    renderHistory(
+      `/topology?health=on&overlayFrame=${encodeURIComponent(
+        "atlast:overlay-frame:demo-company/previous",
+      )}&asOf=${encodeURIComponent(LATEST_IDENTITY.asOf)}&horizon=20&derivationVersion=m1-v1`,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Browse history" }));
+    const select = await screen.findByLabelText("Retained observation anchor");
+    fireEvent.change(select, {
+      target: { value: `${HISTORICAL_IDENTITY.asOf}|20|m1-v1` },
+    });
+
+    await waitFor(() => {
+      const params = new URLSearchParams(
+        screen.getByLabelText("location").textContent,
+      );
+      expect(params.get("asOf")).toBe(HISTORICAL_IDENTITY.asOf);
+      expect(params.has("overlayFrame")).toBe(false);
+      expect(params.get("health")).toBe("on");
+    });
+  });
+
+  it("clears health and overlayFrame when returning to latest", async () => {
+    renderHistory(
+      `/topology?health=on&overlayFrame=${encodeURIComponent(
+        "atlast:overlay-frame:demo-company/previous",
+      )}&asOf=${encodeURIComponent(HISTORICAL_IDENTITY.asOf)}&horizon=20&derivationVersion=m1-v1`,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Return to latest" }));
+
+    await waitFor(() => {
+      const params = new URLSearchParams(
+        screen.getByLabelText("location").textContent,
+      );
+      expect(params.has("overlayFrame")).toBe(false);
+      expect(params.has("asOf")).toBe(false);
+      // health=on itself is not pin-dependent and is intentionally preserved.
+      expect(params.get("health")).toBe("on");
+    });
+  });
+
   it("starts a genuinely new latest generation and removes all pin fields", async () => {
     const generationBefore = topologySessionCoordinator.currentGeneration();
     renderHistory(

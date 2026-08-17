@@ -1120,3 +1120,135 @@ body {
     padding-bottom: 0;
   }
 }
+
+/* ---------- M3-D synthetic operational overlay ---------- */
+
+.health-overlay-controls {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  border: 1px solid var(--hairline);
+  border-left: 0.35rem solid var(--rust);
+  padding: 1rem;
+  background: rgba(255, 252, 245, 0.7);
+}
+
+.health-overlay-controls h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
+}
+
+.health-overlay-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.health-overlay-emphasis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  border: 1px solid var(--hairline);
+  padding: 0.75rem;
+}
+
+.health-overlay-emphasis-option {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.health-overlay-status {
+  margin: 1rem 0;
+}
+
+.health-overlay-status-error {
+  border-left: 0.3rem solid var(--rust);
+  padding: 0.65rem 0.85rem;
+  background: rgba(160, 61, 30, 0.08);
+}
+
+.health-overlay-coordinate {
+  overflow-wrap: anywhere;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.health-overlay-gaps {
+  margin: 1rem 0;
+  border: 1px dashed var(--hairline);
+  padding: 0.85rem;
+}
+
+.health-overlay-gaps ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.health-overlay-gaps li {
+  overflow-wrap: anywhere;
+  border-top: 1px solid var(--hairline);
+  padding-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.topology-structured-health {
+  overflow-wrap: anywhere;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+/*
+ * Every state is distinguishable by stable text and glyph (always rendered
+ * in markup) plus a distinct non-color border pattern here — never by color
+ * alone (ADR-0031 § 3). `health-neutral` is the shared, muted treatment for
+ * nonmatching or unreported entities: the text still reports the true
+ * state, only the pattern recedes.
+ */
+.topology-node.health-neutral {
+  border-style: dotted !important;
+  opacity: 0.72;
+}
+
+.topology-node.health-state-healthy {
+  border-style: solid !important;
+}
+
+.topology-node.health-state-degraded {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+
+.topology-node.health-state-down {
+  border-style: double !important;
+  border-width: 4px !important;
+}
+
+.topology-node.health-state-disconnected {
+  border-style: groove !important;
+  border-width: 3px !important;
+}
+
+.topology-node.health-state-expiring-certificate {
+  border-style: dashed !important;
+  border-width: 1px !important;
+}
+
+.topology-node.health-state-latent-downstream-risk {
+  border-style: ridge !important;
+  border-width: 3px !important;
+}
+
+@media (max-width: 45rem) {
+  .health-overlay-emphasis {
+    flex-direction: column;
+  }
+}

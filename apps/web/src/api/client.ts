@@ -24,6 +24,7 @@ import {
   evidenceChainResultSchema,
   evidenceDetailResultSchema,
   healthCheckResultSchema,
+  healthContextResultSchema,
   snapshotAnchorsResultSchema,
   snapshotDetailResultSchema,
   subjectDetailResultSchema,
@@ -33,6 +34,8 @@ import {
   type EvidenceChainResult,
   type EvidenceDetailResult,
   type HealthCheckResult,
+  type HealthContextResult,
+  type OverlayFrameIdentifier,
   type SnapshotDetailResult,
   type SnapshotAnchorsResult,
   type SnapshotIdentity,
@@ -73,6 +76,7 @@ const WIRE_QUERY_PARAM = {
   asOf: "asOf",
   horizon: "horizon",
   derivationVersion: "derivationVersion",
+  overlayFrame: "overlayFrame",
 } as const;
 
 /** Stable identifiers contain literal `/` and `:` (ADR-0024 § 5); every path segment is percent-encoded individually, never the whole path. */
@@ -283,6 +287,42 @@ export function fetchSnapshotSummary(
   return fetchValidated(
     `/api/v1/snapshots?${query.toString()}`,
     snapshotDetailResultSchema,
+    signal,
+  );
+}
+
+export interface HealthContextParams {
+  readonly direction: "upstream" | "downstream";
+  readonly depth: number;
+  readonly minConfidence?: number;
+  readonly identity?: SnapshotIdentity;
+  readonly overlayFrame?: OverlayFrameIdentifier;
+}
+
+/**
+ * `GET /api/v1/entities/{entityId}/health-context` (M3-C/ADR-0030) — composes
+ * one bounded traversal with one immutable overlay frame server-side; this
+ * client never joins topology and health itself (GUARDRAILS.md § 1.4/M3-D
+ * scope: no browser-computed health policy).
+ */
+export function fetchHealthContext(
+  entityId: string,
+  params: HealthContextParams,
+  signal: AbortSignal,
+): Promise<ClientQueryResult<HealthContextResult>> {
+  const query = new URLSearchParams();
+  query.set(WIRE_QUERY_PARAM.direction, params.direction);
+  query.set(WIRE_QUERY_PARAM.depth, String(params.depth));
+  if (params.minConfidence !== undefined) {
+    query.set(WIRE_QUERY_PARAM.minConfidence, String(params.minConfidence));
+  }
+  appendPin(query, params.identity);
+  if (params.overlayFrame !== undefined) {
+    query.set(WIRE_QUERY_PARAM.overlayFrame, params.overlayFrame);
+  }
+  return fetchValidated(
+    `/api/v1/entities/${encodeIdentifierPathSegment(entityId)}/health-context?${query.toString()}`,
+    healthContextResultSchema,
     signal,
   );
 }
