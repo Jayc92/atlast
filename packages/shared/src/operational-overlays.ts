@@ -157,7 +157,6 @@ export const overlayFrameSchema = z
 
 export const overlayFrameCollectionSchema = z
   .array(overlayFrameSchema)
-  .min(1, "An overlay frame collection must not be empty")
   .superRefine((frames, context): void => {
     const seenFrameIdentifiers = new Set<string>();
     frames.forEach((frame, frameIndex) => {

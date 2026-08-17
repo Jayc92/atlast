@@ -2,8 +2,9 @@
 /**
  * Direct proof that the ADR-0026 § 5 import-boundary rule
  * (`eslint.config.mjs`'s `apps/web/src/**` block) actually rejects
- * representative fixture, graph-model, repository, and API-server imports,
- * and does not reject the one approved `@atlast/shared` import.
+ * representative fixture, graph-model, overlay-model, repository, and
+ * API-server imports, and does not reject the one approved
+ * `@atlast/shared` import.
  *
  * This spawns the already-installed root ESLint CLI as a subprocess — the
  * same tool `pnpm lint`/`scripts/verify.sh` already invoke — rather than
@@ -86,6 +87,26 @@ describe("ADR-0026 § 5 restricted-import boundary — direct proof", () => {
     const messages = lintProbeSource(
       "__probe_graph_model_relative__.ts",
       'import { InMemoryEvidenceStore } from "../../../packages/graph-model/src/evidence-store.ts";\nexport const probe = InMemoryEvidenceStore;\n',
+    );
+    expect(messages.some((m) => m.ruleId === "no-restricted-imports")).toBe(
+      true,
+    );
+  }, 30_000);
+
+  it("rejects a direct @atlast/overlay-model import", () => {
+    const messages = lintProbeSource(
+      "__probe_overlay_model__.ts",
+      'import { projectHealth } from "@atlast/overlay-model";\nexport const probe = projectHealth;\n',
+    );
+    expect(messages.some((m) => m.ruleId === "no-restricted-imports")).toBe(
+      true,
+    );
+  }, 30_000);
+
+  it("rejects a deep relative import reaching into packages/overlay-model", () => {
+    const messages = lintProbeSource(
+      "__probe_overlay_model_relative__.ts",
+      'import { InMemoryOperationalOverlayStore } from "../../../packages/overlay-model/src/in-memory-overlay-store.ts";\nexport const probe = InMemoryOperationalOverlayStore;\n',
     );
     expect(messages.some((m) => m.ruleId === "no-restricted-imports")).toBe(
       true,

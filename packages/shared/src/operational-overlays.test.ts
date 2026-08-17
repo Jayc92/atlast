@@ -41,6 +41,12 @@ describe("operational overlay contracts", () => {
     expect(Object.isFrozen(frame.entries[0])).toBe(true);
   });
 
+  it("accepts an empty immutable collection when no overlay data is available", () => {
+    const frames = overlayFrameCollectionSchema.parse([]);
+    expect(frames).toStrictEqual([]);
+    expect(Object.isFrozen(frames)).toBe(true);
+  });
+
   it("rejects unknown frame and entry fields", () => {
     expect(
       overlayFrameSchema.safeParse({ ...validFrame, computedState: "healthy" })

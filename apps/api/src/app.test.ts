@@ -10,12 +10,16 @@
 import {
   CURRENT_SCHEMA_VERSION,
   entityPageSchema,
+  errorResponseSchema,
   type Evidence,
 } from "@atlast/shared";
 import { InMemoryEvidenceStore } from "@atlast/graph-model";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { initializeApplication } from "./app.ts";
-import { loadFullDemoCompanyOverlayFrames } from "./test-support/demo-company-fixture.ts";
+import {
+  loadFullDemoCompanyOverlayFrames,
+  loadFullDemoCompanySeedEvidence,
+} from "./test-support/demo-company-fixture.ts";
 import { parseJsonBody } from "./test-support/parse-response.ts";
 
 const FIXED_TEST_CLOCK = () => "2026-08-11T00:00:00.000Z";
@@ -37,6 +41,48 @@ describe("GET /health", () => {
       expect(response.json()).toStrictEqual({
         status: "ok",
         service: "atlast-api",
+      });
+    } finally {
+      await application.close();
+    }
+  });
+
+  it("keeps health and topology operational without overlay data while health-context fails honestly", async () => {
+    const application = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      loadFullDemoCompanySeedEvidence(),
+      [],
+    );
+    try {
+      const healthResponse = await application.inject({
+        method: "GET",
+        url: "/health",
+      });
+      expect(healthResponse.statusCode).toBe(200);
+
+      const topologyResponse = await application.inject({
+        method: "GET",
+        url: "/api/v1/entities?limit=1",
+      });
+      expect(topologyResponse.statusCode).toBe(200);
+      expect(
+        parseJsonBody(topologyResponse, entityPageSchema).items,
+      ).toHaveLength(1);
+
+      const healthContextResponse = await application.inject({
+        method: "GET",
+        url: "/api/v1/entities/atlast:entity:checkout/health-context?direction=downstream&depth=1",
+      });
+      expect(healthContextResponse.statusCode).toBe(422);
+      expect(
+        parseJsonBody(healthContextResponse, errorResponseSchema),
+      ).toStrictEqual({
+        code: "INVALID_OVERLAY_COORDINATE",
+        message: "No overlay frame exists at or before this topology snapshot.",
+        details: {
+          reason: "NO_FRAME_AT_OR_BEFORE_SNAPSHOT",
+          topologyAsOf: FIXED_TEST_CLOCK(),
+        },
       });
     } finally {
       await application.close();
