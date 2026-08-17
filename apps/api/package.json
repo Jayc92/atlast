@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@atlast/graph-model": "workspace:*",
+    "@atlast/overlay-model": "workspace:*",
     "@atlast/shared": "workspace:*",
     "fastify": "5.10.0"
   },

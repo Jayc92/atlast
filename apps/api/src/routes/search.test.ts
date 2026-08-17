@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { initializeApplication } from "../app.ts";
 import {
   FIXED_TEST_CLOCK,
+  loadFullDemoCompanyOverlayFrames,
   loadFullDemoCompanySeedEvidence,
 } from "../test-support/demo-company-fixture.ts";
 import { parseJsonBody } from "../test-support/parse-response.ts";
@@ -20,6 +21,7 @@ describe("GET /api/v1/search", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
   });
 

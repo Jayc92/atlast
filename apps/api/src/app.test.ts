@@ -15,13 +15,18 @@ import {
 import { InMemoryEvidenceStore } from "@atlast/graph-model";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { initializeApplication } from "./app.ts";
+import { loadFullDemoCompanyOverlayFrames } from "./test-support/demo-company-fixture.ts";
 import { parseJsonBody } from "./test-support/parse-response.ts";
 
 const FIXED_TEST_CLOCK = () => "2026-08-11T00:00:00.000Z";
 
 describe("GET /health", () => {
   it("returns 200 with the deterministic health payload from a fully initialized application", async () => {
-    const application = await initializeApplication(FIXED_TEST_CLOCK, []);
+    const application = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      [],
+      loadFullDemoCompanyOverlayFrames(),
+    );
     try {
       const response = await application.inject({
         method: "GET",
@@ -94,6 +99,7 @@ describe("initializeApplication", () => {
     const initializationPromise = initializeApplication(
       FIXED_TEST_CLOCK,
       [],
+      loadFullDemoCompanyOverlayFrames(),
     ).then((application) => {
       observedApplication = application;
       return application;
@@ -128,7 +134,11 @@ describe("initializeApplication", () => {
 
     let observedApplication: unknown = "not-yet-settled";
     await expect(
-      initializeApplication(FIXED_TEST_CLOCK, []).then((application) => {
+      initializeApplication(
+        FIXED_TEST_CLOCK,
+        [],
+        loadFullDemoCompanyOverlayFrames(),
+      ).then((application) => {
         observedApplication = application;
         return application;
       }),
@@ -143,8 +153,16 @@ describe("initializeApplication", () => {
     const seedA = buildSingleEntitySeedEvidence("0001", "entity-a");
     const seedB = buildSingleEntitySeedEvidence("0002", "entity-b");
 
-    const applicationA = await initializeApplication(FIXED_TEST_CLOCK, [seedA]);
-    const applicationB = await initializeApplication(FIXED_TEST_CLOCK, [seedB]);
+    const applicationA = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      [seedA],
+      loadFullDemoCompanyOverlayFrames(),
+    );
+    const applicationB = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      [seedB],
+      loadFullDemoCompanyOverlayFrames(),
+    );
     try {
       const responseA = await applicationA.inject({
         method: "GET",

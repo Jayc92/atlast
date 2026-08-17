@@ -19,6 +19,7 @@ import {
   FIXED_TEST_CLOCK,
   FULL_CATALOG_SNAPSHOT_IDENTITY,
   loadDemoCompanySeedEvidenceForScenarios,
+  loadFullDemoCompanyOverlayFrames,
   loadFullDemoCompanySeedEvidence,
 } from "../test-support/demo-company-fixture.ts";
 import { parseJsonBody } from "../test-support/parse-response.ts";
@@ -160,6 +161,7 @@ describe("GET /api/v1/evidence/{evidenceId}", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
   });
 
@@ -237,6 +239,7 @@ describe("GET /api/v1/entities/{entityId}/evidence", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
   });
 
@@ -316,6 +319,7 @@ describe("GET /api/v1/evidence/{evidenceId} — exhaustive provenance traceabili
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       allValidEvidence,
+      loadFullDemoCompanyOverlayFrames(),
     );
   });
 
