@@ -14,7 +14,12 @@
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { evidenceCollectionSchema, type Evidence } from "@atlast/shared";
+import {
+  evidenceCollectionSchema,
+  overlayFrameCollectionSchema,
+  type Evidence,
+  type OverlayFrame,
+} from "@atlast/shared";
 import type { Clock } from "@atlast/graph-model";
 
 const FIXTURE_ROOT = fileURLToPath(
@@ -27,6 +32,12 @@ interface CatalogScenario {
 }
 interface Catalog {
   readonly scenarios: readonly CatalogScenario[];
+}
+interface OverlayCatalogFrame {
+  readonly frameFile: string;
+}
+interface OverlayCatalog {
+  readonly frames: readonly OverlayCatalogFrame[];
 }
 
 function loadFixtureJson(relativePath: string): unknown {
@@ -51,6 +62,16 @@ export function loadFullDemoCompanySeedEvidence(): readonly Evidence[] {
   return evidenceCollectionSchema.parse(
     CATALOG.scenarios.flatMap(
       (scenario) => loadFixtureJson(scenario.evidenceFile) as unknown[],
+    ),
+  );
+}
+
+/** Every validated M3 demo-company overlay frame in catalog order. */
+export function loadFullDemoCompanyOverlayFrames(): readonly OverlayFrame[] {
+  const catalog = loadFixtureJson("overlays/catalog.json") as OverlayCatalog;
+  return overlayFrameCollectionSchema.parse(
+    catalog.frames.map((frame) =>
+      loadFixtureJson(`overlays/${frame.frameFile}`),
     ),
   );
 }

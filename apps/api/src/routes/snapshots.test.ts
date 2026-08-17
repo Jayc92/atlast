@@ -23,11 +23,13 @@ import {
   FULL_CATALOG_SNAPSHOT_IDENTITY,
   UNSUPPORTED_DERIVATION_VERSION_IDENTITY,
   loadDemoCompanySeedEvidenceForScenarios,
+  loadFullDemoCompanyOverlayFrames,
   loadFullDemoCompanySeedEvidence,
 } from "../test-support/demo-company-fixture.ts";
 import { parseJsonBody } from "../test-support/parse-response.ts";
 import {
   createStubEvidenceStore,
+  createStubOperationalOverlayStore,
   createStubTopologyGraphStore,
 } from "../test-support/stub-repositories.ts";
 
@@ -56,6 +58,7 @@ describe("GET /api/v1/snapshots", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
     const response = await application.inject({
       method: "GET",
@@ -74,6 +77,7 @@ describe("GET /api/v1/snapshots", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
     const url = snapshotUrl(FULL_CATALOG_SNAPSHOT_IDENTITY);
     const first = await application.inject({ method: "GET", url });
@@ -84,7 +88,11 @@ describe("GET /api/v1/snapshots", () => {
   });
 
   it("rejects a missing identity component as an ordinary VALIDATION_ERROR, never a latest resolution", async () => {
-    application = await initializeApplication(FIXED_TEST_CLOCK, []);
+    application = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      [],
+      loadFullDemoCompanyOverlayFrames(),
+    );
     const response = await application.inject({
       method: "GET",
       url: snapshotUrl({
@@ -102,6 +110,7 @@ describe("GET /api/v1/snapshots", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
     const response = await application.inject({
       method: "GET",
@@ -117,6 +126,7 @@ describe("GET /api/v1/snapshots", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
     const response = await application.inject({
       method: "GET",
@@ -139,6 +149,7 @@ describe("GET /api/v1/snapshots", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
     const response = await application.inject({
       method: "GET",
@@ -167,6 +178,7 @@ describe("GET /api/v1/snapshots", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadDemoCompanySeedEvidenceForScenarios(["historical-as-of-topology"]),
+      loadFullDemoCompanyOverlayFrames(),
     );
     const response = await application.inject({
       method: "GET",
@@ -201,6 +213,7 @@ describe("GET /api/v1/snapshot-anchors", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
     const response = await application.inject({
       method: "GET",
@@ -290,6 +303,7 @@ describe("GET /api/v1/snapshot-anchors", () => {
         listEvidence,
       }),
       topologyGraphStore: createStubTopologyGraphStore({ getSnapshotSummary }),
+      operationalOverlayStore: createStubOperationalOverlayStore(),
     });
 
     const response = await application.inject({
@@ -308,7 +322,11 @@ describe("GET /api/v1/snapshot-anchors", () => {
   });
 
   it("rejects empty Evidence with the existing closed error", async () => {
-    application = await initializeApplication(FIXED_TEST_CLOCK, []);
+    application = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      [],
+      loadFullDemoCompanyOverlayFrames(),
+    );
     const response = await application.inject({
       method: "GET",
       url: "/api/v1/snapshot-anchors",
@@ -323,6 +341,7 @@ describe("GET /api/v1/snapshot-anchors", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
     for (const url of [
       "/api/v1/snapshot-anchors?limit=1",

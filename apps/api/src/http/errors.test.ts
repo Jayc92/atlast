@@ -24,6 +24,7 @@ import { buildApplication } from "../app.ts";
 import { mapFrameworkError } from "./errors.ts";
 import {
   createStubEvidenceStore,
+  createStubOperationalOverlayStore,
   createStubTopologyGraphStore,
 } from "../test-support/stub-repositories.ts";
 import { parseJsonBody } from "../test-support/parse-response.ts";
@@ -91,6 +92,7 @@ describe("the closed S7 error-response contract", () => {
   it("ROUTE_NOT_FOUND: no route matches the requested method and path", async () => {
     application = buildApplication({
       evidenceStore: createStubEvidenceStore(),
+      operationalOverlayStore: createStubOperationalOverlayStore(),
       topologyGraphStore: createStubTopologyGraphStore(),
     });
     const response = await application.inject({
@@ -111,6 +113,7 @@ describe("the closed S7 error-response contract", () => {
   it("MALFORMED_REQUEST: a Fastify routing-stage rejection (bad URL component) never reaches setErrorHandler, only mapFrameworkError", async () => {
     application = buildApplication({
       evidenceStore: createStubEvidenceStore(),
+      operationalOverlayStore: createStubOperationalOverlayStore(),
       topologyGraphStore: createStubTopologyGraphStore(),
     });
     const response = await application.inject({
@@ -128,6 +131,7 @@ describe("the closed S7 error-response contract", () => {
   it("MALFORMED_REQUEST: an over-length path parameter (FST_ERR_MAX_PARAM_LENGTH) also maps through mapFrameworkError, never a 500", async () => {
     application = buildApplication({
       evidenceStore: createStubEvidenceStore(),
+      operationalOverlayStore: createStubOperationalOverlayStore(),
       topologyGraphStore: createStubTopologyGraphStore(),
     });
     const response = await application.inject({
@@ -168,6 +172,7 @@ describe("the closed S7 error-response contract", () => {
   it("INTERNAL_ERROR: an unexpected exception is caught, redacted, and never leaks its own message", async () => {
     application = buildApplication({
       evidenceStore: createStubEvidenceStore(),
+      operationalOverlayStore: createStubOperationalOverlayStore(),
       topologyGraphStore: createStubTopologyGraphStore({
         getSubject: () => {
           throw new Error("a secret internal detail that must never leak");
@@ -191,6 +196,7 @@ describe("the closed S7 error-response contract", () => {
   it("INTERNAL_ERROR: a repository result that violates its own exact response schema is never sent as a 200", async () => {
     application = buildApplication({
       evidenceStore: createStubEvidenceStore(),
+      operationalOverlayStore: createStubOperationalOverlayStore(),
       topologyGraphStore: createStubTopologyGraphStore({
         // Deliberately violates entityPageSchema: `items` must be an array.
         // This is the point (ADR-0024 § 12's stub-response-violation
@@ -232,6 +238,7 @@ describe("the closed S7 error-response contract", () => {
 
     application = buildApplication({
       evidenceStore: createStubEvidenceStore(),
+      operationalOverlayStore: createStubOperationalOverlayStore(),
       topologyGraphStore: createStubTopologyGraphStore({
         traverse: () => {
           throw new ReferentialIntegrityError({

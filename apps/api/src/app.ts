@@ -7,7 +7,7 @@
  * socket (ADR-0009).
  *
  * `buildApplication` always requires its repository dependencies and always
- * registers `/health` plus all seven v1 routes — there is no conditional
+ * registers `/health` plus all nine product routes — there is no conditional
  * registration and no zero-argument call form. Every `FastifyInstance` this
  * function produces exposes the identical route set, whether in production
  * or in any test, satisfying ADR-0009's "the fully assembled application"
@@ -21,6 +21,8 @@ import {
 import type {
   Evidence,
   EvidenceStore,
+  OperationalOverlayStore,
+  OverlayFrame,
   TopologyGraphStore,
 } from "@atlast/shared";
 import {
@@ -28,9 +30,11 @@ import {
   InMemoryTopologyGraphStore,
   type Clock,
 } from "@atlast/graph-model";
+import { InMemoryOperationalOverlayStore } from "@atlast/overlay-model";
 import { mapFrameworkError, registerErrorHandling } from "./http/errors.ts";
 import { registerEntityRoutes } from "./routes/entities.ts";
 import { registerEvidenceRoutes } from "./routes/evidence.ts";
+import { registerHealthContextRoutes } from "./routes/health-context.ts";
 import { registerSearchRoutes } from "./routes/search.ts";
 import { registerSnapshotRoutes } from "./routes/snapshots.ts";
 import { registerTraversalRoutes } from "./routes/traversal.ts";
@@ -56,11 +60,12 @@ const healthResponseJsonSchema = {
 export interface ApplicationDependencies {
   readonly evidenceStore: EvidenceStore;
   readonly topologyGraphStore: TopologyGraphStore;
+  readonly operationalOverlayStore: OperationalOverlayStore;
 }
 
 /**
- * Build the fully assembled S7 application: `/health` plus exactly the
- * seven ADR-0024 § 1 routes, and the closed error boundary (§ 9). Every
+ * Build the fully assembled application: `/health`, the eight M1/M2 query
+ * routes, the M3 health-context route, and the closed error boundary. Every
  * call requires the complete repository dependency pair — there is no
  * default, throwaway, or health-only variant (ADR-0024 § 12).
  */
@@ -88,6 +93,7 @@ export function buildApplication(
   registerEntityRoutes(application, dependencies);
   registerSearchRoutes(application, dependencies);
   registerTraversalRoutes(application, dependencies);
+  registerHealthContextRoutes(application, dependencies);
   registerEvidenceRoutes(application, dependencies);
   registerSnapshotRoutes(application, dependencies);
 
@@ -107,6 +113,7 @@ export function buildApplication(
 export async function initializeApplication(
   clock: Clock,
   seedEvidence: readonly Evidence[],
+  seedOverlayFrames: readonly OverlayFrame[],
   serverOptions: FastifyServerOptions = {},
 ): Promise<FastifyInstance> {
   const evidenceStore = new InMemoryEvidenceStore(clock);
@@ -114,6 +121,12 @@ export async function initializeApplication(
     evidenceStore,
     clock,
   );
+  const operationalOverlayStore = new InMemoryOperationalOverlayStore(
+    seedOverlayFrames,
+  );
   await evidenceStore.appendEvidence(seedEvidence);
-  return buildApplication({ evidenceStore, topologyGraphStore }, serverOptions);
+  return buildApplication(
+    { evidenceStore, topologyGraphStore, operationalOverlayStore },
+    serverOptions,
+  );
 }

@@ -24,6 +24,14 @@ import {
   ReferentialIntegrityError,
   UnknownIdentifierError,
 } from "@atlast/graph-model";
+import {
+  NoOverlayFrameAtOrBeforeError,
+  OverlayFrameNotFoundError,
+} from "@atlast/overlay-model";
+import type {
+  OverlayFrameIdentifier,
+  UtcMillisecondTimestamp,
+} from "@atlast/shared";
 
 export interface ValidationIssue {
   readonly path: readonly (string | number)[];
@@ -53,6 +61,25 @@ export class ResponseValidationError extends Error {
       `Repository response for ${routeDescription} failed its exact response schema.`,
     );
     this.name = "ResponseValidationError";
+  }
+}
+
+/** An explicit frame exists, but cannot be composed with an earlier topology snapshot. */
+export class FrameAfterTopologySnapshotError extends Error {
+  readonly topologyAsOf: UtcMillisecondTimestamp;
+  readonly overlayFrame: OverlayFrameIdentifier;
+  readonly frameEffectiveAt: UtcMillisecondTimestamp;
+
+  constructor(
+    topologyAsOf: UtcMillisecondTimestamp,
+    overlayFrame: OverlayFrameIdentifier,
+    frameEffectiveAt: UtcMillisecondTimestamp,
+  ) {
+    super("The requested overlay frame is later than the topology snapshot.");
+    this.name = "FrameAfterTopologySnapshotError";
+    this.topologyAsOf = topologyAsOf;
+    this.overlayFrame = overlayFrame;
+    this.frameEffectiveAt = frameEffectiveAt;
   }
 }
 
@@ -207,6 +234,45 @@ function mapKnownError(
           endpointRole: error.endpointRole,
           endpointIdentifier: error.endpointIdentifier,
           resolvedIdentity: error.resolvedIdentity,
+        },
+      },
+    };
+  }
+  if (error instanceof OverlayFrameNotFoundError) {
+    return {
+      statusCode: 404,
+      body: {
+        code: "OVERLAY_FRAME_NOT_FOUND",
+        message: "The requested overlay frame does not exist.",
+        details: { overlayFrame: error.frameIdentifier },
+      },
+    };
+  }
+  if (error instanceof NoOverlayFrameAtOrBeforeError) {
+    return {
+      statusCode: 422,
+      body: {
+        code: "INVALID_OVERLAY_COORDINATE",
+        message: "No overlay frame exists at or before this topology snapshot.",
+        details: {
+          reason: "NO_FRAME_AT_OR_BEFORE_SNAPSHOT",
+          topologyAsOf: error.topologyAsOf,
+        },
+      },
+    };
+  }
+  if (error instanceof FrameAfterTopologySnapshotError) {
+    return {
+      statusCode: 422,
+      body: {
+        code: "INVALID_OVERLAY_COORDINATE",
+        message:
+          "The requested overlay frame is later than the topology snapshot.",
+        details: {
+          reason: "FRAME_AFTER_TOPOLOGY_SNAPSHOT",
+          topologyAsOf: error.topologyAsOf,
+          overlayFrame: error.overlayFrame,
+          frameEffectiveAt: error.frameEffectiveAt,
         },
       },
     };

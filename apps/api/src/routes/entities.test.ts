@@ -15,6 +15,7 @@ import { initializeApplication } from "../app.ts";
 import {
   FIXED_TEST_CLOCK,
   FULL_CATALOG_SNAPSHOT_IDENTITY,
+  loadFullDemoCompanyOverlayFrames,
   loadFullDemoCompanySeedEvidence,
 } from "../test-support/demo-company-fixture.ts";
 import { parseJsonBody } from "../test-support/parse-response.ts";
@@ -26,6 +27,7 @@ describe("GET /api/v1/entities", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
   });
 
@@ -275,7 +277,11 @@ describe("GET /api/v1/entities", () => {
   });
 
   it("rejects a cursorless latest read against an empty Evidence store with INVALID_READ_COORDINATE (EMPTY_EVIDENCE_STORE)", async () => {
-    const emptyApplication = await initializeApplication(FIXED_TEST_CLOCK, []);
+    const emptyApplication = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      [],
+      loadFullDemoCompanyOverlayFrames(),
+    );
     try {
       const response = await emptyApplication.inject({
         method: "GET",
@@ -300,6 +306,7 @@ describe("GET /api/v1/entities/{entityId}", () => {
     application = await initializeApplication(
       FIXED_TEST_CLOCK,
       loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
     );
   });
 

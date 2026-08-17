@@ -6,14 +6,19 @@
  * network (GUARDRAILS.md § 1.4, ADR-0004). Widening the bind address
  * requires the separately approved authentication ADR first.
  *
- * The production `Clock` and the fixture Evidence catalog are constructed
- * and loaded only here — the one place `apps/api` may read wall-clock time
- * or touch the filesystem (ADR-0024 § 12).
+ * The production `Clock`, fixture Evidence catalog, and immutable overlay
+ * frames are constructed and loaded only here — the one place `apps/api`
+ * may read wall-clock time or touch the filesystem (ADRs 0024 and 0030).
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { FastifyInstance } from "fastify";
-import { evidenceCollectionSchema, type Evidence } from "@atlast/shared";
+import {
+  evidenceCollectionSchema,
+  overlayFrameCollectionSchema,
+  type Evidence,
+  type OverlayFrame,
+} from "@atlast/shared";
 import { assertValidClockReading, type Clock } from "@atlast/graph-model";
 import { initializeApplication } from "./app.ts";
 
@@ -39,6 +44,12 @@ interface CatalogScenario {
 interface Catalog {
   readonly scenarios: readonly CatalogScenario[];
 }
+interface OverlayCatalogFrame {
+  readonly frameFile: string;
+}
+interface OverlayCatalog {
+  readonly frames: readonly OverlayCatalogFrame[];
+}
 
 function loadFixtureJson(relativePath: string): unknown {
   return JSON.parse(readFileSync(FIXTURE_ROOT + relativePath, "utf8"));
@@ -63,6 +74,15 @@ function loadDemoCompanySeedEvidence(): readonly Evidence[] {
   );
 }
 
+function loadDemoCompanyOverlayFrames(): readonly OverlayFrame[] {
+  const catalog = loadFixtureJson("overlays/catalog.json") as OverlayCatalog;
+  return overlayFrameCollectionSchema.parse(
+    catalog.frames.map((frame) =>
+      loadFixtureJson(`overlays/${frame.frameFile}`),
+    ),
+  );
+}
+
 function resolvePort(rawPortValue: string | undefined): number {
   if (rawPortValue === undefined || rawPortValue === "") {
     return DEFAULT_PORT;
@@ -80,6 +100,7 @@ async function startServer(): Promise<void> {
   const application: FastifyInstance = await initializeApplication(
     systemClock,
     loadDemoCompanySeedEvidence(),
+    loadDemoCompanyOverlayFrames(),
   );
   const port = resolvePort(process.env["ATLAST_API_PORT"]);
 
