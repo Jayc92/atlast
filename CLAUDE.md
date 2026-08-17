@@ -8,16 +8,16 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0, M1, and M2 are complete. M3-A through M3-C are complete.** M3-C closed through PR #62 at `5f2d038` on 2026-08-16. Joseph Carfagno then explicitly authorized **M3-D only** on 2026-08-16. That release becomes operational only after this authorization record merges and local `main` is synchronized cleanly. **M3-E through M3-F and M4+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
+**M0, M1, and M2 are complete. M3-A through M3-D are complete.** M3-D merged through PR #64 at `a2c2d92` on 2026-08-17 after independent review, complete verification, and explicit human browser-QA approval. Joseph Carfagno then explicitly authorized **M3-E only** on 2026-08-17. That release becomes operational only after the combined M3-D closeout/M3-E authorization record merges and local `main` is synchronized cleanly. **M3-F and M4+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
 
 Permitted work right now, and nothing beyond it:
 
 - **Maintenance and corrections to the completed M0 foundation and the merged, formally complete S1–S8 slices** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — the S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, S5 reconciliation engine, S6 snapshot layer and in-memory repositories, S7 query API v1 routes and error contract in `apps/api`, and S8's boundary re-audit, exhaustive API traceability test, and documentation closeout.
 - **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0025) and of the checkpoint documentation ([HANDOFF.md](HANDOFF.md), per the checkpoint protocol below).
-- **Maintenance and corrections to the completed M3-A through M3-C slices** within accepted ADRs 0029-0031 and without extending product behavior.
-- **M3-D topology overlay UI work**, strictly limited to validated browser client support, canonical URL state, graph and structured overlay rendering, state-emphasis filters, explanations, gaps, directly corresponding `apps/web` tests, and factual `TASKS.md` measurements. It must preserve the M2 coordinator, trust inspector, history playback, no-side-door lint boundary, topology continuity, complete topology/frame identity, non-color semantics, and fail-honest states. No new data source, API behavior, fixture, schema, dependency, overlay-model behavior, topology mutation, or M3-E+ behavior is authorized. This permission becomes operational only after the authorization record merges and `main` is synchronized cleanly.
+- **Maintenance and corrections to the completed M3-A through M3-D slices** within accepted ADRs 0029-0031 and without extending product behavior.
+- **M3-E accessibility, history, and failure hardening**, strictly limited to built-preview desktop/mobile journeys for all six states, gaps, historical frames, retry, keyboard operation, structured equivalence, reduced motion, zoom/reflow, and non-color semantics; representative VoiceOver QA; and factual measurements. No new product behavior, data source, API behavior, fixture, schema, dependency, overlay-model behavior, or topology mutation is authorized. This permission becomes operational only after the combined closeout/authorization record merges and `main` is synchronized cleanly.
 
-**M3-D is the only authorized implementation slice, pending the documentation merge gate. M3-E and every later slice or milestone remain unauthorized**, each gated on an explicit human release.
+**M3-E is the only authorized implementation slice, pending the documentation merge gate. M3-F and every later milestone remain unauthorized**, each gated on an explicit human release.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -30,10 +30,10 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**M0, M1, and M2 are complete. The M3 baseline is accepted, M3-A through M3-C are complete, and M3-D alone is separately authorized pending activation:**
+**M0, M1, and M2 are complete. The M3 baseline is accepted, M3-A through M3-D are complete, and M3-E alone is separately authorized pending activation:**
 
 - Maintenance, corrections, and explicitly released M1 slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod, named by accepted ADR-0005, was introduced in S1 with its justification-at-PR).
-- **M1 and M2 are formally complete, and M3-A through M3-C are merged and closed.** M3-D may begin only after its authorization record merges and `main` is synchronized cleanly, and only within the exact boundary above and in [docs/m3-plan.md](docs/m3-plan.md). Do NOT implement M3-E+ or M4+ work before separate authorization.
+- **M1 and M2 are formally complete, and M3-A through M3-D are merged and closed.** M3-E may begin only after the combined closeout/authorization record merges and `main` is synchronized cleanly, and only within the exact boundary above and in [docs/m3-plan.md](docs/m3-plan.md). Do NOT implement M3-F or M4+ work before separate authorization.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
 - Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
 
