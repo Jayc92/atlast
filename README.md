@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0, M1, and M2 complete; M3-A through M3-E complete.** M3-E merged through PR #66 at `9b4343e` after independent review, complete verification, and explicit human browser-QA approval. **Joseph Carfagno separately authorized M3-F only on 2026-08-17; it becomes operational after the combined M3-E closeout/M3-F authorization record merges and `main` is synchronized cleanly. M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 through M3 complete.** M3-F merged through PR #68 at `6103ced` after independent review, explicit human publication approval, passing GitHub Actions, and passing post-merge verification. Checkpoint `m3-complete` formally closes M3. **No implementation slice is active; M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -36,7 +36,7 @@ Atlast has deliberate boundaries. It is **not** a monitoring system, an incident
 | [PROJECT_SPEC.md](PROJECT_SPEC.md)                         | Vision, goals, guiding principles, scope, and non-goals                                                                                                                                                                       |
 | [docs/architecture.md](docs/architecture.md)               | Architecture philosophy and conceptual system design                                                                                                                                                                          |
 | [docs/milestones.md](docs/milestones.md)                   | Synthetic-first delivery plan (M0 foundation → M1 synthetic topology model → M2 interactive interface → M3 health overlays → M4 change-impact simulation → M5 read-only local Kubernetes connector); predictive AI is post-M5 |
-| [docs/m3-plan.md](docs/m3-plan.md)                         | Approved M3 operational-health-overlay architecture baseline, slices, and release gates; M3-A through M3-E are complete, M3-F is authorized pending activation, and later milestones remain gated                             |
+| [docs/m3-plan.md](docs/m3-plan.md)                         | Completed M3 operational-health-overlay architecture baseline and slice record; M3-A through M3-F are complete at checkpoint `m3-complete`, and later milestones remain gated                                                 |
 | [TASKS.md](TASKS.md)                                       | Current work breakdown and task tracking                                                                                                                                                                                      |
 | [HANDOFF.md](HANDOFF.md)                                   | Canonical checkpoint and model-neutral handoff document — how a replacement assistant or engineer resumes the project safely                                                                                                  |
 | [GUARDRAILS.md](GUARDRAILS.md)                             | Engineering, coding, repository, documentation, and testing standards                                                                                                                                                         |
@@ -129,7 +129,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-The M0 foundation, M1 synthetic topology model, and M2 interactive topology interface are formally complete ([TASKS.md](TASKS.md)). M3-A through M3-E are also complete; M3-E merged through PR #66 at `9b4343e`. M3-F is separately authorized within its exact audit and milestone-closeout boundary, pending the combined documentation merge gate. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+M0 through M3 are formally complete ([TASKS.md](TASKS.md)); checkpoint `m3-complete` records the merged implementation, audit, and post-merge verification evidence. No implementation slice is active. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 

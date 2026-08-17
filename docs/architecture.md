@@ -1,6 +1,6 @@
 # Atlast — Architecture
 
-**Status:** Current. M0, M1, and M2 are implemented and complete; M2 closed through PR #52 at checkpoint `m2-complete`. Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved [m3-plan.md](m3-plan.md) as the M3 implementation baseline on 2026-08-16 after independent review and correction. Baseline acceptance does not release M3-A; M3-A and M4+ remain gated. This document defines the architecture _philosophy_ and conceptual system shape; design positions bind only through human-approved ADRs in `docs/adr/`, and tooling choices require approval before use.
+**Status:** Current. M0 through M3 are implemented and complete; M3 closed at checkpoint `m3-complete` after PR #68 merged at `6103ced` and post-merge verification passed on 2026-08-17. M4+ remain gated and unauthorized. This document defines the architecture _philosophy_ and conceptual system shape; design positions bind only through human-approved ADRs in `docs/adr/`, and tooling choices require approval before use.
 
 ---
 
@@ -128,7 +128,7 @@ The product's core asset. Model requirements:
 
 ### 3.5 Overlay layer
 
-Projects operational state onto graph entities. Through M4, overlay state is **synthetic**, generated to cover at minimum: healthy, degraded, down, disconnected, expiring certificate, and latent downstream risk ([milestones.md M3](milestones.md#m3--operational-health-overlays-gated)). Real overlay sources (alerting, SLOs, incidents, deploys) are post-M5. Overlays:
+Projects operational state onto graph entities. Through M4, overlay state is **synthetic**, generated to cover at minimum: healthy, degraded, down, disconnected, expiring certificate, and latent downstream risk ([milestones.md M3](milestones.md#m3--operational-health-overlays-complete--2026-08-17)). Real overlay sources (alerting, SLOs, incidents, deploys) are post-M5. Overlays:
 
 - Are ephemeral or externally sourced — losing an overlay loses no topology.
 - Never create or modify entities or relationships. An overlay referencing an unknown entity is a _signal_ for discovery, not a graph write.

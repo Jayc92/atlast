@@ -2,7 +2,7 @@
  * Atlast foundation page and milestone landing page (ADR-0003).
  *
  * This page communicates the product vision and the current foundation
- * status. The delivered M2 exploration interface lives at `/topology`; this
+ * status. The delivered M2/M3 exploration interface lives at `/topology`; this
  * route remains a compact project landing page rather than duplicating it.
  *
  * The only data access is a single health check against the backend API
@@ -55,7 +55,7 @@ const MILESTONE_STATUS_LABELS: Record<MilestoneStatus, string> = {
 
 /**
  * The authorized milestone sequence (docs/milestones.md), displayed as
- * roadmap context only. M0 through M2 are formally delivered; every later
+ * roadmap context only. M0 through M3 are formally delivered; every later
  * product milestone remains gated. This page must never imply otherwise and
  * remains a status shell rather than duplicating the topology workspace.
  */
@@ -91,7 +91,7 @@ const MILESTONE_ROUTE: readonly {
     title: "Operational health overlays",
     summary:
       "Synthetic health states projected onto topology — health never viewed without dependency context.",
-    status: "gated",
+    status: "delivered",
   },
   {
     id: "M4",
@@ -202,9 +202,9 @@ export function App(): ReactElement {
             Where the map is headed
           </h2>
           <p className="atlas-section-note">
-            The capabilities below are the long-term ambition — none of them
-            exist yet. Delivery is deliberately synthetic-first: every layer is
-            proven against fixture data before Atlast observes any real system.
+            The capabilities below are the long-term product arc. Delivery is
+            deliberately synthetic-first: every layer is proven against fixture
+            data before Atlast observes any real system.
           </p>
           <ul className="vision-list">
             <li>
@@ -247,8 +247,8 @@ export function App(): ReactElement {
             The plotted route
           </h2>
           <p className="atlas-section-note">
-            Each milestone is gated on its own explicit authorization. M0 and M1
-            are delivered; every later milestone remains gated.
+            Each milestone is gated on its own explicit authorization. M0
+            through M3 are delivered; M4 and M5 remain gated.
           </p>
           <ol className="route-list">
             {MILESTONE_ROUTE.map((milestone) => (
@@ -283,20 +283,21 @@ export function App(): ReactElement {
         >
           <h2 id="status-heading" className="atlas-section-heading">
             <span className="atlas-section-kicker">Current state</span>
-            M2 — Interactive topology interface
+            M3 — Operational health overlays
           </h2>
           <p>
-            M0, M1, and M2 are delivered. The repository now includes the safe
-            TypeScript foundation, fixture-driven topology and query API, and a
-            complete interactive topology workspace at /topology. It remains
+            M0 through M3 are delivered. The repository includes the safe
+            TypeScript foundation, fixture-driven topology and query API, the
+            interactive topology workspace at /topology, and synthetic
+            operational health projected in dependency context. It remains
             synthetic-only and connects to nothing beyond the local API.
           </p>
           <p>
-            M2 adds inventory and identifier search, bounded graph traversal,
-            equivalent structured navigation, trust and Evidence inspection, and
-            reproducible snapshot history. M3 planning is authorized, but M3
-            product implementation and every later milestone remain gated on
-            their own reviewed baseline and explicit release.
+            M3 adds all six accepted health states, equivalent graph and
+            structured presentation, historical overlay frames, explicit gaps,
+            and fail-honest behavior without allowing overlays to author
+            topology. M4 and every later milestone remain gated on their own
+            reviewed baseline and explicit release.
           </p>
         </section>
       </main>

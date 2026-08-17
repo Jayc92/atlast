@@ -1,6 +1,6 @@
 # Atlast M3 Implementation Plan - Operational Health Overlays
 
-**Status:** Approved - M3 implementation baseline; M3-A through M3-E complete; M3-F separately authorized pending activation
+**Status:** Complete - M3-A through M3-F delivered; checkpoint `m3-complete`
 **Date:** 2026-08-16
 
 > **Approval and authorization boundary (2026-08-16):** Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved this plan as the M3 implementation baseline after independent architecture review, correction, and focused re-review. Approval becomes operational only after this record merges to `main` and local `main` is synchronized cleanly. It authorizes no product implementation, dependency, fixture, schema, API, or UI change. M3-A requires a separate bounded slice release. M4+ remain unauthorized.
@@ -26,6 +26,8 @@
 > **M3-E closeout (2026-08-17):** The release record merged through PR #65 at `ce6c146`; the independently reviewed implementation merged through PR #66 at `9b4343e` with GitHub Actions and the complete local verifier passing. Joseph Carfagno explicitly approved human browser QA. M3-E is complete.
 
 > **M3-F release (2026-08-17):** After M3-E merged and local `main` synchronized cleanly, Joseph Carfagno explicitly authorized M3-F within the exact audit and milestone-closeout boundary in § 6. The release becomes operational only after the combined M3-E closeout/M3-F authorization record merges to `main` and local `main` is synchronized cleanly. M4+ remain unauthorized.
+
+> **M3-F closeout and M3 completion (2026-08-17):** The release record merged through PR #67 at `71f0e7e`. The independently reviewed and explicitly human-approved M3-F audit/remediation candidate merged through PR #68 at `6103ced`; GitHub Actions `verify` passed in 3m56s. Post-merge revalidation on the real merge commit repeated the exact-scope review and complete seven-stage verifier successfully. M3-A through M3-F are complete; checkpoint `m3-complete` formally closes M3. No implementation slice is active. M4+ remain unauthorized.
 
 ## 1. Objective
 
@@ -151,7 +153,7 @@ An Entity without a frame entry is `unreported`, not healthy. `unreported` is an
 
 ## 6. Exact Implementation Slices
 
-The baseline is approved, M3-A through M3-E are complete, and M3-F is separately authorized subject to the combined closeout/authorization record merge and clean-synchronization activation gate. Every successor milestone remains dormant until separately released.
+The approved baseline has been fully delivered. M3-A through M3-F are complete and checkpoint `m3-complete` closes the milestone. Every successor milestone remains dormant until separately released.
 
 ### M3-A - contracts and fixture catalog
 
@@ -226,4 +228,4 @@ Before M3-A may begin:
 4. the approval record merges to `main` and local `main` is synchronized cleanly - complete through PR #53 at `b85be38`;
 5. M3-A receives a separate explicit implementation authorization - complete through PR #54 at `e5da808` on 2026-08-16.
 
-M3-A subsequently merged through PR #55 at `e9afcd5` and closed through PR #56 at `a767c93`. M3-B was separately released through PR #57, merged through PR #58 at `98beb46`, and closed through PR #59 at `b932539`. M3-C was separately released through PR #60, merged through PR #61 at `e177fc0`, and closed through PR #62 at `5f2d038`. M3-D was separately released through PR #63, independently reviewed and human-QA-approved, and merged through PR #64 at `a2c2d92`. M3-E was separately released through PR #65, independently reviewed and human-QA-approved, and merged through PR #66 at `9b4343e`. The separate M3-F release above becomes operational only after its record merges and `main` synchronizes cleanly. M3 completion and M4+ work remain gated on the M3-F merge, post-merge verification, formal closeout, and a separate explicit release.
+M3-A subsequently merged through PR #55 at `e9afcd5` and closed through PR #56 at `a767c93`. M3-B was separately released through PR #57, merged through PR #58 at `98beb46`, and closed through PR #59 at `b932539`. M3-C was separately released through PR #60, merged through PR #61 at `e177fc0`, and closed through PR #62 at `5f2d038`. M3-D was separately released through PR #63, independently reviewed and human-QA-approved, and merged through PR #64 at `a2c2d92`. M3-E was separately released through PR #65, independently reviewed and human-QA-approved, and merged through PR #66 at `9b4343e`. M3-F was separately released through PR #67, independently reviewed and human-approved, and merged through PR #68 at `6103ced`; post-merge verification passed. Checkpoint `m3-complete` formally closes M3. M4+ remain gated pending a separate explicit release.

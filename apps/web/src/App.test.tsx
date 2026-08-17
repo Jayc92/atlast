@@ -41,7 +41,7 @@ afterEach(() => {
 });
 
 describe("App — primary rendered content", () => {
-  it("renders the product title, tagline, and M2 status area", async () => {
+  it("renders the product title, tagline, and M3 status area", async () => {
     stubHealthEndpoint({
       ok: true,
       jsonPayload: { status: "ok", service: "atlast-api" },
@@ -58,7 +58,7 @@ describe("App — primary rendered content", () => {
     expect(
       screen.getByRole("heading", {
         level: 2,
-        name: /M2 — Interactive topology interface/,
+        name: /M3 — Operational health overlays/,
       }),
     ).toBeDefined();
 
@@ -67,7 +67,7 @@ describe("App — primary rendered content", () => {
     await screen.findByText("Local API connected");
   });
 
-  it("shows M0 through M2 as delivered and every later milestone as gated", async () => {
+  it("shows M0 through M3 as delivered and later milestones as gated", async () => {
     stubHealthEndpoint({
       ok: true,
       jsonPayload: { status: "ok", service: "atlast-api" },
@@ -75,9 +75,9 @@ describe("App — primary rendered content", () => {
 
     render(<App />);
 
-    expect(screen.getAllByText("delivered", { exact: true })).toHaveLength(3);
-    expect(screen.getAllByText("gated")).toHaveLength(3);
-    expect(screen.getByText(/M0, M1, and M2 are delivered/)).toBeDefined();
+    expect(screen.getAllByText("delivered", { exact: true })).toHaveLength(4);
+    expect(screen.getAllByText("gated")).toHaveLength(2);
+    expect(screen.getByText(/^M0 through M3 are delivered\./)).toBeDefined();
 
     await screen.findByText("Local API connected");
   });

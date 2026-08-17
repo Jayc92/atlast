@@ -2,7 +2,7 @@
 
 **Version:** 0.2.1
 **Date:** 2026-07-21 (metadata corrected 2026-07-30)
-**Status:** Approved — the product baseline, approved by human review 2026-07-22 with the documentation set. M0, M1, and M2 are complete, and M3-A closed through PR #56 at `a767c93` on 2026-08-16. Joseph Carfagno separately authorized M3-B only on 2026-08-16, subject to its documentation merge and clean synchronization gates. M3-C through M3-F and M4+ remain gated ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md)). This document itself authorizes no slice or milestone. Implementation details are governed by human-approved ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining here; the vision, goals, principles, scope, and non-goals below remain the approved product baseline.
+**Status:** Approved product baseline. M0 through M3 are complete; M3 closed at checkpoint `m3-complete` after PR #68 merged at `6103ced` and post-merge verification passed on 2026-08-17. M4+ remain gated and unauthorized ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md)). This document itself authorizes no slice or milestone. Implementation details are governed by human-approved ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining here; the vision, goals, principles, scope, and non-goals below remain the approved product baseline.
 
 ---
 
