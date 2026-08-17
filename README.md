@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0, M1, and M2 complete; M3-A and M3-B complete.** M3-B closed through PR #59 at `b932539`. **Joseph Carfagno separately authorized M3-C only on 2026-08-16; it becomes operational after this authorization record merges and `main` is synchronized cleanly. M3-D through M3-F and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0, M1, and M2 complete; M3-A through M3-C complete.** M3-C merged through PR #61 at `e177fc0` and is closed at checkpoint `m3-c-health-context-api-merged`. **No implementation slice is active. M3-D through M3-F and M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -36,7 +36,7 @@ Atlast has deliberate boundaries. It is **not** a monitoring system, an incident
 | [PROJECT_SPEC.md](PROJECT_SPEC.md)                         | Vision, goals, guiding principles, scope, and non-goals                                                                                                                                                                       |
 | [docs/architecture.md](docs/architecture.md)               | Architecture philosophy and conceptual system design                                                                                                                                                                          |
 | [docs/milestones.md](docs/milestones.md)                   | Synthetic-first delivery plan (M0 foundation → M1 synthetic topology model → M2 interactive interface → M3 health overlays → M4 change-impact simulation → M5 read-only local Kubernetes connector); predictive AI is post-M5 |
-| [docs/m3-plan.md](docs/m3-plan.md)                         | Approved M3 operational-health-overlay architecture baseline, slices, and release gates; implementation remains unauthorized                                                                                                  |
+| [docs/m3-plan.md](docs/m3-plan.md)                         | Approved M3 operational-health-overlay architecture baseline, slices, and release gates; M3-A through M3-C are complete and later slices remain gated                                                                         |
 | [TASKS.md](TASKS.md)                                       | Current work breakdown and task tracking                                                                                                                                                                                      |
 | [HANDOFF.md](HANDOFF.md)                                   | Canonical checkpoint and model-neutral handoff document — how a replacement assistant or engineer resumes the project safely                                                                                                  |
 | [GUARDRAILS.md](GUARDRAILS.md)                             | Engineering, coding, repository, documentation, and testing standards                                                                                                                                                         |
@@ -129,7 +129,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-The M0 foundation, M1 synthetic topology model, and M2 interactive topology interface are formally complete ([TASKS.md](TASKS.md)). M3-A and M3-B are also complete; M3-B closed through PR #59 at `b932539`. M3-C is separately authorized within its exact API-only boundary, pending the authorization merge gate. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M3-D through M3-F and M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+The M0 foundation, M1 synthetic topology model, and M2 interactive topology interface are formally complete ([TASKS.md](TASKS.md)). M3-A through M3-C are also complete; M3-C merged through PR #61 at `e177fc0`. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **No implementation slice is active. M3-D through M3-F and M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
