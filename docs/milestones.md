@@ -1,6 +1,6 @@
 # Atlast — Milestones
 
-**Status:** Current. M0 through M3 and M4-A are complete. M4-A merged through PR #73 at `9ee21e4`; checkpoint `m4-a-impact-engine-merged` records its independently reviewed and verified closure. Joseph Carfagno explicitly authorized M4-B on 2026-08-18 within the accepted API and accuracy-harness boundary, effective only after its documentation record merges and local `main` synchronizes cleanly. M4-C through M4-E and M5+ remain unauthorized.
+**Status:** Current. M0 through M3, M4-A, and M4-B are complete. M4-B merged through PR #75 at `b4f6fc4`; checkpoint `m4-b-impact-api-harness-merged` records its independently reviewed and verified closure. Joseph Carfagno explicitly authorized M4-C on 2026-08-18 within the accepted browser impact-panel boundary, effective only after this documentation record merges and local `main` synchronizes cleanly. M4-D through M4-E and M5+ remain unauthorized.
 
 **Sequencing rationale — synthetic-first.** M0–M4 build the entire product loop (foundation, topology model, interactive interface, health overlays, change-impact simulation) exclusively against synthetic data, so correctness, honesty, and UX are proven before Atlast touches any real system. M5 is the first and only pre-enterprise contact with reality: a read-only connector to a disposable local Kubernetes cluster. Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are all post-M5.
 
@@ -62,7 +62,7 @@
 - [x] Every fact in the graph is traceable to its synthetic evidence via the API — _proven exhaustively by `apps/api/src/routes/evidence.test.ts` (all 20 valid Evidence records dereferenced through `GET /api/v1/evidence/{evidenceId}` alone, across all seven valid fixture scenarios)._
 - [x] Graph/evidence representation decisions recorded as ADRs and human-approved — _ADRs 0014–0025, all Accepted._
 
-**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, whose six slices closed at checkpoint `m2-complete`. Joseph subsequently accepted the independently reviewed M3 baseline and separately released each M3 slice. M3-A through M3-E merged through PRs #55, #58, #61, #64, and #66. M3-F was released through PR #67, independently reviewed, explicitly human-approved, and merged through PR #68 at `6103ced`; post-merge verification passed. Checkpoint `m3-complete` formally closes M3. Joseph subsequently accepted the M4 baseline, separately released M4-A, and authorized M4-B after M4-A merged and passed review and verification. M4-C through M4-E and M5+ remain unauthorized.
+**Authorization note:** M1's completion authorized M1 only. Joseph Carfagno separately authorized M2, whose six slices closed at checkpoint `m2-complete`. Joseph subsequently accepted the independently reviewed M3 baseline and separately released each M3 slice. M3-A through M3-E merged through PRs #55, #58, #61, #64, and #66. M3-F was released through PR #67, independently reviewed, explicitly human-approved, and merged through PR #68 at `6103ced`; post-merge verification passed. Checkpoint `m3-complete` formally closes M3. Joseph subsequently accepted the M4 baseline and separately released M4-A and M4-B. M4-B merged through PR #75 at `b4f6fc4`; Joseph then authorized M4-C behind this documentation merge gate. M4-D through M4-E and M5+ remain unauthorized.
 
 ---
 
@@ -88,7 +88,7 @@
 
 ## M3 — Operational Health Overlays (complete — 2026-08-17)
 
-> **Completion status:** The accepted M3 baseline merged through PR #53 at `b85be38`; M3-A through M3-F were separately authorized, implemented, reviewed, verified, and merged. M3-F merged through PR #68 at `6103ced` after explicit human approval, and post-merge verification passed. Checkpoint `m3-complete` formally closes M3. Joseph subsequently accepted the M4 baseline; M4-A is complete and M4-B is separately authorized behind its documentation merge gate. M4-C through M4-E and M5+ remain unauthorized.
+> **Completion status:** The accepted M3 baseline merged through PR #53 at `b85be38`; M3-A through M3-F were separately authorized, implemented, reviewed, verified, and merged. M3-F merged through PR #68 at `6103ced` after explicit human approval, and post-merge verification passed. Checkpoint `m3-complete` formally closes M3. Joseph subsequently accepted the M4 baseline; M4-A and M4-B are complete, and M4-C is separately authorized behind this documentation merge gate. M4-D through M4-E and M5+ remain unauthorized.
 
 **Goal:** Synthetic operational state projected onto the graph so topology and health are one picture.
 
@@ -111,9 +111,9 @@
 
 ---
 
-## M4 — Change-Impact Simulation (M4-A complete; M4-B authorized; M4-C+ gated)
+## M4 — Change-Impact Simulation (M4-A/B complete; M4-C authorized; M4-D+ gated)
 
-> **Authorization status:** Joseph Carfagno accepted [docs/m4-plan.md](m4-plan.md) and ADRs [0032](adr/0032-m4-change-impact-domain-model.md)-[0035](adr/0035-m4-synthetic-accuracy-harness.md) as the M4 baseline through PR #71 at `8e93d10`, then separately released M4-A. M4-A's shared contracts, pure deterministic engine, focused tests, and engine contract suite were independently reviewed, fully verified, and merged through [PR #73](https://github.com/Jayc92/atlast/pull/73) at `9ee21e4` on 2026-08-18 with GitHub Actions `verify` passing. **Joseph Carfagno then explicitly authorized M4-B on 2026-08-18** within the exact [docs/m4-plan.md § 6](m4-plan.md#6-proposed-implementation-slices) boundary: the composed impact API route, closed error mapping and integration tests, and fixture-backed exact-match accuracy harness under existing `pnpm test`, with no browser work. M4-B becomes operational only after this record merges and local `main` synchronizes cleanly. **M4-C through M4-E and M5+ remain unauthorized.**
+> **Authorization status:** Joseph Carfagno accepted [docs/m4-plan.md](m4-plan.md) and ADRs [0032](adr/0032-m4-change-impact-domain-model.md)-[0035](adr/0035-m4-synthetic-accuracy-harness.md) as the M4 baseline through PR #71 at `8e93d10`, then separately released M4-A and M4-B. M4-B's impact API, closed errors, fixture-backed exact-match harness, and integration tests were independently reviewed, fully verified, and merged through [PR #75](https://github.com/Jayc92/atlast/pull/75) at `b4f6fc4` on 2026-08-18 with GitHub Actions `verify` passing in 4m22s. **Joseph Carfagno then explicitly authorized M4-C on 2026-08-18** within the exact [docs/m4-plan.md § 6](m4-plan.md#6-proposed-implementation-slices) and ADR-0034 browser impact-panel boundary. M4-C becomes operational only after this record merges and local `main` synchronizes cleanly. **M4-D through M4-E and M5+ remain unauthorized.**
 
 **Goal:** Answer "if I change X, what is affected?" with deterministic, explainable analysis over synthetic topologies.
 
@@ -128,8 +128,8 @@
 
 **Exit criteria:**
 
-- [ ] An impact query returns ranked affected entities, each with a traversable, deterministic explanation.
-- [ ] The synthetic scenario harness runs in CI and scores impact quality automatically.
+- [x] An impact query returns ranked affected entities, each with a traversable, deterministic explanation — _delivered by M4-A/B through PR #75; browser presentation remains M4-C._
+- [x] The synthetic scenario harness runs in CI and scores impact quality automatically — _6/6 scripted scenarios matched exactly in the existing verifier through PR #75._
 
 ---
 
