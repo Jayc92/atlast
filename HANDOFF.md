@@ -4,12 +4,12 @@ The canonical, model-neutral resume document for Atlast. Read this file with the
 
 ## 1. Document Control
 
-- **Last updated:** 2026-08-17
-- **Checkpoint name:** `m4-a-authorized`
-- **Latest merged implementation commit:** `6103ced` (`chore: complete M3 hardening audit (#68)`), squash-merged through [PR #68](https://github.com/Jayc92/atlast/pull/68) on 2026-08-17. M4-A is authorized but not yet implemented, so this remains the latest merged _product-implementation_ commit; the M4 baseline acceptance (PR #71) is a documentation-only commit.
-- **Verification:** PR #68 GitHub Actions `verify` passed in 3m56s. The complete seven-stage verifier passed again on the real merge commit: shared 420/420, overlay-model 23/23, graph-model 372/372, API 89/89, web 229/229, browser acceptance 34/34, plus whitespace, formatting, lint, types, and production builds. PR #71 (M4 baseline acceptance, documentation-only) separately passed GitHub Actions `verify`.
-- **Milestone state:** M0 through M3 are formally complete. The M4 implementation baseline — [docs/m4-plan.md](docs/m4-plan.md) and ADRs 0032–0035 — was independently reviewed, corrected, and explicitly accepted by Joseph Carfagno; the acceptance record merged through [PR #71](https://github.com/Jayc92/atlast/pull/71) at `8e93d10` on 2026-08-17. Joseph then explicitly authorized **M4-A** as the only active implementation slice, within the exact boundary [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and [TASKS.md](TASKS.md) state. M4-A is not yet implemented. M4-B through M4-E and M5+ remain unauthorized.
-- **Authorization branch:** `docs/m4-a-authorization`, based on synchronized, clean `main` at `8e93d10`.
+- **Last updated:** 2026-08-18
+- **Checkpoint name:** `m4-a-impact-engine-merged`
+- **Latest merged implementation commit:** `9ee21e4` (`feat: add M4 deterministic impact engine (#73)`), squash-merged through [PR #73](https://github.com/Jayc92/atlast/pull/73) on 2026-08-18.
+- **Verification:** the corrected M4-A candidate passed the complete seven-stage verifier: shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 89/89, web 229/229, and browser acceptance 34/34, plus whitespace, formatting, lint, types, and production builds. PR #73 GitHub Actions `verify` passed in 4m2s.
+- **Milestone state:** M0 through M3 and M4-A are complete. The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035. Joseph Carfagno explicitly authorized **M4-B** on 2026-08-18 within the exact API and accuracy-harness boundary in [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices). M4-B becomes operational only after this documentation record merges and local `main` synchronizes cleanly. M4-C through M4-E and M5+ remain unauthorized.
+- **Authorization branch:** `docs/m4-a-closeout-m4-b-authorization`, based on synchronized, clean `main` at `9ee21e4`.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
 ## 2. Product Summary
@@ -35,8 +35,8 @@ Binding principles:
 - [CLAUDE.md](CLAUDE.md): AI-assistant instructions and authorization boundaries.
 - [TASKS.md](TASKS.md): in-flight work ledger and completed checkpoint evidence.
 - [docs/milestones.md](docs/milestones.md): M0-M5 sequence and exit criteria.
-- [docs/m3-plan.md](docs/m3-plan.md): completed M3 baseline and slice record.
-- [docs/adr/README.md](docs/adr/README.md): Accepted ADRs 0001-0031 and amendment map.
+- [docs/m4-plan.md](docs/m4-plan.md): accepted M4 baseline and bounded slice record.
+- [docs/adr/README.md](docs/adr/README.md): Accepted ADRs 0001-0035 and amendment map.
 - [docs/audits/m0-synthetic-boundary-audit.md](docs/audits/m0-synthetic-boundary-audit.md): synthetic-boundary history; §19 is the M3 closure revalidation.
 - `fixtures/demo-company`: synthetic topology and operational-overlay catalogs.
 - `packages/shared`: contracts and schemas.
@@ -50,14 +50,14 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 
 ## 4. Roadmap Position
 
-| Milestone | State                              | Evidence                                 |
-| --------- | ---------------------------------- | ---------------------------------------- |
-| M0        | Complete - 2026-07-22              | Foundation and closure audit             |
-| M1        | Complete - 2026-08-12              | S1-S8; checkpoint `m1-complete`          |
-| M2        | Complete - 2026-08-16              | M2-A-F; checkpoint `m2-complete`         |
-| M3        | Complete - 2026-08-17              | M3-A-F; PR #68; checkpoint `m3-complete` |
-| M4        | Baseline accepted; M4-A authorized | M4-A not yet implemented; M4-B+ gated    |
-| M5        | Unauthorized                       | No planning or implementation may begin  |
+| Milestone | State                          | Evidence                                  |
+| --------- | ------------------------------ | ----------------------------------------- |
+| M0        | Complete - 2026-07-22          | Foundation and closure audit              |
+| M1        | Complete - 2026-08-12          | S1-S8; checkpoint `m1-complete`           |
+| M2        | Complete - 2026-08-16          | M2-A-F; checkpoint `m2-complete`          |
+| M3        | Complete - 2026-08-17          | M3-A-F; PR #68; checkpoint `m3-complete`  |
+| M4        | M4-A complete; M4-B authorized | PR #73; M4-B gated on this record's merge |
+| M5        | Unauthorized                   | No planning or implementation may begin   |
 
 M3 delivered synthetic operational health without making overlays graph truth:
 
@@ -75,39 +75,36 @@ Both M3 exit criteria are closed:
 - All six accepted states are representable, visually distinguishable, and queryable in context.
 - Overlay data loss loses no topology; empty-overlay startup preserves health and topology while health-context fails honestly.
 
-## 5. M3-F Closure Evidence
+## 5. M4-A Closure Evidence
 
-- Exact merged scope: eight approved files, independently re-derived from `71f0e7e..6103ced` and recorded in audit §19.
-- Browser no-side-door enforcement now rejects direct and deep overlay-model imports.
-- Empty immutable overlay collections are accepted while individual frames remain strictly validated and nonempty.
-- `/health` and topology routes remain operational without overlay data; health-context returns its existing typed closed error.
-- Zero literal NUL bytes across all 273 tracked files.
-- M1 Evidence fixtures, overlay fixtures, dependencies, topology semantics, scripts, and CI were unchanged.
-- Final bundle record: eager JS 431.78 kB / 129.12 kB gzip; eager CSS 18.06 kB / 4.08 kB gzip; lazy graph JS 1,615.56 kB / 501.71 kB gzip.
-- Joseph Carfagno explicitly approved the remediated candidate and audit for publication before merge.
+- Additive impact contracts and the pure `packages/impact-model` engine merged through PR #73 at `9ee21e4`.
+- The engine implements eligible-edge qualification, deterministic two-phase widest-path selection, exact tie breaks, path orientation, ranking, cycle safety, and truncation honesty without repositories, clocks, randomness, or `changeType` influence.
+- Independent review corrected one literal NUL source byte to the source-text escape `\u0000` while preserving runtime delimiter behavior.
+- The complete verifier passed with 15/15 impact-model tests and all existing suites green; GitHub Actions passed in 4m2s.
+- No API route, fixture catalog, browser behavior, or new third-party dependency was introduced in M4-A.
 
 ## 6. Current Git State
 
-At the M4-A-authorization checkpoint before this documentation commit:
+At the M4-A-merged checkpoint before this documentation commit:
 
 ```text
-8e93d10 (HEAD -> main, origin/main, origin/HEAD) docs: accept M4 architecture baseline (#71)
+9ee21e4 (HEAD -> main, origin/main, origin/HEAD) feat: add M4 deterministic impact engine (#73)
+5ebbdc4 docs: authorize M4 implementation slice A (#72)
+8e93d10 docs: accept M4 architecture baseline (#71)
 ba87a29 docs: authorize M4 planning phase (#70)
 539860d docs: close M3 operational health milestone (#69)
-6103ced chore: complete M3 hardening audit (#68)
-71f0e7e docs: close M3-E and authorize M3-F (#67)
 ```
 
 Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-**M4-A** is the only active authorized implementation slice, within the exact boundary [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and [TASKS.md](TASKS.md) state: additive `packages/shared` impact contracts (`impactChangeTypeSchema`, `ImpactPathStep`, `ImpactResult`, the impact-query HTTP envelope per ADR-0033 § 2); the new workspace package `packages/impact-model` implementing the pure deterministic engine per ADR-0032 §§ 3–4 (eligible-edge qualification, the two-phase widest-path/maximin search and its exact tie-break chain, upstream/downstream path orientation, rank-score/ordering), depending only on `@atlast/shared`, with its manifest/tsconfig/build plumbing and the resulting deterministic `pnpm-lock.yaml` importer-block change; focused unit tests; and the ADR-0035 § 3 engine contract-test suite (hand-authored immutable `TraversalResult` vectors, no new Evidence or fixture). No `apps/api` route, fixture catalog, `apps/web` change, or new third-party dependency is authorized.
+**M4-B**, after this authorization record merges and local `main` synchronizes cleanly, is the only authorized implementation slice. Its exact boundary is [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices), ADR-0033, ADR-0035, and [TASKS.md](TASKS.md): add `GET /api/v1/entities/{entityId}/impact`; compose exactly one bounded traversal through the pure impact engine with no additional repository read; implement closed coercion/error/response handling and API integration tests; add the hand-authored `fixtures/demo-company/impact-scenarios/` catalog; and run its exact-match scoring suite under existing `pnpm test`, including change-type invariance and a deliberately mutated expectation. No browser work or new third-party dependency is authorized.
 
 ## 8. Prohibited Work
 
-- Any M4-A implementation beyond the exact boundary above.
-- Any M4-B through M4-E implementation before M4-A's implementation is independently reviewed, verified, merged, and M4-B is separately released.
+- Any M4-B work before this authorization record merges and local `main` synchronizes cleanly, or beyond the exact boundary above.
+- Any M4-C through M4-E implementation before its own separate release.
 - Any M5+ planning or implementation before separate authorization.
 - Real systems, credentials, employer/customer data, connectors, authentication, deployment, or external publication.
 - Product writes or mutation routes.
@@ -153,19 +150,22 @@ TASKS.md, docs/architecture.md, docs/milestones.md, docs/m4-plan.md, and the
 ADR index (ADRs 0032-0035). Inspect git status and git log; real Git state
 overrides stale text.
 
-M0 through M3 are formally complete. The M4 implementation baseline
-(docs/m4-plan.md, ADRs 0032-0035) was independently reviewed, corrected, and
-explicitly accepted by Joseph Carfagno, merging through PR #71 at 8e93d10 on
-2026-08-17. Joseph then explicitly authorized M4-A as the only active
-implementation slice, within the exact boundary docs/m4-plan.md § 6 and
-TASKS.md state. Checkpoint m4-a-authorized is the current boundary. M4-A is
-not yet implemented. M4-B through M4-E and M5+ are unauthorized.
+M0 through M3 and M4-A are complete. M4-A was independently reviewed, fully
+verified, and merged through PR #73 at 9ee21e4 on 2026-08-18. Checkpoint
+m4-a-impact-engine-merged is the current boundary. Joseph Carfagno then
+explicitly authorized M4-B within the exact docs/m4-plan.md § 6, ADR-0033,
+ADR-0035, and TASKS.md boundary. That release becomes operational only after
+its documentation record merges and local main synchronizes cleanly. M4-C
+through M4-E and M5+ are unauthorized.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic,
-read-only, and fail-honest boundaries. Implement only the exact M4-A boundary:
-additive packages/shared impact contracts, the new packages/impact-model pure
-engine, its unit tests, and the ADR-0035 engine contract-test suite. Do not
-add an apps/api route, a fixture catalog, or any apps/web change — those are
-M4-B+. Do not plan or implement M5+. Begin by reporting your understanding of
-checkpoint m4-a-authorized.
+read-only, and fail-honest boundaries. After verifying the authorization
+record is merged and main is synchronized cleanly, implement only M4-B: the
+single composed impact API route, closed coercion/error/response behavior and
+integration tests, the fixture-backed impact-scenario catalog, and its exact-
+match scoring suite under existing pnpm test. Perform exactly one traversal
+and no additional repository read; changeType is echoed but never affects
+ranking. Do not add browser behavior, a new third-party dependency, a new
+script/CI stage, accepted-ADR changes, M4-C+, or M5+ work. Begin by reporting
+your understanding of checkpoint m4-a-impact-engine-merged and the M4-B gate.
 ```
