@@ -1,0 +1,15 @@
+{
+  "id": "checkout-confidence-floor-exclusion",
+  "description": "Checkout's one downstream Relationship edge (checkout -> fulfillment, scenario 6's relationship-target-change seed) is real and traversable but has confidence exactly 0.5 (a single standing source, trace-index). A scripted minimumConfidence of 0.6 correctly excludes it, proving a real but weakly evidenced path is excluded at the scripted floor (ADR-0035 § 3) rather than merely absent as in the zero-impact scenario.",
+  "originEntityIdentifier": "atlast:entity:checkout",
+  "changeType": "removal",
+  "direction": "downstream",
+  "depth": 2,
+  "minimumConfidence": 0.6,
+  "pin": {
+    "asOf": "2026-04-20T12:00:00.000Z",
+    "horizon": 20,
+    "derivationVersion": "m1-v1"
+  },
+  "expectedResults": []
+}

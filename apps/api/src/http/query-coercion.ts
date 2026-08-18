@@ -38,6 +38,7 @@ export const WIRE_QUERY_PARAM = {
   horizon: "horizon",
   derivationVersion: "derivationVersion",
   overlayFrame: "overlayFrame",
+  changeType: "changeType",
 } as const;
 
 export { strictDecimalQueryString, strictIntegerQueryString };

@@ -15,6 +15,9 @@ export default defineConfig({
       "@atlast/graph-model": fileURLToPath(
         new URL("../../packages/graph-model/src/index.ts", import.meta.url),
       ),
+      "@atlast/impact-model": fileURLToPath(
+        new URL("../../packages/impact-model/src/index.ts", import.meta.url),
+      ),
       "@atlast/overlay-model": fileURLToPath(
         new URL("../../packages/overlay-model/src/index.ts", import.meta.url),
       ),

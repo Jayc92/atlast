@@ -26,6 +26,7 @@
     // package entry points instead (ADR-0024 § 14).
     "paths": {
       "@atlast/graph-model": ["../../packages/graph-model/src/index.ts"],
+      "@atlast/impact-model": ["../../packages/impact-model/src/index.ts"],
       "@atlast/overlay-model": ["../../packages/overlay-model/src/index.ts"],
       "@atlast/shared": ["../../packages/shared/src/index.ts"]
     }

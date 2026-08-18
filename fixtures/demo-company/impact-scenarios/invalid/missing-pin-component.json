@@ -1,0 +1,13 @@
+{
+  "id": "missing-pin-component",
+  "description": "Deliberately invalid: the pin omits derivationVersion, violating the all-or-none (asOf, horizon, derivationVersion) pin every scenario must declare (ADR-0035 § 2).",
+  "originEntityIdentifier": "atlast:entity:web",
+  "changeType": "removal",
+  "direction": "downstream",
+  "depth": 3,
+  "pin": {
+    "asOf": "2026-04-20T12:00:00.000Z",
+    "horizon": 20
+  },
+  "expectedResults": []
+}

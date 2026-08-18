@@ -1,0 +1,15 @@
+{
+  "id": "malformed-shape",
+  "description": "Deliberately malformed: originEntityIdentifier is not a valid Entity identifier and an unrecognized top-level key is present.",
+  "originEntityIdentifier": "not a valid identifier",
+  "changeType": "removal",
+  "direction": "downstream",
+  "depth": 3,
+  "unexpectedKey": true,
+  "pin": {
+    "asOf": "2026-04-20T12:00:00.000Z",
+    "horizon": 20,
+    "derivationVersion": "m1-v1"
+  },
+  "expectedResults": []
+}

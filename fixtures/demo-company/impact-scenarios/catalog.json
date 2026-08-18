@@ -1,0 +1,46 @@
+{
+  "catalogVersion": "demo-company-impact-scenarios-v1",
+  "scenarios": [
+    {
+      "id": "web-downstream-removal-invariance",
+      "scenarioFile": "scenarios/01-web-downstream-removal-invariance.json"
+    },
+    {
+      "id": "web-downstream-degradation-invariance",
+      "scenarioFile": "scenarios/02-web-downstream-degradation-invariance.json"
+    },
+    {
+      "id": "web-downstream-interface-change-invariance",
+      "scenarioFile": "scenarios/03-web-downstream-interface-change-invariance.json"
+    },
+    {
+      "id": "orders-zero-impact",
+      "scenarioFile": "scenarios/04-orders-zero-impact.json"
+    },
+    {
+      "id": "checkout-confidence-floor-exclusion",
+      "scenarioFile": "scenarios/05-checkout-confidence-floor-exclusion.json"
+    },
+    {
+      "id": "web-historical-pin-stage1",
+      "scenarioFile": "scenarios/06-web-historical-pin-stage1.json"
+    }
+  ],
+  "invalidCases": [
+    {
+      "id": "malformed-shape",
+      "scenarioFile": "invalid/malformed-shape.json",
+      "reason": "originEntityIdentifier is not a valid Entity identifier and an unrecognized top-level key is present."
+    },
+    {
+      "id": "missing-pin-component",
+      "scenarioFile": "invalid/missing-pin-component.json",
+      "reason": "the pin omits derivationVersion, violating the all-or-none pin requirement."
+    },
+    {
+      "id": "unknown-change-type",
+      "scenarioFile": "invalid/unknown-change-type.json",
+      "reason": "changeType is not one of the closed removal/degradation/interface-change enum."
+    }
+  ]
+}

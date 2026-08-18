@@ -1,0 +1,73 @@
+{
+  "id": "web-downstream-interface-change-invariance",
+  "description": "Web's retained downstream topology (web -> api -> worker -> archive, scenario 7) at the full-catalog pin, changeType interface-change. Part of the three-changeType invariance group with 01 and 02: identical origin, bounds, and pin, only changeType varies, and all three expect identical ranked results (ADR-0035 § 3).",
+  "originEntityIdentifier": "atlast:entity:web",
+  "changeType": "interface-change",
+  "direction": "downstream",
+  "depth": 3,
+  "minimumConfidence": 0,
+  "pin": {
+    "asOf": "2026-04-20T12:00:00.000Z",
+    "horizon": 20,
+    "derivationVersion": "m1-v1"
+  },
+  "expectedResults": [
+    {
+      "entityIdentifier": "atlast:entity:api",
+      "rankScore": 0.5,
+      "pathEdgeCount": 1,
+      "path": [
+        {
+          "sourceEntityIdentifier": "atlast:entity:web",
+          "targetEntityIdentifier": "atlast:entity:api",
+          "relationshipIdentifier": "atlast:relationship:web-calls-api",
+          "assertionIdentifier": "atlast:assertion:c28a1f877d25e67c609817487accf015ea234318f671e12b58d8729ccd2fad8e"
+        }
+      ]
+    },
+    {
+      "entityIdentifier": "atlast:entity:worker",
+      "rankScore": 0.5,
+      "pathEdgeCount": 2,
+      "path": [
+        {
+          "sourceEntityIdentifier": "atlast:entity:web",
+          "targetEntityIdentifier": "atlast:entity:api",
+          "relationshipIdentifier": "atlast:relationship:web-calls-api",
+          "assertionIdentifier": "atlast:assertion:c28a1f877d25e67c609817487accf015ea234318f671e12b58d8729ccd2fad8e"
+        },
+        {
+          "sourceEntityIdentifier": "atlast:entity:api",
+          "targetEntityIdentifier": "atlast:entity:worker",
+          "relationshipIdentifier": "atlast:relationship:api-publishes-worker",
+          "assertionIdentifier": "atlast:assertion:00a72e745333cda9d666353a65cb13c8dbdfcfe30f37b4685f847a545cd8ec58"
+        }
+      ]
+    },
+    {
+      "entityIdentifier": "atlast:entity:archive",
+      "rankScore": 0.5,
+      "pathEdgeCount": 3,
+      "path": [
+        {
+          "sourceEntityIdentifier": "atlast:entity:web",
+          "targetEntityIdentifier": "atlast:entity:api",
+          "relationshipIdentifier": "atlast:relationship:web-calls-api",
+          "assertionIdentifier": "atlast:assertion:c28a1f877d25e67c609817487accf015ea234318f671e12b58d8729ccd2fad8e"
+        },
+        {
+          "sourceEntityIdentifier": "atlast:entity:api",
+          "targetEntityIdentifier": "atlast:entity:worker",
+          "relationshipIdentifier": "atlast:relationship:api-publishes-worker",
+          "assertionIdentifier": "atlast:assertion:00a72e745333cda9d666353a65cb13c8dbdfcfe30f37b4685f847a545cd8ec58"
+        },
+        {
+          "sourceEntityIdentifier": "atlast:entity:worker",
+          "targetEntityIdentifier": "atlast:entity:archive",
+          "relationshipIdentifier": "atlast:relationship:worker-writes-archive",
+          "assertionIdentifier": "atlast:assertion:6ecff0389619d778a0afbd188d779cbefde7541c28f70cc952eb397c9787bd79"
+        }
+      ]
+    }
+  ]
+}
