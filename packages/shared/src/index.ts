@@ -240,3 +240,13 @@ export {
   type ReportedLatentHealthProjection,
   type UnreportedHealthProjection,
 } from "./health-context.ts";
+export {
+  impactChangeTypeSchema,
+  impactPathStepSchema,
+  impactResultEnvelopeSchema,
+  impactResultSchema,
+  type ImpactChangeType,
+  type ImpactPathStep,
+  type ImpactResult,
+  type ImpactResultEnvelope,
+} from "./impact.ts";
