@@ -5,11 +5,11 @@ The canonical, model-neutral resume document for Atlast. Read this file with the
 ## 1. Document Control
 
 - **Last updated:** 2026-08-17
-- **Checkpoint name:** `m3-complete`
+- **Checkpoint name:** `m4-planning-authorized`
 - **Latest merged implementation commit:** `6103ced` (`chore: complete M3 hardening audit (#68)`), squash-merged through [PR #68](https://github.com/Jayc92/atlast/pull/68) on 2026-08-17.
 - **Verification:** PR #68 GitHub Actions `verify` passed in 3m56s. The complete seven-stage verifier passed again on the real merge commit: shared 420/420, overlay-model 23/23, graph-model 372/372, API 89/89, web 229/229, browser acceptance 34/34, plus whitespace, formatting, lint, types, and production builds.
-- **Milestone state:** M0 through M3 are formally complete. No implementation slice is active. M4+ remain unauthorized.
-- **Closeout branch:** `docs/m3-closeout`, based on synchronized, clean `main` at `6103ced`.
+- **Milestone state:** M0 through M3 are formally complete. Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17. No implementation slice is active; M4 product implementation remains gated, and M5+ remain unauthorized.
+- **Authorization branch:** `docs/m4-planning-authorization`, based on synchronized, clean `main` at `539860d`.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
 ## 2. Product Summary
@@ -56,7 +56,7 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 | M1        | Complete - 2026-08-12 | S1-S8; checkpoint `m1-complete`          |
 | M2        | Complete - 2026-08-16 | M2-A-F; checkpoint `m2-complete`         |
 | M3        | Complete - 2026-08-17 | M3-A-F; PR #68; checkpoint `m3-complete` |
-| M4        | Unauthorized          | No planning or implementation may begin  |
+| M4        | Planning authorized   | Product implementation remains gated     |
 | M5        | Unauthorized          | No planning or implementation may begin  |
 
 M3 delivered synthetic operational health without making overlays graph truth:
@@ -88,25 +88,26 @@ Both M3 exit criteria are closed:
 
 ## 6. Current Git State
 
-At the product checkpoint before this documentation commit:
+At the planning-authorization checkpoint before this documentation commit:
 
 ```text
-6103ced (HEAD -> main, origin/main, origin/HEAD) chore: complete M3 hardening audit (#68)
+539860d (HEAD -> main, origin/main, origin/HEAD) docs: close M3 operational health milestone (#69)
+6103ced chore: complete M3 hardening audit (#68)
 71f0e7e docs: close M3-E and authorize M3-F (#67)
 9b4343e test: harden M3 health overlay acceptance (#66)
 ce6c146 docs: close M3-D and authorize M3-E (#65)
-a2c2d92 feat: add M3 operational health overlay UI (#64)
 ```
 
 Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-No implementation slice is active. Permitted work is limited to maintenance and corrections within accepted ADRs, plus factual checkpoint documentation. Any M4 planning or implementation requires a separate explicit human release and its own reviewed baseline.
+No implementation slice is active. M4 planning and pre-release architecture/ADR review are authorized: produce a proposed `docs/m4-plan.md`, Proposed ADRs for implementation-critical decisions, a verification strategy, and bounded implementation slices. M4 product implementation remains gated until that complete baseline is independently reviewed, explicitly accepted by Joseph Carfagno, and the first implementation slice receives a separate release.
 
 ## 8. Prohibited Work
 
-- Any M4+ planning or implementation before separate authorization.
+- Any M4 product implementation before baseline acceptance and a separate slice release.
+- Any M5+ planning or implementation before separate authorization.
 - Real systems, credentials, employer/customer data, connectors, authentication, deployment, or external publication.
 - Product writes or mutation routes.
 - Browser imports from fixtures, graph-model, overlay-model, repository/storage, or API server modules.
@@ -152,11 +153,15 @@ ADR index. Inspect git status and git log; real Git state overrides stale text.
 
 M0 through M3 are formally complete. M3-F merged through PR #68 at 6103ced
 after independent review, explicit human publication approval, passing GitHub
-Actions, and passing post-merge verification. Checkpoint m3-complete is the
-current boundary. No implementation slice is active. M4+ remain unauthorized.
+Actions, and passing post-merge verification. Joseph Carfagno explicitly
+authorized M4 planning and pre-release architecture/ADR review on 2026-08-17.
+Checkpoint m4-planning-authorized is the current boundary. No implementation
+slice is active. M4 product implementation remains gated; M5+ are unauthorized.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic,
-read-only, and fail-honest boundaries. Do not plan or implement M4+ work until
-Joseph Carfagno provides a separate explicit release. Begin by reporting your
-understanding of checkpoint m3-complete and the current authorization boundary.
+read-only, and fail-honest boundaries. Produce only the proposed M4 plan,
+Proposed ADRs, review corrections, and factual planning records. Do not
+implement M4 product behavior until Joseph accepts the reviewed baseline and
+separately releases its first slice. Do not plan or implement M5+. Begin by
+reporting your understanding of checkpoint m4-planning-authorized.
 ```

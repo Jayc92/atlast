@@ -1,6 +1,6 @@
 # Atlast — Tasks
 
-The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0 through M3 are complete. M3-F merged through PR #68 at `6103ced` on 2026-08-17; checkpoint `m3-complete` records formal closure after post-merge verification passed.** No implementation slice is active. **M4+ remain unauthorized.**
+The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0 through M3 are complete. M3-F merged through PR #68 at `6103ced` on 2026-08-17; checkpoint `m3-complete` records formal closure after post-merge verification passed.** Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17. No implementation slice is active. **M4 product implementation remains gated; M5+ remain unauthorized.**
 
 **Legend:** `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked (note the blocker)
 
@@ -242,7 +242,7 @@ M1 exit criteria (below) are now all checked and closed as project facts, per [d
 
 ## M3 — Operational Health Overlays (complete — 2026-08-17)
 
-Joseph Carfagno explicitly pre-authorized M3 planning on 2026-08-13. The independently reviewed and approved baseline merged through PR #53 at `b85be38`; M3-A through M3-E then merged through PRs #55, #58, #61, #64, and #66. M3-F was separately released through PR #67, independently reviewed, explicitly human-approved, and merged through PR #68 at `6103ced` on 2026-08-17. Post-merge revalidation passed. **M3 is formally complete at checkpoint `m3-complete`; no implementation slice is active. M4+ remain unauthorized.**
+Joseph Carfagno explicitly pre-authorized M3 planning on 2026-08-13. The independently reviewed and approved baseline merged through PR #53 at `b85be38`; M3-A through M3-E then merged through PRs #55, #58, #61, #64, and #66. M3-F was separately released through PR #67, independently reviewed, explicitly human-approved, and merged through PR #68 at `6103ced` on 2026-08-17. Post-merge revalidation passed. **M3 is formally complete at checkpoint `m3-complete`; no implementation slice is active. M4 planning is now separately authorized, M4 product implementation remains gated, and M5+ remain unauthorized.**
 
 **M3-P baseline (2026-08-16):** Joseph Carfagno explicitly accepted ADRs [0029](docs/adr/0029-m3-overlay-model-and-temporal-semantics.md)-[0031](docs/adr/0031-m3-overlay-presentation-and-accessibility.md) and approved [docs/m3-plan.md](docs/m3-plan.md) as the M3 implementation baseline. It defines separate immutable overlay frames; deterministic direct/effective state and latent-risk semantics; explicit topology/frame coordinates; a bounded health-in-context API join; unknown-target gaps; query-only graph/structured UI presentation; six implementation slices; and verification/release gates. The accepted baseline merged through PR #53 at `b85be38`; its acceptance authorized no implementation by itself.
 
@@ -309,7 +309,7 @@ The new spec adds five tests, each running against the real compiled API and bui
 
 **Verification:** the complete unmodified seven-stage repository verifier passed before merge and again directly on `6103ced`: shared **420/420**, overlay-model **23/23**, graph-model **372/372**, API **89/89**, web **229/229**, and browser acceptance **34/34**, with whitespace, formatting, lint, types, and production builds also clean. GitHub Actions `verify` passed in **3m56s**. **Exact merged scope:** `TASKS.md`, `docs/audits/m0-synthetic-boundary-audit.md`, `eslint.config.mjs`, `apps/web/src/eslint-boundary.test.ts`, `packages/shared/src/operational-overlays.ts` and its test, `packages/overlay-model/src/in-memory-overlay-store.test.ts`, and `apps/api/src/app.test.ts`.
 
-**Checkpoint `m3-complete` — M3 formal closeout (2026-08-17):** PR #68 merged the independently reviewed and human-approved M3-F candidate at `6103ced`. Post-merge revalidation repeated the exact-scope review and complete verifier against the real merge commit; audit § 19 records the result. Both M3 exit criteria are satisfied: all six states are represented and queryable in context with equivalent accessible views, and overlay removal loses no topology. **M3-A through M3-F are complete. No implementation slice is active. M4+ remain gated and unauthorized; this closure grants no M4 permission.**
+**Checkpoint `m3-complete` — M3 formal closeout (2026-08-17):** PR #68 merged the independently reviewed and human-approved M3-F candidate at `6103ced`. Post-merge revalidation repeated the exact-scope review and complete verifier against the real merge commit; audit § 19 records the result. Both M3 exit criteria are satisfied: all six states are represented and queryable in context with equivalent accessible views, and overlay removal loses no topology. **M3-A through M3-F are complete. This closure itself granted no M4 permission; Joseph Carfagno subsequently and separately authorized M4 planning only. No implementation slice is active.**
 
 - [x] Inventory the completed topology, snapshot, API, browser, accessibility, and synthetic-boundary seams.
 - [x] Draft the M3 implementation plan and Proposed ADRs 0029-0031.
@@ -321,7 +321,12 @@ The new spec adds five tests, each running against the real compiled API and bui
 - [x] Health-in-context queries and UI overlay toggles
 - [x] Unknown-entity overlays surface as gaps, not phantom nodes
 
-## M4 — Change-Impact Simulation (gated — not authorized)
+## M4 — Change-Impact Simulation (planning authorized; implementation gated)
+
+**M4 planning authorization (2026-08-17):** after M3 formally closed through PR #69 at `539860d` and local `main` synchronized cleanly, Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review only. The released boundary is a proposed `docs/m4-plan.md`; Proposed ADRs resolving deterministic change semantics, confidence-weighted ranking, evidence-path explanations, synthetic accuracy measurement, API/browser boundaries, and verification strategy; bounded implementation slices; independent review and correction; and factual planning records. This authorization becomes operational only after its documentation PR merges and local `main` synchronizes cleanly. It authorizes no runtime code, fixture, schema, dependency, or M4 product implementation. M4 implementation requires explicit human acceptance of the complete reviewed baseline and a separate release of its first slice. M5+ remain unauthorized.
+
+- [~] **M4-P — implementation plan and pre-release architecture review** — inventory the completed M1-M3 deterministic topology, snapshot, health-context, API, browser, accessibility, and synthetic-boundary seams; define deterministic change types and impact semantics; define ranked blast-radius and traversable Evidence-path contracts; design a synthetic scenario accuracy harness; define API, browser, failure-honesty, accessibility, and verification obligations; derive bounded implementation slices; record significant choices as Proposed ADRs; obtain independent review and explicit human approval before implementation.
+- [ ] **M4 implementation slices** — not released. Do not implement product behavior during M4-P.
 
 - [ ] Deterministic impact query API with change-type semantics
 - [ ] Ranked blast radius with evidence path per claim

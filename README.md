@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 through M3 complete.** M3-F merged through PR #68 at `6103ced` after independent review, explicit human publication approval, passing GitHub Actions, and passing post-merge verification. Checkpoint `m3-complete` formally closes M3. **No implementation slice is active; M4+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 through M3 complete; M4 planning authorized.** M3-F merged through PR #68 at `6103ced` after independent review, explicit human publication approval, passing GitHub Actions, and passing post-merge verification. Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17. **No implementation slice is active; M4 product implementation remains gated, and M5+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -129,7 +129,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-M0 through M3 are formally complete ([TASKS.md](TASKS.md)); checkpoint `m3-complete` records the merged implementation, audit, and post-merge verification evidence. No implementation slice is active. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+M0 through M3 are formally complete ([TASKS.md](TASKS.md)); checkpoint `m3-complete` records their merged implementation, audit, and post-merge verification evidence. M4 planning and pre-release architecture/ADR review are authorized, but no implementation slice is active. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4 product implementation remains gated; M5+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
