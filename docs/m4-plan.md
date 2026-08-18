@@ -5,7 +5,9 @@
 
 > **Planning authorization boundary (2026-08-17):** Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review only, after M3 formally closed through PR #69 at `539860d` and local `main` synchronized cleanly ([TASKS.md](../TASKS.md), [HANDOFF.md](../HANDOFF.md)). The released boundary was this plan, Proposed ADRs 0032–0035, independent review and correction, bounded implementation slices, and factual planning records.
 
-> **Approval and authorization boundary (2026-08-17):** After independent architecture review and correction, Joseph Carfagno explicitly accepted ADRs 0032–0035 and approved this plan as the M4 implementation baseline. Approval becomes operational only after this record merges to `main` and local `main` is synchronized cleanly. **It authorizes no runtime code, fixture, schema, dependency, or M4 product implementation.** M4-A requires a separate, explicit bounded-slice release after that merge. M5+ remain unauthorized.
+> **Approval and authorization boundary (2026-08-17):** After independent architecture review and correction, Joseph Carfagno explicitly accepted ADRs 0032–0035 and approved this plan as the M4 implementation baseline. The acceptance record merged through PR #71 at `8e93d10`, and local `main` was synchronized cleanly.
+
+> **M4-A release (2026-08-17):** After the accepted baseline merged and local `main` synchronized cleanly, Joseph Carfagno explicitly authorized M4-A within the exact boundary in [§ 6](#6-proposed-implementation-slices): additive shared impact contracts and the `packages/impact-model` pure engine, its unit tests, and the ADR-0035 engine contract-test suite. No `apps/api` route, fixture catalog, or `apps/web` change is authorized. This release is effective only after the documentation record of this authorization merges to `main` and local `main` is synchronized cleanly. **M4-B through M4-E and M5+ remain unauthorized.**
 
 ## 1. Objective
 
@@ -137,7 +139,7 @@ Before M4-A may begin:
 1. this plan and ADRs 0032–0035 receive independent architecture review — **complete 2026-08-17**;
 2. every blocking finding is corrected and re-reviewed — **complete 2026-08-17**;
 3. Joseph Carfagno explicitly accepts the complete M4 baseline (this plan and ADRs 0032–0035) — **complete 2026-08-17**;
-4. the acceptance record merges to `main` and local `main` is synchronized cleanly — **not yet done**;
-5. M4-A receives a separate, explicit implementation authorization — **not yet done**.
+4. the acceptance record merges to `main` and local `main` is synchronized cleanly — **complete 2026-08-17, through PR #71 at `8e93d10`**;
+5. M4-A receives a separate, explicit implementation authorization — **complete 2026-08-17; effective once this record merges to `main` and local `main` is synchronized cleanly**.
 
-Each subsequent slice (M4-B through M4-E) requires its own separate, explicit authorization after its predecessor's implementation is independently reviewed, passes the complete local `scripts/verify.sh`, is approved, merges with GitHub Actions `verify` passing, and its checkpoint documentation is updated — exactly the discipline every M1/M2/M3 slice already followed. Baseline acceptance (steps 1–3) does not itself release M4-A; steps 4–5 remain outstanding. M4 implementation remains gated; M5+ remain unauthorized.
+M4-A implementation has not yet begun. Each subsequent slice (M4-B through M4-E) requires its own separate, explicit authorization after its predecessor's implementation is independently reviewed, passes the complete local `scripts/verify.sh`, is approved, merges with GitHub Actions `verify` passing, and its checkpoint documentation is updated — exactly the discipline every M1/M2/M3 slice already followed. M4-B through M4-E remain gated; M5+ remain unauthorized.

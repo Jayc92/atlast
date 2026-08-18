@@ -8,17 +8,17 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 through M3 are complete.** M3-F merged through PR #68 at `6103ced` on 2026-08-17 after independent review, explicit human publication approval, passing GitHub Actions, and passing post-merge verification. Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17. Checkpoint `m4-planning-authorized` records the current boundary. **No implementation slice is active. M4 product implementation remains gated; M5+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
+**M0 through M3 are complete.** M3-F merged through PR #68 at `6103ced` on 2026-08-17 after independent review, explicit human publication approval, passing GitHub Actions, and passing post-merge verification. Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17, then explicitly accepted the M4 implementation baseline ([docs/m4-plan.md](docs/m4-plan.md), ADRs 0032–0035) through [PR #71](https://github.com/Jayc92/atlast/pull/71) at `8e93d10` on 2026-08-17, then explicitly authorized **M4-A** as the only active implementation slice. Checkpoint `m4-a-authorized` records the current boundary. **M4-A is not yet implemented. M4-B through M4-E and M5+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
 
 Permitted work right now, and nothing beyond it:
 
 - **Maintenance and corrections to the completed M0 foundation and the merged, formally complete S1–S8 slices** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — the S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, S5 reconciliation engine, S6 snapshot layer and in-memory repositories, S7 query API v1 routes and error contract in `apps/api`, and S8's boundary re-audit, exhaustive API traceability test, and documentation closeout.
 - **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0025) and of the checkpoint documentation ([HANDOFF.md](HANDOFF.md), per the checkpoint protocol below).
 - **Maintenance and corrections to completed M2 and M3 work** within accepted ADRs 0026-0031 and without extending product behavior.
-- **M4 planning and pre-release architecture/ADR review only** — propose `docs/m4-plan.md`, Proposed ADRs, bounded implementation slices, synthetic accuracy and verification strategy, and independent-review corrections. This permission authorizes no product implementation.
+- **M4-A implementation only** — within the exact boundary [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and [TASKS.md](TASKS.md) state: additive `packages/shared` impact contracts (`impactChangeTypeSchema`, `ImpactPathStep`, `ImpactResult`, the impact-query HTTP envelope per ADR-0033 § 2); the new workspace package `packages/impact-model` implementing the pure deterministic engine per ADR-0032 §§ 3–4, depending only on `@atlast/shared`; its focused unit tests; and the ADR-0035 § 3 engine contract-test suite. No `apps/api` route, fixture catalog, `apps/web` change, or new third-party dependency. This permission authorizes no M4-B through M4-E or M5+ work.
 - **Checkpoint documentation maintenance** that keeps merged facts, verification evidence, and milestone gates accurate.
 
-**No implementation slice is active. M4 product implementation remains unauthorized**, pending explicit acceptance of the independently reviewed baseline and a separate release of its first slice. **M5 and every later milestone remain unauthorized.**
+**M4-A is the only active authorized implementation slice, not yet implemented. M4-B through M4-E remain unauthorized pending their own separate release after M4-A's implementation is independently reviewed, verified, and merged. M5 and every later milestone remain unauthorized.**
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -31,10 +31,10 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**M0 through M3 are complete; checkpoint `m4-planning-authorized` is the current project boundary:**
+**M0 through M3 are complete; checkpoint `m4-a-authorized` is the current project boundary:**
 
 - Maintenance, corrections, and explicitly released M1 slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod, named by accepted ADR-0005, was introduced in S1 with its justification-at-PR).
-- **M1, M2, and M3 are formally complete.** M4 planning is authorized, but do NOT implement M4 product behavior before baseline acceptance and a separate slice release; do NOT plan or implement M5+ work.
+- **M1, M2, and M3 are formally complete.** The M4 baseline is accepted and M4-A is authorized within its exact bounded scope (`docs/m4-plan.md` § 6); do NOT implement M4-B through M4-E product behavior before M4-A's implementation merges and its successor is separately released; do NOT plan or implement M5+ work.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
 - Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
 
