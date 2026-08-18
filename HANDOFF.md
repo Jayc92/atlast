@@ -5,11 +5,11 @@ The canonical, model-neutral resume document for Atlast. Read this file with the
 ## 1. Document Control
 
 - **Last updated:** 2026-08-17
-- **Checkpoint name:** `m4-planning-authorized`
-- **Latest merged implementation commit:** `6103ced` (`chore: complete M3 hardening audit (#68)`), squash-merged through [PR #68](https://github.com/Jayc92/atlast/pull/68) on 2026-08-17.
-- **Verification:** PR #68 GitHub Actions `verify` passed in 3m56s. The complete seven-stage verifier passed again on the real merge commit: shared 420/420, overlay-model 23/23, graph-model 372/372, API 89/89, web 229/229, browser acceptance 34/34, plus whitespace, formatting, lint, types, and production builds.
-- **Milestone state:** M0 through M3 are formally complete. Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17. No implementation slice is active; M4 product implementation remains gated, and M5+ remain unauthorized.
-- **Authorization branch:** `docs/m4-planning-authorization`, based on synchronized, clean `main` at `539860d`.
+- **Checkpoint name:** `m4-a-authorized`
+- **Latest merged implementation commit:** `6103ced` (`chore: complete M3 hardening audit (#68)`), squash-merged through [PR #68](https://github.com/Jayc92/atlast/pull/68) on 2026-08-17. M4-A is authorized but not yet implemented, so this remains the latest merged _product-implementation_ commit; the M4 baseline acceptance (PR #71) is a documentation-only commit.
+- **Verification:** PR #68 GitHub Actions `verify` passed in 3m56s. The complete seven-stage verifier passed again on the real merge commit: shared 420/420, overlay-model 23/23, graph-model 372/372, API 89/89, web 229/229, browser acceptance 34/34, plus whitespace, formatting, lint, types, and production builds. PR #71 (M4 baseline acceptance, documentation-only) separately passed GitHub Actions `verify`.
+- **Milestone state:** M0 through M3 are formally complete. The M4 implementation baseline — [docs/m4-plan.md](docs/m4-plan.md) and ADRs 0032–0035 — was independently reviewed, corrected, and explicitly accepted by Joseph Carfagno; the acceptance record merged through [PR #71](https://github.com/Jayc92/atlast/pull/71) at `8e93d10` on 2026-08-17. Joseph then explicitly authorized **M4-A** as the only active implementation slice, within the exact boundary [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and [TASKS.md](TASKS.md) state. M4-A is not yet implemented. M4-B through M4-E and M5+ remain unauthorized.
+- **Authorization branch:** `docs/m4-a-authorization`, based on synchronized, clean `main` at `8e93d10`.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
 ## 2. Product Summary
@@ -50,14 +50,14 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 
 ## 4. Roadmap Position
 
-| Milestone | State                 | Evidence                                 |
-| --------- | --------------------- | ---------------------------------------- |
-| M0        | Complete - 2026-07-22 | Foundation and closure audit             |
-| M1        | Complete - 2026-08-12 | S1-S8; checkpoint `m1-complete`          |
-| M2        | Complete - 2026-08-16 | M2-A-F; checkpoint `m2-complete`         |
-| M3        | Complete - 2026-08-17 | M3-A-F; PR #68; checkpoint `m3-complete` |
-| M4        | Planning authorized   | Product implementation remains gated     |
-| M5        | Unauthorized          | No planning or implementation may begin  |
+| Milestone | State                              | Evidence                                 |
+| --------- | ---------------------------------- | ---------------------------------------- |
+| M0        | Complete - 2026-07-22              | Foundation and closure audit             |
+| M1        | Complete - 2026-08-12              | S1-S8; checkpoint `m1-complete`          |
+| M2        | Complete - 2026-08-16              | M2-A-F; checkpoint `m2-complete`         |
+| M3        | Complete - 2026-08-17              | M3-A-F; PR #68; checkpoint `m3-complete` |
+| M4        | Baseline accepted; M4-A authorized | M4-A not yet implemented; M4-B+ gated    |
+| M5        | Unauthorized                       | No planning or implementation may begin  |
 
 M3 delivered synthetic operational health without making overlays graph truth:
 
@@ -88,25 +88,26 @@ Both M3 exit criteria are closed:
 
 ## 6. Current Git State
 
-At the planning-authorization checkpoint before this documentation commit:
+At the M4-A-authorization checkpoint before this documentation commit:
 
 ```text
-539860d (HEAD -> main, origin/main, origin/HEAD) docs: close M3 operational health milestone (#69)
+8e93d10 (HEAD -> main, origin/main, origin/HEAD) docs: accept M4 architecture baseline (#71)
+ba87a29 docs: authorize M4 planning phase (#70)
+539860d docs: close M3 operational health milestone (#69)
 6103ced chore: complete M3 hardening audit (#68)
 71f0e7e docs: close M3-E and authorize M3-F (#67)
-9b4343e test: harden M3 health overlay acceptance (#66)
-ce6c146 docs: close M3-D and authorize M3-E (#65)
 ```
 
 Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-No implementation slice is active. M4 planning and pre-release architecture/ADR review are authorized: produce a proposed `docs/m4-plan.md`, Proposed ADRs for implementation-critical decisions, a verification strategy, and bounded implementation slices. M4 product implementation remains gated until that complete baseline is independently reviewed, explicitly accepted by Joseph Carfagno, and the first implementation slice receives a separate release.
+**M4-A** is the only active authorized implementation slice, within the exact boundary [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and [TASKS.md](TASKS.md) state: additive `packages/shared` impact contracts (`impactChangeTypeSchema`, `ImpactPathStep`, `ImpactResult`, the impact-query HTTP envelope per ADR-0033 § 2); the new workspace package `packages/impact-model` implementing the pure deterministic engine per ADR-0032 §§ 3–4 (eligible-edge qualification, the two-phase widest-path/maximin search and its exact tie-break chain, upstream/downstream path orientation, rank-score/ordering), depending only on `@atlast/shared`, with its manifest/tsconfig/build plumbing and the resulting deterministic `pnpm-lock.yaml` importer-block change; focused unit tests; and the ADR-0035 § 3 engine contract-test suite (hand-authored immutable `TraversalResult` vectors, no new Evidence or fixture). No `apps/api` route, fixture catalog, `apps/web` change, or new third-party dependency is authorized.
 
 ## 8. Prohibited Work
 
-- Any M4 product implementation before baseline acceptance and a separate slice release.
+- Any M4-A implementation beyond the exact boundary above.
+- Any M4-B through M4-E implementation before M4-A's implementation is independently reviewed, verified, merged, and M4-B is separately released.
 - Any M5+ planning or implementation before separate authorization.
 - Real systems, credentials, employer/customer data, connectors, authentication, deployment, or external publication.
 - Product writes or mutation routes.
@@ -148,20 +149,23 @@ You are taking over as conductor for Atlast at
 (GitHub: https://github.com/Jayc92/atlast).
 
 Before acting, read HANDOFF.md, PROJECT_SPEC.md, GUARDRAILS.md, CLAUDE.md,
-TASKS.md, docs/architecture.md, docs/milestones.md, docs/m3-plan.md, and the
-ADR index. Inspect git status and git log; real Git state overrides stale text.
+TASKS.md, docs/architecture.md, docs/milestones.md, docs/m4-plan.md, and the
+ADR index (ADRs 0032-0035). Inspect git status and git log; real Git state
+overrides stale text.
 
-M0 through M3 are formally complete. M3-F merged through PR #68 at 6103ced
-after independent review, explicit human publication approval, passing GitHub
-Actions, and passing post-merge verification. Joseph Carfagno explicitly
-authorized M4 planning and pre-release architecture/ADR review on 2026-08-17.
-Checkpoint m4-planning-authorized is the current boundary. No implementation
-slice is active. M4 product implementation remains gated; M5+ are unauthorized.
+M0 through M3 are formally complete. The M4 implementation baseline
+(docs/m4-plan.md, ADRs 0032-0035) was independently reviewed, corrected, and
+explicitly accepted by Joseph Carfagno, merging through PR #71 at 8e93d10 on
+2026-08-17. Joseph then explicitly authorized M4-A as the only active
+implementation slice, within the exact boundary docs/m4-plan.md § 6 and
+TASKS.md state. Checkpoint m4-a-authorized is the current boundary. M4-A is
+not yet implemented. M4-B through M4-E and M5+ are unauthorized.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic,
-read-only, and fail-honest boundaries. Produce only the proposed M4 plan,
-Proposed ADRs, review corrections, and factual planning records. Do not
-implement M4 product behavior until Joseph accepts the reviewed baseline and
-separately releases its first slice. Do not plan or implement M5+. Begin by
-reporting your understanding of checkpoint m4-planning-authorized.
+read-only, and fail-honest boundaries. Implement only the exact M4-A boundary:
+additive packages/shared impact contracts, the new packages/impact-model pure
+engine, its unit tests, and the ADR-0035 engine contract-test suite. Do not
+add an apps/api route, a fixture catalog, or any apps/web change — those are
+M4-B+. Do not plan or implement M5+. Begin by reporting your understanding of
+checkpoint m4-a-authorized.
 ```

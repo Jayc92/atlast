@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 through M3 complete; M4 planning authorized.** M3-F merged through PR #68 at `6103ced` after independent review, explicit human publication approval, passing GitHub Actions, and passing post-merge verification. Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17. **No implementation slice is active; M4 product implementation remains gated, and M5+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 through M3 complete; M4 baseline accepted; M4-A authorized.** M3-F merged through PR #68 at `6103ced` after independent review, explicit human publication approval, passing GitHub Actions, and passing post-merge verification. Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17, then explicitly accepted the M4 implementation baseline (`docs/m4-plan.md`, ADRs 0032–0035) on 2026-08-17 through [PR #71](https://github.com/Jayc92/atlast/pull/71). Joseph then explicitly authorized **M4-A** as the only active implementation slice. **M4-A is not yet implemented; M4-B through M4-E and M5+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -129,7 +129,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-M0 through M3 are formally complete ([TASKS.md](TASKS.md)); checkpoint `m3-complete` records their merged implementation, audit, and post-merge verification evidence. M4 planning and pre-release architecture/ADR review are authorized, but no implementation slice is active. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4 product implementation remains gated; M5+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+M0 through M3 are formally complete ([TASKS.md](TASKS.md)); checkpoint `m3-complete` records their merged implementation, audit, and post-merge verification evidence. The M4 implementation baseline is accepted, and M4-A is the only active authorized implementation slice, not yet implemented. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4-B through M4-E and M5+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 

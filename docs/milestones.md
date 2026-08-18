@@ -111,9 +111,9 @@
 
 ---
 
-## M4 — Change-Impact Simulation (planning authorized; implementation gated)
+## M4 — Change-Impact Simulation (baseline accepted; M4-A authorized; M4-B+ gated)
 
-> **Authorization status:** Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17 after M3 formally closed through PR #69 at `539860d`. The only released work is the proposed M4 implementation plan, Proposed ADRs, independent architecture review and corrections, bounded-slice design, synthetic accuracy/verification strategy, and factual planning records. M4 product implementation requires explicit acceptance of that complete reviewed baseline and a separate release of its first slice. M5+ remain unauthorized.
+> **Authorization status:** Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17 after M3 formally closed through PR #69 at `539860d`. The released work was the proposed M4 implementation plan, Proposed ADRs 0032-0035, independent architecture review and corrections, bounded-slice design, synthetic accuracy/verification strategy, and factual planning records. **Joseph Carfagno then explicitly accepted [docs/m4-plan.md](m4-plan.md) and ADRs [0032](adr/0032-m4-change-impact-domain-model.md)-[0035](adr/0035-m4-synthetic-accuracy-harness.md) as the M4 implementation baseline on 2026-08-17**, after independent architecture review and correction; the acceptance record merged through [PR #71](https://github.com/Jayc92/atlast/pull/71) at `8e93d10`. **Joseph Carfagno then explicitly authorized M4-A** (recorded in [TASKS.md](../TASKS.md)) as the only active implementation slice, within the exact boundary [docs/m4-plan.md § 6](m4-plan.md#6-proposed-implementation-slices) states: additive `packages/shared` impact contracts and the new `packages/impact-model` pure deterministic engine, its unit tests, and the ADR-0035 engine contract-test suite — no `apps/api` route, fixture catalog, or `apps/web` change. M4-A is not yet implemented. **M4-B through M4-E and M5+ remain unauthorized.**
 
 **Goal:** Answer "if I change X, what is affected?" with deterministic, explainable analysis over synthetic topologies.
 
