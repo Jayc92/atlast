@@ -61,6 +61,17 @@ Binding decisions are made only through human-approved ADRs ([GUARDRAILS.md § 1
 
 **M3 approval note (2026-08-16):** Joseph Carfagno explicitly accepted ADRs 0029-0031 and approved [docs/m3-plan.md](../m3-plan.md) as the M3 implementation baseline after independent architecture review, correction, and focused re-review. M3-A was separately released, implemented, and closed through PR #56 at `a767c93`. Joseph then separately authorized M3-B only; activation requires its authorization record to merge and local `main` to synchronize cleanly. M3-C through M3-F and M4+ remain unauthorized.
 
+### Accepted M4 baseline (not implementation authority)
+
+| ADR                                                      | Decision                                                                                                        | Status   |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------- |
+| [0032](0032-m4-change-impact-domain-model.md)            | Deterministic change-impact domain model, change-type semantics, and confidence-weighted widest-path ranking    | Accepted |
+| [0033](0033-m4-impact-query-api-contract.md)             | One composed, bounded impact-query API route reusing the existing traversal contract                            | Accepted |
+| [0034](0034-m4-impact-presentation-and-accessibility.md) | Optional, entity-scoped impact panel with precise non-color rank/change-type semantics and accessibility parity | Accepted |
+| [0035](0035-m4-synthetic-accuracy-harness.md)            | Exact-match scripted-scenario accuracy harness, running under the existing verifier with no new CI stage        | Accepted |
+
+**M4 approval note (2026-08-17):** ADRs 0032-0035 and [docs/m4-plan.md](../m4-plan.md) were drafted as the proposed M4 implementation baseline under Joseph Carfagno's 2026-08-17 authorization of M4 planning and pre-release architecture/ADR review only, independently reviewed and corrected, then **explicitly accepted by Joseph Carfagno on 2026-08-17** as the M4 implementation baseline. Acceptance becomes operational only after this record merges to `main` and local `main` is synchronized cleanly. **This acceptance does not release M4-A** — M4-A requires its own separate, explicit implementation authorization after that merge. M4 implementation remains gated until M4-A is separately released; M5+ remain unauthorized.
+
 **Approval note (2026-07-23):** ADRs 0014–0018 were accepted by human review as the **M1 architecture baseline**, alongside approval of [docs/m1-plan.md](../m1-plan.md). Acceptance settles the M1 planning decisions only — **it does not authorize M1 implementation**, which requires its own separate, explicit human authorization per [docs/milestones.md](../milestones.md).
 
 **Approval note (2026-07-23, ADR-0019):** ADR-0019's identity-only subject decision was **accepted by human review**, resolving the internal contradiction between ADR-0014's typed-subject clauses and ADR-0015's coexisting-conflicting-claims requirement. It amends **only** those identified clauses (metadata-only amendment notices on ADR-0014/0015; their accepted decision text is preserved). Acceptance **unblocks Slice S1** — it does not authorize S2–S8 or M2+, which remain gated as before.
