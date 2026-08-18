@@ -49,6 +49,14 @@ export class RequestValidationError extends Error {
   }
 }
 
+/** Thrown for request input that an accepted route contract classifies as malformed. */
+export class MalformedRequestError extends Error {
+  constructor() {
+    super("The request could not be parsed.");
+    this.name = "MalformedRequestError";
+  }
+}
+
 /**
  * Thrown when a repository result fails its own exact response schema
  * (ADR-0024 § 11) before `reply.send` — never exposed to the client; always
@@ -187,6 +195,16 @@ function buildInvalidReadCoordinateDetails(
 function mapKnownError(
   error: unknown,
 ): { statusCode: number; body: ErrorResponse } | undefined {
+  if (error instanceof MalformedRequestError) {
+    return {
+      statusCode: 400,
+      body: {
+        code: "MALFORMED_REQUEST",
+        message: "The request could not be parsed.",
+        details: {},
+      },
+    };
+  }
   if (error instanceof RequestValidationError) {
     return {
       statusCode: 400,

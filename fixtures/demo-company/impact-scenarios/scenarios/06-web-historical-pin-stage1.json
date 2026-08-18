@@ -1,0 +1,29 @@
+{
+  "id": "web-historical-pin-stage1",
+  "description": "The identical web-downstream query as the invariance group (01-03), but pinned to scenario 7's first declared asOfSeed (2026-04-01T12:00:00.000Z, stage 1: only web -> api exists yet). The expected result differs from the full-catalog pin's three-entity result, proving scenario replay is temporally bound rather than accidentally latest-only (ADR-0035 § 3).",
+  "originEntityIdentifier": "atlast:entity:web",
+  "changeType": "removal",
+  "direction": "downstream",
+  "depth": 3,
+  "minimumConfidence": 0,
+  "pin": {
+    "asOf": "2026-04-01T12:00:00.000Z",
+    "horizon": 20,
+    "derivationVersion": "m1-v1"
+  },
+  "expectedResults": [
+    {
+      "entityIdentifier": "atlast:entity:api",
+      "rankScore": 0.5,
+      "pathEdgeCount": 1,
+      "path": [
+        {
+          "sourceEntityIdentifier": "atlast:entity:web",
+          "targetEntityIdentifier": "atlast:entity:api",
+          "relationshipIdentifier": "atlast:relationship:web-calls-api",
+          "assertionIdentifier": "atlast:assertion:c28a1f877d25e67c609817487accf015ea234318f671e12b58d8729ccd2fad8e"
+        }
+      ]
+    }
+  ]
+}

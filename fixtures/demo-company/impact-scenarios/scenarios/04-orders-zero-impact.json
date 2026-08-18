@@ -1,0 +1,15 @@
+{
+  "id": "orders-zero-impact",
+  "description": "The orders entity (scenario 3's conflicting-type seed) has no Relationship evidence at all in the retained catalog, so a downstream impact query from it correctly scores an empty ranked list — proving an empty results array is a correctly scripted, non-error outcome (ADR-0035 § 3).",
+  "originEntityIdentifier": "atlast:entity:orders",
+  "changeType": "degradation",
+  "direction": "downstream",
+  "depth": 2,
+  "minimumConfidence": 0,
+  "pin": {
+    "asOf": "2026-04-20T12:00:00.000Z",
+    "horizon": 20,
+    "derivationVersion": "m1-v1"
+  },
+  "expectedResults": []
+}

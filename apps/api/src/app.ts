@@ -7,7 +7,7 @@
  * socket (ADR-0009).
  *
  * `buildApplication` always requires its repository dependencies and always
- * registers `/health` plus all nine product routes — there is no conditional
+ * registers `/health` plus all ten product routes — there is no conditional
  * registration and no zero-argument call form. Every `FastifyInstance` this
  * function produces exposes the identical route set, whether in production
  * or in any test, satisfying ADR-0009's "the fully assembled application"
@@ -35,6 +35,7 @@ import { mapFrameworkError, registerErrorHandling } from "./http/errors.ts";
 import { registerEntityRoutes } from "./routes/entities.ts";
 import { registerEvidenceRoutes } from "./routes/evidence.ts";
 import { registerHealthContextRoutes } from "./routes/health-context.ts";
+import { registerImpactRoutes } from "./routes/impact.ts";
 import { registerSearchRoutes } from "./routes/search.ts";
 import { registerSnapshotRoutes } from "./routes/snapshots.ts";
 import { registerTraversalRoutes } from "./routes/traversal.ts";
@@ -65,7 +66,8 @@ export interface ApplicationDependencies {
 
 /**
  * Build the fully assembled application: `/health`, the eight M1/M2 query
- * routes, the M3 health-context route, and the closed error boundary. Every
+ * routes, the M3 health-context route, the M4 impact route, and the closed
+ * error boundary. Every
  * call requires the complete repository dependency pair — there is no
  * default, throwaway, or health-only variant (ADR-0024 § 12).
  */
@@ -94,6 +96,7 @@ export function buildApplication(
   registerSearchRoutes(application, dependencies);
   registerTraversalRoutes(application, dependencies);
   registerHealthContextRoutes(application, dependencies);
+  registerImpactRoutes(application, dependencies);
   registerEvidenceRoutes(application, dependencies);
   registerSnapshotRoutes(application, dependencies);
 
