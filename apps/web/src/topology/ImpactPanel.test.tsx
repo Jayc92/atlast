@@ -39,6 +39,15 @@ function selectValue(element: HTMLElement): string {
   return element.value;
 }
 
+/** The text of the enclosing path-step `<li>` for a step's inspect button. */
+function pathStepText(inspectButton: HTMLElement): string {
+  const listItem = inspectButton.closest("li");
+  if (listItem === null) {
+    throw new Error("Expected the inspect button to be inside a <li>");
+  }
+  return listItem.textContent;
+}
+
 function defaultProps(
   overrides: {
     readonly onChangeTypeChange?: (changeType: string) => void;
@@ -214,6 +223,115 @@ describe("ImpactPanel", () => {
         name: `Inspect evidence for ${SECOND_AFFECTED_ENTITY_IDENTIFIER} step 1`,
       }),
     ).toBeDefined();
+  });
+
+  it("renders a multi-hop path in traversal order with a pluralized edge count and uniquely-named steps", async () => {
+    const MID_ENTITY_IDENTIFIER = "atlast:entity:service/orders";
+    const SECOND_RELATIONSHIP_IDENTIFIER =
+      "atlast:relationship:calls/orders-billing";
+    const SECOND_ASSERTION_IDENTIFIER = `atlast:assertion:${"d".repeat(64)}`;
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes("/impact?"),
+        buildImpactResultEnvelope({
+          originEntityIdentifier: ORIGIN_ENTITY_IDENTIFIER,
+          changeType: "removal",
+          items: [
+            buildRelationshipSubjectReadResult({
+              identifier: RELATIONSHIP_IDENTIFIER,
+              relationshipType: "calls",
+              sourceEntityIdentifier: ORIGIN_ENTITY_IDENTIFIER,
+              targetEntityIdentifier: MID_ENTITY_IDENTIFIER,
+            }),
+            buildRelationshipSubjectReadResult({
+              identifier: SECOND_RELATIONSHIP_IDENTIFIER,
+              relationshipType: "calls",
+              sourceEntityIdentifier: MID_ENTITY_IDENTIFIER,
+              targetEntityIdentifier: AFFECTED_ENTITY_IDENTIFIER,
+            }),
+          ],
+          results: [
+            buildImpactResult({
+              entityIdentifier: AFFECTED_ENTITY_IDENTIFIER,
+              rankScore: 0.6,
+              path: [
+                {
+                  sourceEntityIdentifier: ORIGIN_ENTITY_IDENTIFIER,
+                  targetEntityIdentifier: MID_ENTITY_IDENTIFIER,
+                  relationshipIdentifier: RELATIONSHIP_IDENTIFIER,
+                  assertionIdentifier: ASSERTION_IDENTIFIER,
+                },
+                {
+                  sourceEntityIdentifier: MID_ENTITY_IDENTIFIER,
+                  targetEntityIdentifier: AFFECTED_ENTITY_IDENTIFIER,
+                  relationshipIdentifier: SECOND_RELATIONSHIP_IDENTIFIER,
+                  assertionIdentifier: SECOND_ASSERTION_IDENTIFIER,
+                },
+              ],
+            }),
+          ],
+        }),
+      ),
+    ]);
+
+    render(<ImpactPanel {...defaultProps()} />);
+
+    expect(await screen.findByText("2 edges")).toBeDefined();
+    // The path renders origin-outward in traversal order (ADR-0032 § 3), not
+    // reordered or deduplicated by the browser.
+    const firstStep = await screen.findByRole("button", {
+      name: `Inspect evidence for ${AFFECTED_ENTITY_IDENTIFIER} step 1`,
+    });
+    const secondStep = await screen.findByRole("button", {
+      name: `Inspect evidence for ${AFFECTED_ENTITY_IDENTIFIER} step 2`,
+    });
+    expect(pathStepText(firstStep)).toContain(
+      `${ORIGIN_ENTITY_IDENTIFIER} → ${MID_ENTITY_IDENTIFIER} via ${RELATIONSHIP_IDENTIFIER}`,
+    );
+    expect(pathStepText(secondStep)).toContain(
+      `${MID_ENTITY_IDENTIFIER} → ${AFFECTED_ENTITY_IDENTIFIER} via ${SECOND_RELATIONSHIP_IDENTIFIER}`,
+    );
+  });
+
+  it("shows an honest gap notice, with no interactive control, when a path step's relationship is missing from the loaded traversal", async () => {
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes("/impact?"),
+        buildImpactResultEnvelope({
+          originEntityIdentifier: ORIGIN_ENTITY_IDENTIFIER,
+          changeType: "removal",
+          // Deliberately empty `items`: the path step below cites a
+          // relationship the traversal did not return, exercising the
+          // honest-degradation branch rather than a crash or a silent gap.
+          items: [],
+          results: [
+            buildImpactResult({
+              entityIdentifier: AFFECTED_ENTITY_IDENTIFIER,
+              rankScore: 0.5,
+              path: [
+                {
+                  sourceEntityIdentifier: ORIGIN_ENTITY_IDENTIFIER,
+                  targetEntityIdentifier: AFFECTED_ENTITY_IDENTIFIER,
+                  relationshipIdentifier: RELATIONSHIP_IDENTIFIER,
+                  assertionIdentifier: ASSERTION_IDENTIFIER,
+                },
+              ],
+            }),
+          ],
+        }),
+      ),
+    ]);
+
+    render(<ImpactPanel {...defaultProps()} />);
+
+    expect(
+      await screen.findByText(
+        /evidence for this step could not be located in the loaded traversal/i,
+      ),
+    ).toBeDefined();
+    expect(
+      screen.queryByRole("button", { name: /Inspect evidence/ }),
+    ).toBeNull();
   });
 
   it("shows an explicit truncation notice when the traversal is truncated", async () => {
