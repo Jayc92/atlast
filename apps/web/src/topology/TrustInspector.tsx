@@ -18,6 +18,12 @@ export interface TrustInspectorProps {
   readonly traversalTruncated?: boolean;
   readonly returnFocus: HTMLElement | null;
   readonly onClose: () => void;
+  /**
+   * The M4-C impact-panel entry point (ADR-0034 § 1/§ 6). Omitted by any
+   * caller that only ever inspects Relationship subjects (e.g.
+   * `TopologyPage`); rendered only when the inspected subject is an Entity.
+   */
+  readonly onAnalyzeImpact?: (entityIdentifier: string) => void;
 }
 
 function confidenceText(confidence: number): string {
@@ -202,6 +208,7 @@ export function TrustInspector({
   traversalTruncated = false,
   returnFocus,
   onClose,
+  onAnalyzeImpact,
 }: TrustInspectorProps): ReactElement {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
@@ -246,15 +253,28 @@ export function TrustInspector({
           </h2>
           <p>{selection.subject.subject.identifier}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            onClose();
-            window.setTimeout(() => returnFocus?.focus(), 0);
-          }}
-        >
-          Close inspector
-        </button>
+        <div className="trust-inspector-actions">
+          {onAnalyzeImpact !== undefined &&
+            selection.subject.subject.subjectKind === "entity" && (
+              <button
+                type="button"
+                onClick={() => {
+                  onAnalyzeImpact(selection.subject.subject.identifier);
+                }}
+              >
+                Analyze impact on {selection.subject.subject.identifier}
+              </button>
+            )}
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              window.setTimeout(() => returnFocus?.focus(), 0);
+            }}
+          >
+            Close inspector
+          </button>
+        </div>
       </header>
 
       {traversalTruncated && (

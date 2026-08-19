@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router";
 import type {
   EffectiveHealthState,
+  ImpactChangeType,
   SnapshotIdentity,
   SubjectDetailResult,
   TraversalDirection,
@@ -28,6 +29,7 @@ import {
   HealthOverlayLoadingStatus,
   HealthOverlayMismatchStatus,
 } from "./HealthOverlayStatus.tsx";
+import { ImpactPanel } from "./ImpactPanel.tsx";
 import {
   ApiErrorStatus,
   InternalErrorStatus,
@@ -95,6 +97,7 @@ function useNarrowTopologyViewport(): boolean {
 
 export function EntityDetailPage(): ReactElement {
   const inspectorReturnFocusRef = useRef<HTMLElement | null>(null);
+  const impactReturnFocusRef = useRef<HTMLElement | null>(null);
   const routeParams = useParams<{ entityId: string }>();
   const trimmedEntityId = routeParams.entityId?.trim();
   const isValidEntityId =
@@ -336,6 +339,38 @@ export function EntityDetailPage(): ReactElement {
     setSearchParams(serializeTopologyUrlState(withoutSelected));
   };
 
+  /**
+   * `changeType` is valid only when `selected` names an Entity (ADR-0034
+   * § 1), so opening the impact panel from either entity detail or the
+   * trust inspector always (re-)selects the target Entity alongside a
+   * default `changeType`, defaulting to `removal`.
+   */
+  const openImpactPanel = (entityIdentifier: string): void => {
+    impactReturnFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    setSearchParams(
+      serializeTopologyUrlState({
+        ...urlState,
+        selected: entityIdentifier,
+        changeType: "removal",
+      }),
+    );
+  };
+
+  const closeImpactPanel = (): void => {
+    const withoutChangeType = { ...urlState };
+    delete withoutChangeType.changeType;
+    setSearchParams(serializeTopologyUrlState(withoutChangeType));
+  };
+
+  const changeImpactChangeType = (nextChangeType: ImpactChangeType): void => {
+    setSearchParams(
+      serializeTopologyUrlState({ ...urlState, changeType: nextChangeType }),
+    );
+  };
+
   if (!isValidEntityId) {
     return <Navigate to="/topology" replace />;
   }
@@ -462,6 +497,14 @@ export function EntityDetailPage(): ReactElement {
               >
                 Inspect entity trust
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  openImpactPanel(view.identifier);
+                }}
+              >
+                Analyze impact on {view.identifier}
+              </button>
             </article>
           );
         })()}
@@ -548,8 +591,24 @@ export function EntityDetailPage(): ReactElement {
             : {})}
           returnFocus={inspectorReturnFocusRef.current}
           onClose={clearSelected}
+          onAnalyzeImpact={openImpactPanel}
         />
       )}
+      {urlState.changeType !== undefined &&
+        urlState.selected !== undefined &&
+        identity !== undefined && (
+          <ImpactPanel
+            originEntityIdentifier={urlState.selected}
+            changeType={urlState.changeType}
+            direction={direction}
+            depth={depth}
+            minConfidence={minConfidence}
+            identity={identity}
+            returnFocus={impactReturnFocusRef.current}
+            onChangeTypeChange={changeImpactChangeType}
+            onClose={closeImpactPanel}
+          />
+        )}
       {identity !== undefined && (
         <p className="topology-snapshot-indicator">
           Snapshot: {urlState.pin !== undefined ? "pinned" : "latest"} · asOf{" "}

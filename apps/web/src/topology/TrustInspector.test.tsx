@@ -5,6 +5,7 @@ import { TrustInspector } from "./TrustInspector.tsx";
 import { topologyRequestCache } from "./session.ts";
 import {
   buildEvidenceDetailResult,
+  buildRelationshipSubjectReadResult,
   buildSubjectReadResult,
   FIXTURE_EVIDENCE_IDENTIFIER,
   FIXTURE_IDENTITY,
@@ -210,5 +211,94 @@ describe("TrustInspector", () => {
       expect(writeText).toHaveBeenCalledWith(JSON.stringify(FIXTURE_IDENTITY));
       expect(screen.getByText("Snapshot identity copied.")).toBeDefined();
     });
+  });
+
+  it("offers Analyze impact for an Entity subject when the callback is supplied", () => {
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+        buildEvidenceDetailResult(),
+      ),
+    ]);
+    const onAnalyzeImpact = vi.fn();
+
+    render(
+      <TrustInspector
+        selection={{
+          subject: buildSubjectReadResult({
+            identifier: "atlast:entity:checkout",
+            entityType: "service",
+          }),
+        }}
+        snapshotIdentity={FIXTURE_IDENTITY}
+        returnFocus={null}
+        onClose={() => undefined}
+        onAnalyzeImpact={onAnalyzeImpact}
+      />,
+    );
+
+    screen
+      .getByRole("button", {
+        name: "Analyze impact on atlast:entity:checkout",
+      })
+      .click();
+    expect(onAnalyzeImpact).toHaveBeenCalledWith("atlast:entity:checkout");
+  });
+
+  it("omits Analyze impact for a Relationship subject even when the callback is supplied", () => {
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+        buildEvidenceDetailResult(),
+      ),
+    ]);
+
+    render(
+      <TrustInspector
+        selection={{
+          subject: buildRelationshipSubjectReadResult({
+            identifier: "atlast:relationship:calls/checkout-orders",
+            relationshipType: "calls",
+            sourceEntityIdentifier: "atlast:entity:checkout",
+            targetEntityIdentifier: "atlast:entity:orders",
+          }),
+        }}
+        snapshotIdentity={FIXTURE_IDENTITY}
+        returnFocus={null}
+        onClose={() => undefined}
+        onAnalyzeImpact={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /Analyze impact on/ }),
+    ).toBeNull();
+  });
+
+  it("omits Analyze impact when no callback is supplied", () => {
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+        buildEvidenceDetailResult(),
+      ),
+    ]);
+
+    render(
+      <TrustInspector
+        selection={{
+          subject: buildSubjectReadResult({
+            identifier: "atlast:entity:checkout",
+            entityType: "service",
+          }),
+        }}
+        snapshotIdentity={FIXTURE_IDENTITY}
+        returnFocus={null}
+        onClose={() => undefined}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /Analyze impact on/ }),
+    ).toBeNull();
   });
 });
