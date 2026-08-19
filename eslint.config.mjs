@@ -80,14 +80,16 @@ export default defineConfig(
   },
 
   {
-    // The M2-A browser import boundary (ADR-0026 § 5; docs/m2-plan.md § 6):
+    // The M2-A browser import boundary (ADR-0026 § 5; docs/m2-plan.md § 6),
+    // extended by M4-E (ADR-0033 § 3.5) to also cover packages/impact-model:
     // apps/web must never import fixtures, packages/graph-model,
-    // packages/overlay-model, or an apps/api server module — every graph
-    // and overlay read happens over the query API, never a
-    // side door. `@atlast/shared` (types and the additive HTTP schemas) is
-    // apps/web's one approved workspace dependency and is deliberately not
-    // matched by any pattern below. Enforced with the built-in
-    // `no-restricted-imports` rule — no new ESLint plugin dependency.
+    // packages/overlay-model, packages/impact-model, or an apps/api server
+    // module — every graph, overlay, and impact read happens over the query
+    // API, never a side door. `@atlast/shared` (types and the additive HTTP
+    // schemas) is apps/web's one approved workspace dependency and is
+    // deliberately not matched by any pattern below. Enforced with the
+    // built-in `no-restricted-imports` rule — no new ESLint plugin
+    // dependency.
     files: ["apps/web/src/**/*.ts", "apps/web/src/**/*.tsx"],
     rules: {
       "no-restricted-imports": [
@@ -103,6 +105,11 @@ export default defineConfig(
               name: "@atlast/overlay-model",
               message:
                 "apps/web must never import packages/overlay-model — read only through the query API (ADR-0026 § 3).",
+            },
+            {
+              name: "@atlast/impact-model",
+              message:
+                "apps/web must never import packages/impact-model — read only through the query API (ADR-0033 § 3.5).",
             },
             {
               name: "@atlast/api",
@@ -128,6 +135,15 @@ export default defineConfig(
               ],
               message:
                 "apps/web must never import packages/overlay-model — read only through the query API (ADR-0026 § 3).",
+            },
+            {
+              group: [
+                "@atlast/impact-model/*",
+                "**/packages/impact-model/**",
+                "**/impact-model/**",
+              ],
+              message:
+                "apps/web must never import packages/impact-model — read only through the query API (ADR-0033 § 3.5).",
             },
             {
               group: ["**/fixtures/**", "**/fixtures"],
