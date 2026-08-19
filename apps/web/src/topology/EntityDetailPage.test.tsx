@@ -506,6 +506,127 @@ describe("EntityDetailPage", () => {
       });
     });
 
+    it("closing the impact panel also closes a trust inspector that only opened as its side effect", async () => {
+      const detail = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      stubApiFetch([
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        jsonRoute(
+          (url) => url.includes("/impact?"),
+          buildImpactResultEnvelope({
+            originEntityIdentifier: "atlast:entity:checkout",
+            changeType: "removal",
+          }),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          detail,
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities?"),
+          buildEntityPage([]),
+        ),
+      ]);
+      renderEntityDetail("/entities/atlast%3Aentity%3Acheckout?view=list");
+
+      // Opening impact from the entity summary (not from an already-open
+      // trust inspector) sets `selected` as a side effect (ADR-0034 § 1),
+      // which also opens a trust inspector the user never asked for.
+      fireEvent.click(
+        await screen.findByRole("button", {
+          name: "Analyze impact on atlast:entity:checkout",
+        }),
+      );
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Impact analysis",
+      });
+      expect(
+        screen.getByRole("dialog", { name: "Trust inspector" }),
+      ).toBeDefined();
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Close impact panel" }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.queryByRole("heading", { name: "Impact analysis" }),
+        ).toBeNull();
+      });
+      expect(
+        screen.queryByRole("dialog", { name: "Trust inspector" }),
+      ).toBeNull();
+    });
+
+    it("closing the impact panel preserves a trust inspector the user deliberately opened first", async () => {
+      const detail = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      stubApiFetch([
+        jsonRoute(
+          (url) =>
+            url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+          buildEvidenceDetailResult(),
+        ),
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        jsonRoute(
+          (url) => url.includes("/impact?"),
+          buildImpactResultEnvelope({
+            originEntityIdentifier: "atlast:entity:checkout",
+            changeType: "removal",
+          }),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          detail,
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities?"),
+          buildEntityPage([]),
+        ),
+      ]);
+      renderEntityDetail("/entities/atlast%3Aentity%3Acheckout?view=list");
+
+      fireEvent.click(
+        await screen.findByRole("button", { name: "Inspect entity trust" }),
+      );
+      const inspectorDialog = await screen.findByRole("dialog", {
+        name: "Trust inspector",
+      });
+      fireEvent.click(
+        within(inspectorDialog).getByRole("button", {
+          name: "Analyze impact on atlast:entity:checkout",
+        }),
+      );
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Impact analysis",
+      });
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Close impact panel" }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.queryByRole("heading", { name: "Impact analysis" }),
+        ).toBeNull();
+      });
+      expect(
+        screen.getByRole("dialog", { name: "Trust inspector" }),
+      ).toBeDefined();
+    });
+
     it("opens the impact panel from the trust inspector's Analyze impact control", async () => {
       const detail = buildSubjectDetailResult({
         identifier: "atlast:entity:checkout",

@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactElement,
+} from "react";
 import type {
   AssertionReadResult,
   CanonicalClaim,
@@ -129,17 +136,25 @@ function collectEvidenceIdentifiers(
 function AssertionTrust({
   assertion,
   snapshotIdentity,
+  headingIdPrefix,
 }: {
   readonly assertion: AssertionReadResult;
   readonly snapshotIdentity: SnapshotIdentity;
+  /**
+   * Scopes this assertion's heading id to the enclosing `TrustInspector`
+   * instance. The impact panel's evidence drill-down can mount a second
+   * `TrustInspector` while the page's own trust inspector is already open
+   * (ADR-0034 § 3); without this prefix, two dialogs inspecting the same
+   * assertion identifier would emit duplicate DOM ids and break
+   * `aria-labelledby` resolution for the second one.
+   */
+  readonly headingIdPrefix: string;
 }): ReactElement {
   const { revision } = assertion;
+  const headingId = `${headingIdPrefix}-${revision.identifier}`;
   return (
-    <article
-      className="trust-assertion"
-      aria-labelledby={`trust-${revision.identifier}`}
-    >
-      <h3 id={`trust-${revision.identifier}`}>{revision.identifier}</h3>
+    <article className="trust-assertion" aria-labelledby={headingId}>
+      <h3 id={headingId}>{revision.identifier}</h3>
       <ClaimFields claim={revision.claim} />
       <dl className="trust-fields">
         <dt>Confidence</dt>
@@ -211,6 +226,13 @@ export function TrustInspector({
   onAnalyzeImpact,
 }: TrustInspectorProps): ReactElement {
   const headingRef = useRef<HTMLHeadingElement>(null);
+  // Scopes every id this instance renders so a second, simultaneously-open
+  // `TrustInspector` (the impact panel's evidence drill-down, ADR-0034 § 3)
+  // never collides with this one's DOM ids or `aria-labelledby` targets.
+  const instanceId = useId();
+  const headingId = `${instanceId}-trust-inspector-heading`;
+  const snapshotHeadingId = `${instanceId}-trust-snapshot-heading`;
+  const evidenceHeadingId = `${instanceId}-trust-evidence-heading`;
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
     "idle",
   );
@@ -243,12 +265,12 @@ export function TrustInspector({
     <aside
       className="trust-inspector"
       role="dialog"
-      aria-labelledby="trust-inspector-heading"
+      aria-labelledby={headingId}
     >
       <header className="trust-inspector-header">
         <div>
           <p className="topology-kicker">Why Atlast believes this</p>
-          <h2 id="trust-inspector-heading" ref={headingRef} tabIndex={-1}>
+          <h2 id={headingId} ref={headingRef} tabIndex={-1}>
             Trust inspector
           </h2>
           <p>{selection.subject.subject.identifier}</p>
@@ -290,8 +312,8 @@ export function TrustInspector({
         {orderedAssertions.length === 1 ? "" : "s"}; none is treated as a
         winner.
       </p>
-      <section aria-labelledby="trust-snapshot-heading">
-        <h3 id="trust-snapshot-heading">Snapshot identity</h3>
+      <section aria-labelledby={snapshotHeadingId}>
+        <h3 id={snapshotHeadingId}>Snapshot identity</h3>
         <dl className="trust-fields">
           <dt>As of</dt>
           <dd>{snapshotIdentity.asOf}</dd>
@@ -327,11 +349,12 @@ export function TrustInspector({
           key={assertion.revision.identifier}
           assertion={assertion}
           snapshotIdentity={snapshotIdentity}
+          headingIdPrefix={instanceId}
         />
       ))}
 
-      <section aria-labelledby="trust-evidence-heading">
-        <h3 id="trust-evidence-heading">Dereferenced Evidence</h3>
+      <section aria-labelledby={evidenceHeadingId}>
+        <h3 id={evidenceHeadingId}>Dereferenced Evidence</h3>
         {evidenceIdentifiers.map((identifier) => {
           const state = evidence.states[identifier] ?? {
             status: "loading" as const,

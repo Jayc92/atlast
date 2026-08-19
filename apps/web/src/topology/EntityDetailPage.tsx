@@ -343,13 +343,23 @@ export function EntityDetailPage(): ReactElement {
    * `changeType` is valid only when `selected` names an Entity (ADR-0034
    * § 1), so opening the impact panel from either entity detail or the
    * trust inspector always (re-)selects the target Entity alongside a
-   * default `changeType`, defaulting to `removal`.
+   * default `changeType`, defaulting to `removal`. When `selected` did not
+   * already name this Entity, opening impact analysis newly opens the trust
+   * inspector too, as a side effect the user did not directly ask for;
+   * `impactOpenedTrustInspectorRef` remembers that so closing the impact
+   * panel can undo exactly that side effect rather than leaving an
+   * unrequested trust inspector open (or, symmetrically, closing a trust
+   * inspector the user deliberately opened first).
    */
+  const impactOpenedTrustInspectorRef = useRef(false);
+
   const openImpactPanel = (entityIdentifier: string): void => {
     impactReturnFocusRef.current =
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null;
+    impactOpenedTrustInspectorRef.current =
+      urlState.selected !== entityIdentifier;
     setSearchParams(
       serializeTopologyUrlState({
         ...urlState,
@@ -360,9 +370,13 @@ export function EntityDetailPage(): ReactElement {
   };
 
   const closeImpactPanel = (): void => {
-    const withoutChangeType = { ...urlState };
-    delete withoutChangeType.changeType;
-    setSearchParams(serializeTopologyUrlState(withoutChangeType));
+    const next = { ...urlState };
+    delete next.changeType;
+    if (impactOpenedTrustInspectorRef.current) {
+      delete next.selected;
+      impactOpenedTrustInspectorRef.current = false;
+    }
+    setSearchParams(serializeTopologyUrlState(next));
   };
 
   const changeImpactChangeType = (nextChangeType: ImpactChangeType): void => {

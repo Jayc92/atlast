@@ -89,6 +89,61 @@ afterEach(() => {
 });
 
 describe("TrustInspector", () => {
+  it("scopes accessible labels across simultaneous inspector instances", async () => {
+    stubApiFetch([
+      jsonRoute(
+        (url) => url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+        buildEvidenceDetailResult(),
+      ),
+    ]);
+    const subject = buildSubjectReadResult({
+      identifier: "atlast:entity:checkout",
+      entityType: "service",
+    });
+    const assertionIdentifier = subject.assertions[0]?.revision.identifier;
+    if (assertionIdentifier === undefined) {
+      throw new Error("Expected fixture assertion");
+    }
+
+    const { container } = render(
+      <>
+        <TrustInspector
+          selection={{ subject }}
+          snapshotIdentity={FIXTURE_IDENTITY}
+          returnFocus={null}
+          onClose={() => undefined}
+        />
+        <TrustInspector
+          selection={{ subject }}
+          snapshotIdentity={FIXTURE_IDENTITY}
+          returnFocus={null}
+          onClose={() => undefined}
+        />
+      </>,
+    );
+
+    await screen.findAllByText(/production/);
+    const labelledElements = [
+      ...screen.getAllByRole("dialog", { name: "Trust inspector" }),
+      ...screen.getAllByRole("region", { name: "Snapshot identity" }),
+      ...screen.getAllByRole("region", { name: "Dereferenced Evidence" }),
+      ...screen.getAllByRole("article", {
+        name: assertionIdentifier,
+      }),
+    ];
+    const labelIds = labelledElements.map((element) =>
+      element.getAttribute("aria-labelledby"),
+    );
+
+    expect(labelIds.every((id) => id !== null)).toBe(true);
+    expect(new Set(labelIds).size).toBe(labelIds.length);
+    for (const id of labelIds) {
+      expect(container.querySelectorAll(`[id="${String(id)}"]`)).toHaveLength(
+        1,
+      );
+    }
+  });
+
   it("shows complete trust semantics, dereferences unique Evidence, and keeps partial failures visible", async () => {
     const fetchStub = stubApiFetch([
       jsonRoute(
