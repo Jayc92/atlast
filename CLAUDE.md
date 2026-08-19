@@ -8,17 +8,17 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 through M3 and M4-A through M4-C are complete.** M4-C was independently reviewed, fully verified, explicitly approved after human browser QA, and merged through PR #77 at `dc4a90a` on 2026-08-18 with GitHub Actions `verify` passing in 4m57s. Checkpoint `m4-c-impact-panel-merged` records that closure. Joseph Carfagno then explicitly authorized **M4-D** within the exact hardening and acceptance boundary in [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices). **M4-D becomes active only after this documentation record merges and local `main` synchronizes cleanly. M4-E and M5+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
+**M0 through M3 and M4-A through M4-D are complete.** M4-D was independently reviewed, fully verified, explicitly approved after human VoiceOver QA, and merged through PR #79 at `e5d4a2c` on 2026-08-19 with GitHub Actions `verify` passing in 4m26s. Checkpoint `m4-d-impact-hardening-merged` records that closure. **No implementation slice is active. M4-E and M5+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
 
 Permitted work right now, and nothing beyond it:
 
 - **Maintenance and corrections to the completed M0 foundation and the merged, formally complete S1–S8 slices** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — the S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, S5 reconciliation engine, S6 snapshot layer and in-memory repositories, S7 query API v1 routes and error contract in `apps/api`, and S8's boundary re-audit, exhaustive API traceability test, and documentation closeout.
 - **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0025) and of the checkpoint documentation ([HANDOFF.md](HANDOFF.md), per the checkpoint protocol below).
 - **Maintenance and corrections to completed M2 and M3 work** within accepted ADRs 0026-0031 and without extending product behavior.
-- **M4-D implementation only, after this authorization record merges and local `main` synchronizes cleanly** — accessibility, canonical-URL, truncation, empty-state, and failure-state hardening for the delivered impact panel; built-preview browser acceptance for the primary desktop and mobile impact journeys; representative VoiceOver QA; directly corresponding `apps/web` and acceptance tests; and factual measurements, all within accepted ADR-0034 and [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices). No dependency, API/domain/fixture, impact-engine, accepted-ADR, M4-E, or M5+ change.
+- **Maintenance and factual checkpoint documentation for completed M4-A through M4-D** within accepted ADRs 0032-0035 and without extending product behavior.
 - **Checkpoint documentation maintenance** that keeps merged facts, verification evidence, and milestone gates accurate.
 
-**M4-A through M4-C are complete. M4-D is the next authorized implementation slice and becomes operational only after this documentation record merges and local `main` synchronizes cleanly. M4-E, M5, and every later milestone remain unauthorized.**
+**M4-A through M4-D are complete. No implementation slice is active. M4-E, M5, and every later milestone remain unauthorized.**
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -31,10 +31,10 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**M0 through M3 and M4-A through M4-C are complete; checkpoint `m4-c-impact-panel-merged` is the current project boundary:**
+**M0 through M3 and M4-A through M4-D are complete; checkpoint `m4-d-impact-hardening-merged` is the current project boundary:**
 
 - Maintenance, corrections, and explicitly released M1 slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod, named by accepted ADR-0005, was introduced in S1 with its justification-at-PR).
-- **M1, M2, and M3 are formally complete, and M4-A through M4-C are merged.** M4-D is separately authorized within its exact bounded scope (`docs/m4-plan.md` § 6 and ADR-0034) after this record's merge/synchronization gate; do NOT implement M4-E or plan/implement M5+ work.
+- **M1, M2, and M3 are formally complete, and M4-A through M4-D are merged.** No implementation slice is active; do NOT implement M4-E or plan/implement M5+ work without separate explicit authorization.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
 - Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
 

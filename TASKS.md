@@ -1,6 +1,6 @@
 # Atlast — Tasks
 
-The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0 through M3 and M4-A through M4-C are complete. M4-C merged through PR #77 at `dc4a90a` on 2026-08-18 after independent review, complete verification, and explicit human browser-QA approval; checkpoint `m4-c-impact-panel-merged` records its closure.** Joseph Carfagno explicitly authorized M4-D on 2026-08-18 within the exact accepted hardening and browser-acceptance boundary. That release becomes operational only after this documentation record merges and local `main` synchronizes cleanly. **M4-E and M5+ remain unauthorized.**
+The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0 through M3 and M4-A through M4-D are complete. M4-D merged through PR #79 at `e5d4a2c` on 2026-08-19 after independent review, complete verification, and explicit human VoiceOver-QA approval; checkpoint `m4-d-impact-hardening-merged` records its closure.** No implementation slice is active. **M4-E and M5+ remain unauthorized.**
 
 **Legend:** `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked (note the blocker)
 
@@ -321,7 +321,7 @@ The new spec adds five tests, each running against the real compiled API and bui
 - [x] Health-in-context queries and UI overlay toggles
 - [x] Unknown-entity overlays surface as gaps, not phantom nodes
 
-## M4 — Change-Impact Simulation (M4-A/B/C complete; M4-D authorized; M4-E gated)
+## M4 — Change-Impact Simulation (M4-A/B/C/D complete; M4-E gated)
 
 **M4 planning authorization (2026-08-17):** after M3 formally closed through PR #69 at `539860d` and local `main` synchronized cleanly, Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review only. The released boundary is a proposed `docs/m4-plan.md`; Proposed ADRs resolving deterministic change semantics, confidence-weighted ranking, evidence-path explanations, synthetic accuracy measurement, API/browser boundaries, and verification strategy; bounded implementation slices; independent review and correction; and factual planning records. This authorization becomes operational only after its documentation PR merges and local `main` synchronizes cleanly. It authorizes no runtime code, fixture, schema, dependency, or M4 product implementation. M4 implementation requires explicit human acceptance of the complete reviewed baseline and a separate release of its first slice. M5+ remain unauthorized.
 
@@ -361,9 +361,9 @@ The exact-match scoring suite (`apps/api/src/test-support/impact-scenario-catalo
 
 **Checkpoint `m4-c-impact-panel-merged` — M4-C closeout (2026-08-18):** the independently reviewed and human-QA-approved candidate squash-merged through [PR #77](https://github.com/Jayc92/atlast/pull/77) at `dc4a90a`; GitHub Actions `verify` passed in 4m57s; and local `main` synchronized cleanly. The complete local verifier passed shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 259/259, and browser acceptance 34/34. Closing M4-C does not itself authorize later work; Joseph Carfagno separately authorized M4-D below.
 
-- [~] **M4-D - accessibility, canonical-state, failure-state, and browser-acceptance hardening** - **explicitly authorized by Joseph Carfagno on 2026-08-18**, within the exact [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and accepted [ADR-0034](docs/adr/0034-m4-impact-presentation-and-accessibility.md) boundary: harden accessibility, canonical URL behavior, truncation, empty states, and failure states for the delivered impact panel; add built-preview browser acceptance for the primary desktop and mobile impact journeys; perform representative VoiceOver QA; add directly corresponding `apps/web` and acceptance tests; and record factual measurements. **M4-D must NOT implement:** new dependencies; API, domain, fixture, or impact-engine behavior; browser-side ranking; accepted-ADR edits; M4-E boundary-audit/closeout work; or M5+ work. **This authorization becomes operational only after this documentation PR merges to `main` and local `main` synchronizes cleanly.**
+- [x] **M4-D - accessibility, canonical-state, failure-state, and browser-acceptance hardening** - **explicitly authorized by Joseph Carfagno on 2026-08-18**, within the exact [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and accepted [ADR-0034](docs/adr/0034-m4-impact-presentation-and-accessibility.md) boundary: harden accessibility, canonical URL behavior, truncation, empty states, and failure states for the delivered impact panel; add built-preview browser acceptance for the primary desktop and mobile impact journeys; perform representative VoiceOver QA; add directly corresponding `apps/web` and acceptance tests; and record factual measurements. **M4-D must NOT implement:** new dependencies; API, domain, fixture, or impact-engine behavior; browser-side ranking; accepted-ADR edits; M4-E boundary-audit/closeout work; or M5+ work. **This authorization became operational after PR #78 merged and local `main` synchronized cleanly.**
 
-**M4-D implementation record (2026-08-19, independently reviewed and human-QA-approved candidate, not yet merged):** on branch `feat/m4-d-impact-hardening` (based on synchronized `main` at `7fd6beb`), M4-D was implemented within the authorized boundary above, entirely inside `apps/web/**` and a new `tests/acceptance` spec — no `apps/api`, `packages/*`, fixture, dependency, lockfile, or accepted-ADR change.
+**M4-D implementation record (2026-08-19, merged):** on branch `feat/m4-d-impact-hardening` (based on synchronized `main` at `7fd6beb`), M4-D was implemented within the authorized boundary above, entirely inside `apps/web/**` and a new `tests/acceptance` spec — no `apps/api`, `packages/*`, fixture, dependency, lockfile, or accepted-ADR change.
 
 An accessibility/failure-state audit of the delivered M4-C impact panel, cross-checked by writing the required built-preview acceptance journey first, found two real defects (not merely missing coverage) and one genuine, previously-untested coverage gap in the component suite:
 
@@ -379,7 +379,7 @@ An accessibility/failure-state audit of the delivered M4-C impact panel, cross-c
 
 **Human browser QA approval (2026-08-19):** Joseph Carfagno explicitly approved the M4-D candidate after completing representative VoiceOver QA covering the primary impact-analysis journey, empty-result and failure states, focus return, and simultaneous trust/impact dialog naming.
 
-**Not yet done, and required before this checkpoint can close:** the PR/CI/merge/checkpoint sequence every prior slice followed. Nothing in this candidate has been committed, pushed, or merged.
+**Checkpoint `m4-d-impact-hardening-merged` — M4-D closeout (2026-08-19):** the independently reviewed and human-QA-approved candidate squash-merged through [PR #79](https://github.com/Jayc92/atlast/pull/79) at `e5d4a2c`; GitHub Actions `verify` passed in 4m26s; and local `main` synchronized cleanly. The complete local verifier passed shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 264/264, and browser acceptance 46/46. No implementation slice is active. Closing M4-D does not authorize M4-E; M4-E and M5+ remain gated and unauthorized.
 
 - [x] Deterministic impact query API with change-type semantics
 - [x] Ranked blast radius with evidence path per claim

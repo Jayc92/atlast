@@ -4,12 +4,12 @@ The canonical, model-neutral resume document for Atlast. Read this file with the
 
 ## 1. Document Control
 
-- **Last updated:** 2026-08-18
-- **Checkpoint name:** `m4-c-impact-panel-merged`
-- **Latest merged implementation commit:** `dc4a90a` (`feat: add M4 browser impact panel (#77)`), squash-merged through [PR #77](https://github.com/Jayc92/atlast/pull/77) on 2026-08-18.
-- **Verification:** the corrected M4-C candidate passed the complete seven-stage verifier: shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 259/259, and browser acceptance 34/34, plus whitespace, formatting, lint, types, and production builds. PR #77 GitHub Actions `verify` passed in 4m57s.
-- **Milestone state:** M0 through M3 and M4-A through M4-C are complete. The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035. Joseph Carfagno explicitly authorized **M4-D** on 2026-08-18 within the exact hardening and acceptance boundary in [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and accepted ADR-0034. M4-D becomes operational only after this documentation record merges and local `main` synchronizes cleanly. M4-E and M5+ remain unauthorized.
-- **Authorization branch:** `docs/m4-c-closeout-m4-d-authorization`, based on synchronized, clean `main` at `dc4a90a`.
+- **Last updated:** 2026-08-19
+- **Checkpoint name:** `m4-d-impact-hardening-merged`
+- **Latest merged implementation commit:** `e5d4a2c` (`fix: harden M4 impact analysis accessibility (#79)`), squash-merged through [PR #79](https://github.com/Jayc92/atlast/pull/79) on 2026-08-19.
+- **Verification:** the corrected M4-D candidate passed the complete seven-stage verifier: shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 264/264, and browser acceptance 46/46, plus whitespace, formatting, lint, types, and production builds. PR #79 GitHub Actions `verify` passed in 4m26s.
+- **Milestone state:** M0 through M3 and M4-A through M4-D are complete. The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035. No implementation slice is active. M4-E and M5+ remain unauthorized.
+- **Closeout branch:** `docs/m4-d-closeout`, based on synchronized, clean `main` at `e5d4a2c`.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
 ## 2. Product Summary
@@ -50,14 +50,14 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 
 ## 4. Roadmap Position
 
-| Milestone | State                              | Evidence                                  |
-| --------- | ---------------------------------- | ----------------------------------------- |
-| M0        | Complete - 2026-07-22              | Foundation and closure audit              |
-| M1        | Complete - 2026-08-12              | S1-S8; checkpoint `m1-complete`           |
-| M2        | Complete - 2026-08-16              | M2-A-F; checkpoint `m2-complete`          |
-| M3        | Complete - 2026-08-17              | M3-A-F; PR #68; checkpoint `m3-complete`  |
-| M4        | M4-A/B/C complete; M4-D authorized | PR #77; M4-D gated on this record's merge |
-| M5        | Unauthorized                       | No planning or implementation may begin   |
+| Milestone | State                 | Evidence                                          |
+| --------- | --------------------- | ------------------------------------------------- |
+| M0        | Complete - 2026-07-22 | Foundation and closure audit                      |
+| M1        | Complete - 2026-08-12 | S1-S8; checkpoint `m1-complete`                   |
+| M2        | Complete - 2026-08-16 | M2-A-F; checkpoint `m2-complete`                  |
+| M3        | Complete - 2026-08-17 | M3-A-F; PR #68; checkpoint `m3-complete`          |
+| M4        | M4-A/B/C/D complete   | PR #79; checkpoint `m4-d-impact-hardening-merged` |
+| M5        | Unauthorized          | No planning or implementation may begin           |
 
 M3 delivered synthetic operational health without making overlays graph truth:
 
@@ -75,34 +75,34 @@ Both M3 exit criteria are closed:
 - All six accepted states are representable, visually distinguishable, and queryable in context.
 - Overlay data loss loses no topology; empty-overlay startup preserves health and topology while health-context fails honestly.
 
-## 5. M4-C Closure Evidence
+## 5. M4-D Closure Evidence
 
-- The query-API-only browser impact panel, canonical `changeType` state, server-authoritative ranked results, exact trust language, and Evidence-path drill-down merged through PR #77 at `dc4a90a`.
-- Independent review corrected repeated-`changeType` canonicalization, duplicate impact-entry accessible names, and path-step control naming; no blocker remained.
-- Joseph Carfagno explicitly approved human browser QA covering both entry points, depth-three ranked paths, change-type switching, nested Evidence inspection, focus-preserving close behavior, and copied-link state.
-- The complete verifier passed with 259/259 web tests and all existing suites green; GitHub Actions passed in 4m57s. No API, domain, fixture, dependency, or accepted-ADR behavior changed.
+- Accessibility and failure-state hardening for the delivered impact panel merged through PR #79 at `e5d4a2c`.
+- The implementation gives simultaneous trust inspectors unique React-scoped label ids, closes only the trust selection implicitly opened by impact analysis, and covers honest multi-hop and missing-relationship behavior.
+- Independent review added a focused simultaneous-inspector label-resolution regression; no blocking finding remained.
+- Joseph Carfagno explicitly approved human VoiceOver QA covering the primary impact journey, empty and failure states, focus return, and simultaneous trust/impact dialog naming.
+- The complete verifier passed with 264/264 web tests and 46/46 browser cases; GitHub Actions passed in 4m26s. No API, domain, fixture, dependency, lockfile, impact-engine, or accepted-ADR behavior changed.
 
 ## 6. Current Git State
 
-At the M4-C-merged checkpoint before this documentation commit:
+At the M4-D-merged checkpoint before this documentation commit:
 
 ```text
-dc4a90a (HEAD -> main, origin/main, origin/HEAD) feat: add M4 browser impact panel (#77)
+e5d4a2c (HEAD -> main, origin/main, origin/HEAD) fix: harden M4 impact analysis accessibility (#79)
+7fd6beb docs: close M4-C and authorize M4-D (#78)
+dc4a90a feat: add M4 browser impact panel (#77)
 aa61c7f docs: close M4-B and authorize M4-C (#76)
 b4f6fc4 feat: add M4 impact query API and accuracy harness (#75)
-0688fca docs: close M4-A and authorize M4-B (#74)
-9ee21e4 feat: add M4 deterministic impact engine (#73)
 ```
 
 Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-**M4-D**, after this authorization record merges and local `main` synchronizes cleanly, is the only authorized implementation slice. Its exact boundary is [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices), ADR-0034, and [TASKS.md](TASKS.md): harden accessibility, canonical URLs, truncation, empty states, and failure states for the delivered impact panel; add built-preview browser acceptance for primary desktop/mobile impact journeys; complete representative VoiceOver QA; add directly corresponding tests; and record factual measurements. No dependency, API/domain/fixture, impact-engine, accepted-ADR, M4-E, or M5+ change is authorized.
+No implementation slice is active. Authorized work is limited to maintenance and factual checkpoint documentation for completed M0 through M3 and M4-A through M4-D, within accepted ADRs and without extending product behavior. M4-E requires a separate explicit human release.
 
 ## 8. Prohibited Work
 
-- Any M4-D work before this authorization record merges and local `main` synchronizes cleanly, or beyond the exact boundary above.
 - Any M4-E implementation before its own separate release.
 - Any M5+ planning or implementation before separate authorization.
 - Real systems, credentials, employer/customer data, connectors, authentication, deployment, or external publication.
@@ -149,21 +149,16 @@ TASKS.md, docs/architecture.md, docs/milestones.md, docs/m4-plan.md, and the
 ADR index (ADRs 0032-0035). Inspect git status and git log; real Git state
 overrides stale text.
 
-M0 through M3 and M4-A through M4-C are complete. M4-C was independently
-reviewed, fully verified, human-QA-approved, and merged through PR #77 at
-dc4a90a on 2026-08-18. Checkpoint m4-c-impact-panel-merged is the current
-boundary. Joseph Carfagno then explicitly authorized M4-D within the exact
-docs/m4-plan.md § 6, ADR-0034, and TASKS.md boundary. That release becomes
-operational only after its documentation record merges and local main
-synchronizes cleanly. M4-E and M5+ are unauthorized.
+M0 through M3 and M4-A through M4-D are complete. M4-D was independently
+reviewed, fully verified, human-VoiceOver-QA-approved, and merged through PR
+#79 at e5d4a2c on 2026-08-19. Checkpoint m4-d-impact-hardening-merged is the
+current boundary. No implementation slice is active. M4-E and M5+ are
+unauthorized.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic,
-read-only, and fail-honest boundaries. After verifying the authorization
-record is merged and main is synchronized cleanly, implement only M4-D:
-accessibility, canonical-URL, truncation/empty/failure-state hardening;
-built-preview desktop/mobile impact journeys; representative VoiceOver QA;
-directly corresponding tests; and factual measurements. Do not add a new
-dependency, API/domain/fixture or impact-engine changes, accepted-ADR changes,
-M4-E, or M5+ work. Begin by reporting your understanding of checkpoint
-m4-c-impact-panel-merged and the M4-D gate.
+read-only, and fail-honest boundaries. Do not implement M4-E or plan/implement
+M5+ work without a separate explicit human release. Limit work to maintenance
+and factual checkpoint documentation until that release exists. Begin by
+reporting your understanding of checkpoint m4-d-impact-hardening-merged and
+the inactive implementation gate.
 ```

@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 through M3 and M4-A through M4-C complete; M4-D authorized behind its documentation merge gate.** M4-C merged through [PR #77](https://github.com/Jayc92/atlast/pull/77) at `dc4a90a` after independent review, complete verification, and explicit human browser-QA approval. Joseph Carfagno explicitly authorized **M4-D** on 2026-08-18 within the exact hardening and acceptance boundary in [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices). It becomes operational only after this authorization record merges and local `main` synchronizes cleanly. **M4-E and M5+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 through M3 and M4-A through M4-D complete; no implementation slice active.** M4-D merged through [PR #79](https://github.com/Jayc92/atlast/pull/79) at `e5d4a2c` after independent review, complete verification, and explicit human VoiceOver-QA approval. Checkpoint `m4-d-impact-hardening-merged` records that closure. **M4-E and M5+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -129,7 +129,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-M0 through M3 and M4-A through M4-C are complete ([TASKS.md](TASKS.md)); checkpoint `m4-c-impact-panel-merged` records the merged M4-C implementation, review, verification, and human-QA evidence. M4-D is authorized only within the exact accepted hardening and browser-acceptance boundary, effective after this documentation merge/synchronization gate. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4-E and M5+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+M0 through M3 and M4-A through M4-D are complete ([TASKS.md](TASKS.md)); checkpoint `m4-d-impact-hardening-merged` records the merged M4-D implementation, review, verification, and human-QA evidence. No implementation slice is active. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4-E and M5+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
