@@ -1,6 +1,6 @@
 # Atlast — Tasks
 
-The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0 through M3 and M4-A through M4-D are complete. M4-D merged through PR #79 at `e5d4a2c` on 2026-08-19 after independent review, complete verification, and explicit human VoiceOver-QA approval; checkpoint `m4-d-impact-hardening-merged` records its closure.** No implementation slice is active. **M4-E and M5+ remain unauthorized.**
+The single place in-flight work is tracked ([GUARDRAILS.md § 4](GUARDRAILS.md#4-documentation-standards)). **M0 through M3 and M4-A through M4-D are complete. M4-D merged through PR #79 at `e5d4a2c` on 2026-08-19 after independent review, complete verification, and explicit human VoiceOver-QA approval; checkpoint `m4-d-impact-hardening-merged` records its closure.** Joseph Carfagno explicitly authorized M4-E on 2026-08-19; it becomes operational only after this authorization record merges and local `main` synchronizes cleanly. **M5+ remain unauthorized.**
 
 **Legend:** `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked (note the blocker)
 
@@ -321,7 +321,7 @@ The new spec adds five tests, each running against the real compiled API and bui
 - [x] Health-in-context queries and UI overlay toggles
 - [x] Unknown-entity overlays surface as gaps, not phantom nodes
 
-## M4 — Change-Impact Simulation (M4-A/B/C/D complete; M4-E gated)
+## M4 — Change-Impact Simulation (M4-A/B/C/D complete; M4-E authorized)
 
 **M4 planning authorization (2026-08-17):** after M3 formally closed through PR #69 at `539860d` and local `main` synchronized cleanly, Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review only. The released boundary is a proposed `docs/m4-plan.md`; Proposed ADRs resolving deterministic change semantics, confidence-weighted ranking, evidence-path explanations, synthetic accuracy measurement, API/browser boundaries, and verification strategy; bounded implementation slices; independent review and correction; and factual planning records. This authorization becomes operational only after its documentation PR merges and local `main` synchronizes cleanly. It authorizes no runtime code, fixture, schema, dependency, or M4 product implementation. M4 implementation requires explicit human acceptance of the complete reviewed baseline and a separate release of its first slice. M5+ remain unauthorized.
 
@@ -380,6 +380,8 @@ An accessibility/failure-state audit of the delivered M4-C impact panel, cross-c
 **Human browser QA approval (2026-08-19):** Joseph Carfagno explicitly approved the M4-D candidate after completing representative VoiceOver QA covering the primary impact-analysis journey, empty-result and failure states, focus return, and simultaneous trust/impact dialog naming.
 
 **Checkpoint `m4-d-impact-hardening-merged` — M4-D closeout (2026-08-19):** the independently reviewed and human-QA-approved candidate squash-merged through [PR #79](https://github.com/Jayc92/atlast/pull/79) at `e5d4a2c`; GitHub Actions `verify` passed in 4m26s; and local `main` synchronized cleanly. The complete local verifier passed shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 264/264, and browser acceptance 46/46. No implementation slice is active. Closing M4-D does not authorize M4-E; M4-E and M5+ remain gated and unauthorized.
+
+- [ ] **M4-E - boundary re-audit, measurements, exit-criterion closure, and milestone closeout** - **explicitly authorized by Joseph Carfagno on 2026-08-19**, within the exact [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) boundary: re-audit the synthetic and query-API-only boundaries; extend the existing browser no-side-door ESLint rule and focused tests to prohibit direct or deep `packages/impact-model` imports; record factual bundle, latency, memory, and cardinality measurements; evaluate the M4 exit criteria; and prepare the factual M4 audit and checkpoint closeout. Directly corresponding tests and documentation are authorized. **M4-E must NOT implement:** new product capabilities or production behavior; changes to impact ranking, API behavior, browser analysis behavior, schemas, dependencies, manifests, lockfiles, fixtures, accepted ADRs, verification scripts, CI, real-system access, credentials, or any M5+ work. Any audit finding requiring behavior outside this exact boundary requires a separate explicit human remediation extension. **This authorization becomes operational only after this documentation PR merges to `main` and local `main` synchronizes cleanly.**
 
 - [x] Deterministic impact query API with change-type semantics
 - [x] Ranked blast radius with evidence path per claim

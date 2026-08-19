@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 through M3 and M4-A through M4-D complete; no implementation slice active.** M4-D merged through [PR #79](https://github.com/Jayc92/atlast/pull/79) at `e5d4a2c` after independent review, complete verification, and explicit human VoiceOver-QA approval. Checkpoint `m4-d-impact-hardening-merged` records that closure. **M4-E and M5+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 through M3 and M4-A through M4-D complete; M4-E explicitly authorized.** M4-D merged through [PR #79](https://github.com/Jayc92/atlast/pull/79) at `e5d4a2c` after independent review, complete verification, and explicit human VoiceOver-QA approval. Checkpoint `m4-d-impact-hardening-merged` records that closure. M4-E becomes operational only after its authorization record merges and local `main` synchronizes cleanly. **M5+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -129,7 +129,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-M0 through M3 and M4-A through M4-D are complete ([TASKS.md](TASKS.md)); checkpoint `m4-d-impact-hardening-merged` records the merged M4-D implementation, review, verification, and human-QA evidence. No implementation slice is active. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M4-E and M5+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+M0 through M3 and M4-A through M4-D are complete ([TASKS.md](TASKS.md)); checkpoint `m4-d-impact-hardening-merged` records the merged M4-D implementation, review, verification, and human-QA evidence. M4-E is explicitly authorized within its audit/measurement/closeout boundary and becomes operational only after its authorization record merges and local `main` synchronizes cleanly. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M5+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
