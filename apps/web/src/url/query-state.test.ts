@@ -269,6 +269,69 @@ describe("parseTopologyUrlState — M3-D health overlay fields", () => {
   });
 });
 
+describe("parseTopologyUrlState — M4-C changeType field", () => {
+  const ENTITY_SELECTED = "atlast:entity:service/checkout";
+  const RELATIONSHIP_SELECTED = "atlast:relationship:calls/checkout-orders";
+
+  it("accepts a valid changeType alongside an Entity-shaped selected", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(`selected=${ENTITY_SELECTED}&changeType=removal`),
+    );
+    expect(state.changeType).toBe("removal");
+    expect(wasCanonicalized).toBe(false);
+  });
+
+  it.each([
+    ["removal", "removal"],
+    ["degradation", "degradation"],
+    ["interface-change", "interface-change"],
+  ])("accepts the %s changeType value", (_description, value) => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(`selected=${ENTITY_SELECTED}&changeType=${value}`),
+    );
+    expect(state.changeType).toBe(value);
+    expect(wasCanonicalized).toBe(false);
+  });
+
+  it("drops an unrecognized changeType value and flags canonicalization", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(`selected=${ENTITY_SELECTED}&changeType=upgrade`),
+    );
+    expect(state.changeType).toBeUndefined();
+    expect(wasCanonicalized).toBe(true);
+  });
+
+  it("drops changeType with no selected present, flagging canonicalization", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams("changeType=removal"),
+    );
+    expect(state.changeType).toBeUndefined();
+    expect(state.selected).toBeUndefined();
+    expect(wasCanonicalized).toBe(true);
+  });
+
+  it("drops changeType when selected names a Relationship, flagging canonicalization", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(
+        `selected=${RELATIONSHIP_SELECTED}&changeType=removal`,
+      ),
+    );
+    expect(state.changeType).toBeUndefined();
+    expect(state.selected).toBe(RELATIONSHIP_SELECTED);
+    expect(wasCanonicalized).toBe(true);
+  });
+
+  it("drops the whole changeType value for a repeated parameter and flags canonicalization", () => {
+    const { state, wasCanonicalized } = parseTopologyUrlState(
+      new URLSearchParams(
+        `selected=${ENTITY_SELECTED}&changeType=removal&changeType=degradation`,
+      ),
+    );
+    expect(state.changeType).toBeUndefined();
+    expect(wasCanonicalized).toBe(true);
+  });
+});
+
 describe("serializeTopologyUrlState", () => {
   it("round-trips a complete state deterministically", () => {
     const state: TopologyUrlState = {
@@ -302,7 +365,7 @@ describe("serializeTopologyUrlState", () => {
     expect(serialized.has("derivationVersion")).toBe(false);
   });
 
-  it("writes every parameter in the exact ADR-0031 § 2 canonical order", () => {
+  it("writes every parameter in the exact ADR-0031 § 2 / ADR-0034 § 1 canonical order", () => {
     const state: TopologyUrlState = {
       q: "checkout",
       direction: "downstream",
@@ -314,6 +377,7 @@ describe("serializeTopologyUrlState", () => {
       healthStates: ["down", "healthy"],
       pin: VALID_PIN,
       overlayFrame: "atlast:overlay-frame:demo-company/active-conditions",
+      changeType: "removal",
     };
     const serialized = serializeTopologyUrlState(state);
     expect([...serialized.keys()]).toEqual([
@@ -329,10 +393,38 @@ describe("serializeTopologyUrlState", () => {
       "horizon",
       "derivationVersion",
       "overlayFrame",
+      "changeType",
     ]);
     // healthStates is deduplicated and reordered canonically at serialization,
     // independent of the order supplied by the caller.
     expect(serialized.get("healthStates")).toBe("healthy,down");
+  });
+
+  it("round-trips a complete changeType state deterministically", () => {
+    const state: TopologyUrlState = {
+      selected: "atlast:entity:service/checkout",
+      changeType: "interface-change",
+    };
+    const serialized = serializeTopologyUrlState(state);
+    const { state: reparsed, wasCanonicalized } =
+      parseTopologyUrlState(serialized);
+    expect(reparsed).toEqual(state);
+    expect(wasCanonicalized).toBe(false);
+  });
+
+  it("never writes changeType when selected does not name an Entity", () => {
+    const serialized = serializeTopologyUrlState({
+      selected: "atlast:relationship:calls/checkout-orders",
+      changeType: "removal",
+    } as unknown as TopologyUrlState);
+    expect(serialized.has("changeType")).toBe(false);
+  });
+
+  it("never writes changeType with no selected present", () => {
+    const serialized = serializeTopologyUrlState({
+      changeType: "removal",
+    } as unknown as TopologyUrlState);
+    expect(serialized.has("changeType")).toBe(false);
   });
 
   it("round-trips a complete health-overlay state deterministically", () => {

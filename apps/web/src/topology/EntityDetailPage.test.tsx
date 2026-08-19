@@ -10,6 +10,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -19,6 +20,7 @@ import {
   buildEvidenceDetailResult,
   buildEntityPage,
   buildEntityReadResult,
+  buildImpactResultEnvelope,
   buildRelationshipSubjectReadResult,
   buildSubjectDetailResult,
   buildTraversalResult,
@@ -32,6 +34,14 @@ const OVERLAY_META = {
   frameIdentifier: "atlast:overlay-frame:demo-company/active-conditions",
   effectiveAt: "2026-08-01T00:00:00.000Z",
 };
+
+/** A runtime narrowing (not a type assertion) so this reads `.value` safely regardless of how `getByRole`'s declared return type resolves. */
+function selectValue(element: HTMLElement): string {
+  if (!(element instanceof HTMLSelectElement)) {
+    throw new Error("Expected an HTMLSelectElement");
+  }
+  return element.value;
+}
 
 /**
  * Builds a schema-valid `HealthContextResult` payload whose `items` and
@@ -432,6 +442,179 @@ describe("EntityDetailPage", () => {
     expect(params.has("asOf")).toBe(false);
     expect(params.has("horizon")).toBe(false);
     expect(params.has("derivationVersion")).toBe(false);
+  });
+
+  describe("M4-C impact panel", () => {
+    it("opens the impact panel from entity detail with a default changeType and the page's traversal bounds", async () => {
+      const detail = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      stubApiFetch([
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        // The impact route's URL contains the entity-detail matcher as a
+        // substring, so it must be listed first — `stubApiFetch` returns the
+        // first matching route (mirroring this file's existing
+        // traversal-before-detail ordering convention).
+        jsonRoute(
+          (url) => url.includes("/impact?"),
+          buildImpactResultEnvelope({
+            originEntityIdentifier: "atlast:entity:checkout",
+            changeType: "removal",
+          }),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          detail,
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities?"),
+          buildEntityPage([]),
+        ),
+      ]);
+      const router = renderEntityDetail(
+        "/entities/atlast%3Aentity%3Acheckout?view=list&depth=3",
+      );
+
+      const invoker = await screen.findByRole("button", {
+        name: "Analyze impact on atlast:entity:checkout",
+      });
+      invoker.focus();
+      fireEvent.click(invoker);
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "Impact analysis",
+        }),
+      ).toBeDefined();
+      expect(router.state.location.search).toContain("changeType=removal");
+      expect(router.state.location.search).toContain(
+        `selected=${encodeURIComponent("atlast:entity:checkout")}`,
+      );
+      await screen.findByText(/no reachable entities meet these bounds/i);
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Close impact panel" }),
+      );
+      await waitFor(() => {
+        expect(router.state.location.search).not.toContain("changeType=");
+        expect(document.activeElement).toBe(invoker);
+      });
+    });
+
+    it("opens the impact panel from the trust inspector's Analyze impact control", async () => {
+      const detail = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      stubApiFetch([
+        jsonRoute(
+          (url) =>
+            url.includes(encodeURIComponent(FIXTURE_EVIDENCE_IDENTIFIER)),
+          buildEvidenceDetailResult(),
+        ),
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        // Listed before the entity-detail matcher below, since the impact
+        // URL contains that matcher as a substring (`stubApiFetch` returns
+        // the first match).
+        jsonRoute(
+          (url) => url.includes("/impact?"),
+          buildImpactResultEnvelope({
+            originEntityIdentifier: "atlast:entity:checkout",
+            changeType: "removal",
+          }),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          detail,
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities?"),
+          buildEntityPage([]),
+        ),
+      ]);
+      renderEntityDetail("/entities/atlast%3Aentity%3Acheckout?view=list");
+
+      fireEvent.click(
+        await screen.findByRole("button", { name: "Inspect entity trust" }),
+      );
+      const inspectorDialog = await screen.findByRole("dialog", {
+        name: "Trust inspector",
+      });
+
+      // Two identically-named "Analyze impact on ..." controls exist while
+      // the inspector is open here (the entity summary's own, and the
+      // inspector's, both correctly targeting the same entity) — scope to
+      // the inspector to exercise its specific entry point (ADR-0034 § 6).
+      fireEvent.click(
+        within(inspectorDialog).getByRole("button", {
+          name: "Analyze impact on atlast:entity:checkout",
+        }),
+      );
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "Impact analysis",
+        }),
+      ).toBeDefined();
+    });
+
+    it("renders the impact panel directly from a copied link naming an Entity and a valid changeType", async () => {
+      const detail = buildSubjectDetailResult({
+        identifier: "atlast:entity:checkout",
+        entityType: "service",
+      });
+      stubApiFetch([
+        jsonRoute(
+          (url) => url.includes("/traversal?"),
+          buildTraversalResult([]),
+        ),
+        // Listed before the entity-detail matcher below, since the impact
+        // URL contains that matcher as a substring (`stubApiFetch` returns
+        // the first match).
+        jsonRoute(
+          (url) => url.includes("/impact?"),
+          buildImpactResultEnvelope({
+            originEntityIdentifier: "atlast:entity:checkout",
+            changeType: "interface-change",
+          }),
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities/atlast%3Aentity%3Acheckout"),
+          detail,
+        ),
+        jsonRoute(
+          (url) => url.includes("/api/v1/entities?"),
+          buildEntityPage([]),
+        ),
+      ]);
+
+      renderEntityDetail(
+        `/entities/atlast%3Aentity%3Acheckout?selected=${encodeURIComponent(
+          "atlast:entity:checkout",
+        )}&changeType=interface-change`,
+      );
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "Impact analysis",
+        }),
+      ).toBeDefined();
+      expect(
+        selectValue(
+          screen.getByRole("combobox", { name: "Hypothetical change" }),
+        ),
+      ).toBe("interface-change");
+    });
   });
 
   describe("M3-D operational health overlay", () => {

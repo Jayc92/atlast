@@ -12,9 +12,12 @@
  * act on immediately.
  */
 import {
+  entityIdentifierSchema,
+  impactChangeTypeSchema,
   overlayFrameIdentifierSchema,
   snapshotIdentitySchema,
   type EffectiveHealthState,
+  type ImpactChangeType,
   type OverlayFrameIdentifier,
   type SnapshotIdentity,
   type TraversalDirection,
@@ -37,6 +40,8 @@ export interface TopologyUrlState {
   readonly pin?: SnapshotIdentity;
   /** Valid only alongside `health` and a complete `pin` (ADR-0031 § 2). */
   readonly overlayFrame?: OverlayFrameIdentifier;
+  /** Valid only when `selected` names an Entity (ADR-0034 § 1); absence means the impact panel is closed. */
+  readonly changeType?: ImpactChangeType;
 }
 
 export interface ParsedTopologyUrlState {
@@ -65,6 +70,7 @@ const CANONICAL_PARAMETER_NAMES: ReadonlySet<string> = new Set([
   "horizon",
   "derivationVersion",
   "overlayFrame",
+  "changeType",
 ]);
 
 /** Canonical write order for `healthStates` (ADR-0031 § 1). */
@@ -215,6 +221,32 @@ function parseOverlayFrameToken(raw: string | null): {
 }
 
 /**
+ * ADR-0034 § 1 is explicit that an unknown *or repeated* `changeType` value
+ * drops the whole parameter — unlike `direction`/`view`'s legacy safe-first
+ * handling (first occurrence trusted), this mirrors `healthStates`'s
+ * stricter repeated-key rule: no occurrence is trusted once the key repeats.
+ */
+function parseChangeType(raw: string | null): {
+  readonly value: ImpactChangeType | undefined;
+  readonly invalid: boolean;
+} {
+  if (raw === null) {
+    return { value: undefined, invalid: false };
+  }
+  const parsed = impactChangeTypeSchema.safeParse(raw);
+  return parsed.success
+    ? { value: parsed.data, invalid: false }
+    : { value: undefined, invalid: true };
+}
+
+/** `changeType` is meaningful only when `selected` syntactically names an Entity, not a Relationship or edge token (ADR-0034 § 1). */
+function selectedNamesAnEntity(selected: string | undefined): boolean {
+  return (
+    selected !== undefined && entityIdentifierSchema.safeParse(selected).success
+  );
+}
+
+/**
  * The complete-pin rule: `asOf`, `horizon`, and `derivationVersion` present
  * together validate through the shared `snapshotIdentitySchema`; one or two
  * present is a partial pin and is dropped entirely (never half-pinned);
@@ -287,6 +319,16 @@ export function parseTopologyUrlState(
   const overlayFrameDroppedByDependency =
     overlayFrameParsed.value !== undefined &&
     (health.value !== true || pin.value === undefined);
+  const changeTypeRaw = searchParams.get("changeType");
+  const changeTypeRepeated = searchParams.getAll("changeType").length > 1;
+  // ADR-0034 § 1 is explicit here (unlike the legacy safe-first handling
+  // used by direction/view/health): a repeated key drops the whole
+  // changeType value rather than trusting either occurrence.
+  const changeTypeParsed = changeTypeRepeated
+    ? { value: undefined, invalid: true }
+    : parseChangeType(changeTypeRaw);
+  const changeTypeDroppedByDependency =
+    changeTypeParsed.value !== undefined && !selectedNamesAnEntity(selected);
 
   const state: TopologyUrlState = {
     ...(q !== undefined ? { q } : {}),
@@ -307,6 +349,9 @@ export function parseTopologyUrlState(
     overlayFrameParsed.value !== undefined
       ? { overlayFrame: overlayFrameParsed.value }
       : {}),
+    ...(changeTypeParsed.value !== undefined && selectedNamesAnEntity(selected)
+      ? { changeType: changeTypeParsed.value }
+      : {}),
   };
 
   const wasCanonicalized =
@@ -320,19 +365,23 @@ export function parseTopologyUrlState(
     healthStatesParsed.invalid ||
     healthStatesDroppedByDependency ||
     (overlayFrameRaw !== null && overlayFrameParsed.invalid) ||
-    overlayFrameDroppedByDependency;
+    overlayFrameDroppedByDependency ||
+    (changeTypeRaw !== null && changeTypeParsed.invalid) ||
+    changeTypeDroppedByDependency;
 
   return { state, wasCanonicalized };
 }
 
 /**
  * Deterministic serialization in one fixed field order — ADR-0031 § 2's
- * exact canonical order `q, direction, depth, minConfidence, view, selected,
- * health, healthStates, asOf, horizon, derivationVersion, overlayFrame` — so
- * a copied URL and a freshly-built one for the same state are byte-identical.
+ * canonical order plus ADR-0034 § 1's exactly one trailing key: `q,
+ * direction, depth, minConfidence, view, selected, health, healthStates,
+ * asOf, horizon, derivationVersion, overlayFrame, changeType` — so a copied
+ * URL and a freshly-built one for the same state are byte-identical.
  * Dependency rules are re-enforced here defensively (never trusting a caller
  * to have already dropped an invalid combination): `healthStates` requires
- * `health`; `overlayFrame` requires both `health` and a complete `pin`.
+ * `health`; `overlayFrame` requires both `health` and a complete `pin`;
+ * `changeType` requires `selected` to syntactically name an Entity.
  */
 export function serializeTopologyUrlState(
   state: TopologyUrlState,
@@ -378,6 +427,9 @@ export function serializeTopologyUrlState(
     state.overlayFrame !== undefined
   ) {
     params.set("overlayFrame", state.overlayFrame);
+  }
+  if (state.changeType !== undefined && selectedNamesAnEntity(state.selected)) {
+    params.set("changeType", state.changeType);
   }
   return params;
 }

@@ -25,6 +25,7 @@ import {
   evidenceDetailResultSchema,
   healthCheckResultSchema,
   healthContextResultSchema,
+  impactResultEnvelopeSchema,
   snapshotAnchorsResultSchema,
   snapshotDetailResultSchema,
   subjectDetailResultSchema,
@@ -35,6 +36,8 @@ import {
   type EvidenceDetailResult,
   type HealthCheckResult,
   type HealthContextResult,
+  type ImpactChangeType,
+  type ImpactResultEnvelope,
   type OverlayFrameIdentifier,
   type SnapshotDetailResult,
   type SnapshotAnchorsResult,
@@ -77,6 +80,7 @@ const WIRE_QUERY_PARAM = {
   horizon: "horizon",
   derivationVersion: "derivationVersion",
   overlayFrame: "overlayFrame",
+  changeType: "changeType",
 } as const;
 
 /** Stable identifiers contain literal `/` and `:` (ADR-0024 § 5); every path segment is percent-encoded individually, never the whole path. */
@@ -323,6 +327,41 @@ export function fetchHealthContext(
   return fetchValidated(
     `/api/v1/entities/${encodeIdentifierPathSegment(entityId)}/health-context?${query.toString()}`,
     healthContextResultSchema,
+    signal,
+  );
+}
+
+export interface ImpactParams {
+  readonly direction: "upstream" | "downstream";
+  readonly depth: number;
+  readonly minConfidence?: number;
+  readonly changeType: ImpactChangeType;
+  readonly identity?: SnapshotIdentity;
+}
+
+/**
+ * `GET /api/v1/entities/{entityId}/impact` (M4-B route, ADR-0033) — the
+ * server resolves one bounded traversal and computes deterministic,
+ * evidence-derived ranked impact server-side; `changeType` is validated and
+ * echoed but never affects ranking (ADR-0032 § 3), and this client never
+ * recomputes `results` (ADR-0034 § 2).
+ */
+export function fetchImpact(
+  entityId: string,
+  params: ImpactParams,
+  signal: AbortSignal,
+): Promise<ClientQueryResult<ImpactResultEnvelope>> {
+  const query = new URLSearchParams();
+  query.set(WIRE_QUERY_PARAM.direction, params.direction);
+  query.set(WIRE_QUERY_PARAM.depth, String(params.depth));
+  if (params.minConfidence !== undefined) {
+    query.set(WIRE_QUERY_PARAM.minConfidence, String(params.minConfidence));
+  }
+  query.set(WIRE_QUERY_PARAM.changeType, params.changeType);
+  appendPin(query, params.identity);
+  return fetchValidated(
+    `/api/v1/entities/${encodeIdentifierPathSegment(entityId)}/impact?${query.toString()}`,
+    impactResultEnvelopeSchema,
     signal,
   );
 }

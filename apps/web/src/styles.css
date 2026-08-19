@@ -1049,6 +1049,97 @@ body {
   padding-bottom: 1rem;
 }
 
+.trust-inspector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.impact-panel {
+  margin-top: 2rem;
+  border: 2px solid var(--ink);
+  padding: clamp(1rem, 3vw, 1.75rem);
+  background:
+    linear-gradient(135deg, rgba(30, 95, 90, 0.08), transparent 38%),
+    rgba(245, 239, 226, 0.97);
+  box-shadow: 0.65rem 0.65rem 0 rgba(160, 61, 30, 0.14);
+}
+
+.impact-panel-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 1rem;
+}
+
+.impact-panel-header h2,
+.impact-panel-header p {
+  margin: 0;
+}
+
+.impact-panel-header h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 2.7rem);
+  line-height: 1.05;
+}
+
+.impact-panel-change-type {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 1rem;
+  max-width: 20rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.impact-panel-change-type select {
+  min-height: 2.35rem;
+  border: 1px solid var(--ink-soft);
+  border-radius: 0;
+  padding: 0.35rem 0.5rem;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+}
+
+.impact-result-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.impact-result {
+  border: 1px solid var(--hairline);
+  padding: 1rem;
+  background: rgba(255, 252, 245, 0.58);
+}
+
+.impact-result h3 {
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.impact-path-steps {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 45rem) {
+  .impact-panel-header {
+    display: grid;
+  }
+}
+
 .trust-inspector-header h2,
 .trust-inspector-header p {
   margin: 0;

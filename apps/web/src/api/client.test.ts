@@ -13,6 +13,7 @@ import {
   fetchEvidence,
   fetchHealth,
   fetchHealthContext,
+  fetchImpact,
   fetchSearch,
   fetchSnapshotAnchors,
   fetchSnapshotSummary,
@@ -260,6 +261,63 @@ describe("fetchTraversal", () => {
     expect(requestedUrl.searchParams.get("direction")).toBe("downstream");
     expect(requestedUrl.searchParams.get("depth")).toBe("3");
     expect(requestedUrl.searchParams.get("minConfidence")).toBe("0.5");
+  });
+});
+
+describe("fetchImpact", () => {
+  it("sends direction, depth, minConfidence, changeType, and the pin, and validates an empty result", async () => {
+    const fetchStub = stubFetch({
+      ok: true,
+      jsonPayload: {
+        data: {
+          originEntityIdentifier: "atlast:entity:service/checkout",
+          changeType: "removal",
+          items: [],
+          results: [],
+        },
+        traversal: { truncated: false, subjectCount: 0 },
+        meta: VALID_META,
+      },
+    });
+    const result = await fetchImpact(
+      "atlast:entity:service/checkout",
+      {
+        direction: "downstream",
+        depth: 3,
+        minConfidence: 0.5,
+        changeType: "removal",
+        identity: VALID_META.resolvedIdentity,
+      },
+      new AbortController().signal,
+    );
+    expect(result.ok).toBe(true);
+    const requestedUrl = new URL(
+      String(fetchStub.mock.calls[0]?.[0]),
+      "http://localhost",
+    );
+    expect(requestedUrl.pathname).toBe(
+      "/api/v1/entities/atlast%3Aentity%3Aservice%2Fcheckout/impact",
+    );
+    expect(requestedUrl.searchParams.get("direction")).toBe("downstream");
+    expect(requestedUrl.searchParams.get("depth")).toBe("3");
+    expect(requestedUrl.searchParams.get("minConfidence")).toBe("0.5");
+    expect(requestedUrl.searchParams.get("changeType")).toBe("removal");
+    expect(requestedUrl.searchParams.get("asOf")).toBe(
+      VALID_META.resolvedIdentity.asOf,
+    );
+  });
+
+  it("collapses a malformed response into a redacted internal failure", async () => {
+    stubFetch({ ok: true, jsonPayload: { not: "a valid impact envelope" } });
+    const result = await fetchImpact(
+      "atlast:entity:service/checkout",
+      { direction: "downstream", depth: 1, changeType: "removal" },
+      new AbortController().signal,
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.kind).toBe("client-internal-failure");
+    }
   });
 });
 

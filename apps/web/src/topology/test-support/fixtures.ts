@@ -8,6 +8,10 @@ import type {
   EntityPage,
   EntityReadResult,
   EvidenceDetailResult,
+  ImpactChangeType,
+  ImpactPathStep,
+  ImpactResult,
+  ImpactResultEnvelope,
   SnapshotIdentity,
   SubjectDetailResult,
   SubjectPage,
@@ -188,6 +192,43 @@ export function buildTraversalResult(
   return {
     items: [...items],
     traversal: { truncated, subjectCount: items.length },
+    meta: FIXTURE_META,
+  };
+}
+
+export function buildImpactResult(overrides: {
+  readonly entityIdentifier: string;
+  readonly rankScore: number;
+  readonly path: readonly ImpactPathStep[];
+}): ImpactResult {
+  return {
+    entityIdentifier: overrides.entityIdentifier,
+    rankScore: overrides.rankScore,
+    pathEdgeCount: overrides.path.length,
+    path: [...overrides.path],
+  };
+}
+
+export function buildImpactResultEnvelope(overrides: {
+  readonly originEntityIdentifier: string;
+  readonly changeType: ImpactChangeType;
+  readonly items?: readonly SubjectReadResult[];
+  readonly results?: readonly ImpactResult[];
+  readonly truncated?: boolean;
+}): ImpactResultEnvelope {
+  const items = overrides.items ?? [];
+  const results = overrides.results ?? [];
+  return {
+    data: {
+      originEntityIdentifier: overrides.originEntityIdentifier,
+      changeType: overrides.changeType,
+      items: [...items],
+      results: [...results],
+    },
+    traversal: {
+      truncated: overrides.truncated ?? false,
+      subjectCount: items.length,
+    },
     meta: FIXTURE_META,
   };
 }
