@@ -113,6 +113,26 @@ describe("ADR-0026 § 5 restricted-import boundary — direct proof", () => {
     );
   }, 30_000);
 
+  it("rejects a direct @atlast/impact-model import", () => {
+    const messages = lintProbeSource(
+      "__probe_impact_model__.ts",
+      'import { computeImpact } from "@atlast/impact-model";\nexport const probe = computeImpact;\n',
+    );
+    expect(messages.some((m) => m.ruleId === "no-restricted-imports")).toBe(
+      true,
+    );
+  }, 30_000);
+
+  it("rejects a deep relative import reaching into packages/impact-model", () => {
+    const messages = lintProbeSource(
+      "__probe_impact_model_relative__.ts",
+      'import { computeImpact } from "../../../packages/impact-model/src/impact-engine.ts";\nexport const probe = computeImpact;\n',
+    );
+    expect(messages.some((m) => m.ruleId === "no-restricted-imports")).toBe(
+      true,
+    );
+  }, 30_000);
+
   it("rejects a relative import reaching into fixtures", () => {
     const messages = lintProbeSource(
       "__probe_fixtures__.ts",
