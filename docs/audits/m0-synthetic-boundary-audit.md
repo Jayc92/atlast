@@ -755,3 +755,55 @@ The unmodified, existing production entrypoint (`apps/api/src/server.ts`) was st
 ### 21.10 Scope Confirmation
 
 Direct inspection of the complete implementation diff confirms: `initializeApplication`'s signature, parameters, and effective behavior are unchanged (refactored to share construction logic with the new function, never altered); `apps/api/src/server.ts` is untouched; no existing route, schema, or query behavior changed; no second application _contract_ was created (`buildApplication` is called identically by both composition functions — ADR-0009's "one application shape" invariant holds); no write-capable Kubernetes operation exists anywhere in the connector; no ambient kubeconfig resolution exists (`loadFromFile` with an explicit path, `setCurrentContext` with an explicit name — never `loadFromDefault`); no credential or generated kubeconfig entered the repository (§ 21.6); and no unrelated Docker/Supabase container was inspected, stopped, or modified at any point. The complete, unmodified `./scripts/verify.sh` passed all seven stages after every change recorded in this section.
+
+## 22. M5 Source-Loss Freshness Proof — Evidence Record (2026-08-20)
+
+**Status:** Merged-ready evidence record, real-system experiment. This section proves M5 exit criterion 2 ("Deleting the cluster degrades freshness visibly; established facts age, nothing is corrupted") against the real, disposable `atlast-m5` Kind cluster established for M5-A (§ 21). **No implementation change was made or is proposed by this section.** Temporal aging was demonstrated using the accepted pinned-`asOf` query contract; the test did **not** wait 30 wall-clock days and did **not** modify production freshness thresholds, the `Clock` implementation, Evidence timestamps, source data, or derivation rules.
+
+### 22.1 Pre-Destruction Safety Gate
+
+Confirmed immediately before any destructive action: `main` at `b84365f`, identical to `origin/main`, working tree clean; `kind get clusters` listed `atlast-m5`; `kubectl config current-context` reported `kind-atlast-m5`; `kubectl cluster-info` resolved the control plane to `https://127.0.0.1:63200` (loopback), satisfying the accepted `assertLocalKindTarget` guard (ADR-0037 § 4) by direct inspection. Container isolation: exactly one Docker container belonged to `atlast-m5` (`atlast-m5-control-plane`); nine unrelated, pre-existing Supabase containers (`supabase_studio_concert-memory-map`, `supabase_pg_meta_concert-memory-map`, `supabase_storage_concert-memory-map`, `supabase_rest_concert-memory-map`, `supabase_realtime_concert-memory-map`, `supabase_inbucket_concert-memory-map`, `supabase_auth_concert-memory-map`, `supabase_kong_concert-memory-map`, `supabase_db_concert-memory-map`) were identified and excluded from any action. The M5-A experiment process was confirmed running at PID 663, started `2026-08-20 14:45:25`, unrestarted since M5-A's own checkpoint.
+
+### 22.2 Pre-Loss Baseline
+
+`GET /api/v1/entities/atlast:entity:atlast-m5-atlast-m5-live-pod` (unpinned, `latest`) returned `200` with subject identifier `atlast:entity:atlast-m5-atlast-m5-live-pod`, freshness `current`, confidence `0.5`, `ruleTrace` rule `normalized-exact-match`, and a provenance array of **3,644** Evidence identifiers (the experiment had been polling every 2 seconds since M5-A's original checkpoint). The experiment's own log (`/private/tmp/atlast-m5-experiment.log`) showed continuous successful polls immediately prior (`sequence(s) 3643`, `3644`). Dereferencing the earliest provenance citation, `GET /api/v1/evidence/atlast:evidence:kubernetes/atlast-m5/atlast-m5-live-pod/1`, returned `200` with `sourceScopedIdentity.source: "kubernetes"` and `observedAt: "2026-08-20T18:45:40.319Z"` — confirmed real, Kubernetes-sourced, and not a `demo-company` fixture record. **Note on assertion-revision volatility while polling is live:** because `GraphAssertion` identifiers are content-addressed over the complete canonical revision payload including `provenance` (ADR-0022), the assertion identifier changes on every poll that appends a corroborating Evidence record while the source remains reachable — observed directly (e.g. `...36edd6d7...` then `...90823e88...` then `...c8ce814a...` across successive reads seconds apart). This is expected, accepted behavior, not a defect; it is exactly why the identifier only becomes stable once polling stops (§ 22.4).
+
+### 22.3 Destructive Action
+
+Executed exactly: `kind delete cluster --name atlast-m5`. Output: `Deleting cluster "atlast-m5" ... Deleted nodes: ["atlast-m5-control-plane"]`. Immediately after, `kind get clusters` reported "No kind clusters found," and `docker ps` showed the `atlast-m5-control-plane` container gone with all nine Supabase containers unaffected and still healthy.
+
+### 22.4 Source Loss Proven
+
+The M5-A experiment process was confirmed to be the **same** PID (663, same start timestamp) both immediately after deletion and after a further ~20 seconds of continued running — no restart, no re-exec, at any point in this section. Polls failed repeatedly and were logged, not silently swallowed and not fatal: the process's log recorded `connect ECONNREFUSED 127.0.0.1:63200` immediately after deletion, transitioning to `TypeError: fetch failed` once the loopback port itself stopped accepting connections; 18 consecutive `poll failed` log lines were observed, growing to 24 after a further ~8-second wait, with the process alive and unrestarted throughout (`pollOnce().catch(...)` — the existing, unmodified M5-A error-handling path).
+
+### 22.5 Evidence Freeze Proven
+
+Two `GET /api/v1/entities/atlast:entity:atlast-m5-atlast-m5-live-pod` reads, ~10 seconds apart, both **after** persistent poll failure was already established, each returned `200` with the **identical** assertion identifier `atlast:assertion:4221b68a8115a7cfb505d57dde5dfd3ad159f573ef0a24c3c59bc86f50ebc6b2` and the **identical** provenance count of **3,707** — confirming the watermark had frozen (a small number of polls succeeded in the brief window between the delete command returning and the API server actually becoming unreachable, then stopped growing entirely). No phantom or replacement entity appeared; the same subject and assertion remained continuously available; no restart occurred. The final real Kubernetes observation, `GET /api/v1/evidence/atlast:evidence:kubernetes/atlast-m5/atlast-m5-live-pod/3707`, returned `200` with `observedAt: "2026-08-20T20:49:57.382Z"` — the frozen `latestSupportingObservedAt` this proof's aging is measured against.
+
+### 22.6 Freshness Aging Proven (Pinned-`asOf` Contract, No Wall-Clock Wait)
+
+Using the frozen `horizon=3707`, `derivationVersion=m1-v1`, and three `asOf` values derived from the frozen `2026-08-20T20:49:57.382Z` observation — **entirely through the existing, unmodified pinned-read query contract** (ADR-0016/0017/0024); no `Clock` implementation, threshold, Evidence timestamp, or derivation rule was touched:
+
+| Case          | `asOf` (offset from final real observation) | HTTP | Assertion identifier                                                                | Freshness      | Provenance count |
+| ------------- | ------------------------------------------- | ---- | ----------------------------------------------------------------------------------- | -------------- | ---------------- |
+| A. CURRENT    | `2026-08-21T20:49:57.382Z` (+1 day)         | 200  | `atlast:assertion:4221b68a8115a7cfb505d57dde5dfd3ad159f573ef0a24c3c59bc86f50ebc6b2` | **current**    | 3,707            |
+| B. STALE      | `2026-08-30T20:49:57.382Z` (+10 days)       | 200  | `atlast:assertion:4221b68a8115a7cfb505d57dde5dfd3ad159f573ef0a24c3c59bc86f50ebc6b2` | **stale**      | 3,707            |
+| C. HISTORICAL | `2026-09-29T20:49:57.382Z` (+40 days)       | 200  | `atlast:assertion:4221b68a8115a7cfb505d57dde5dfd3ad159f573ef0a24c3c59bc86f50ebc6b2` | **historical** | 3,707            |
+
+Subject identifier (`atlast:entity:atlast-m5-atlast-m5-live-pod`), confidence (`0.5`), and `ruleTrace` rule (`normalized-exact-match`) were identical across all three reads. The entity and its assertion revision identity remained perfectly stable across the transition — expected, because provenance had already frozen (§ 22.5) before any of these three reads.
+
+### 22.7 Provenance Integrity After Source Loss
+
+At the historical pinned read's own frozen provenance, both the earliest (`.../1`) and the final (`.../3707`) Kubernetes Evidence records were re-dereferenced directly (not through the pin) and found byte-identical to their pre-loss values: `sourceScopedIdentity.source: "kubernetes"` unchanged on both; `observedAt` unchanged (`2026-08-20T18:45:40.319Z` and `2026-08-20T20:49:57.382Z` respectively). No fixture Evidence was substituted; no Evidence was rewritten to manufacture the observed freshness transition — the transition in § 22.6 is derived purely from comparing the caller-declared `asOf` against this same, unchanged, real observation timestamp.
+
+### 22.8 Synthetic Independence Reconfirmed With the Cluster Gone
+
+With `atlast-m5` fully deleted, the complete, unmodified `./scripts/verify.sh` was run twice and passed all seven stages both times: shared 429/429 (19 files), impact-model 15/15 (2 files), graph-model 372/372 (19 files), overlay-model 23/23 (2 files), connectors 14/14 (3 files), web 266/266 (29 files), api 123/123 (10 files), and browser acceptance 46/46 — none of which depend on, or were affected by, the now-deleted Kubernetes cluster. This directly reconfirms M5 exit criterion 3 under the strongest possible condition: not merely "the connector disabled," but the connector's real target cluster actually gone.
+
+### 22.9 Container and Credential Hygiene
+
+Throughout this entire experiment, `docker ps` was re-checked at each stage and confirmed the nine pre-existing Supabase containers were never inspected beyond a read-only `docker ps` listing, never stopped, and never modified. **No credential, token, kubeconfig content, or certificate material is recorded anywhere in this section**, consistent with § 21.6's standing practice.
+
+### 22.10 Conclusion
+
+M5 exit criterion 2 — "Deleting the cluster degrades freshness visibly; established facts age, nothing is corrupted" — is satisfied by direct, real-system evidence: the established Kubernetes-derived fact remained present, its real provenance remained dereferenceable and unaltered, no corruption or phantom replacement occurred, the experiment process never restarted, and its freshness classification transitioned honestly from `current` through `stale` to `historical` as a pure function of elapsed time against its last real observation — proven via the existing pinned-read contract, without waiting 30 real days and without weakening any accepted threshold, Clock, or derivation rule.
