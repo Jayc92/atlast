@@ -31,7 +31,20 @@ The stack direction is a TypeScript monorepo, established in M0 Phase B; specifi
 - No credentials, tokens, or secrets in source, fixtures, or documentation — ever, including "example" values that are real.
 - The topology graph is itself sensitive data (it maps the organization's attack surface). Authentication requirements distinguish two stages:
   - **The M0 local API shell** binds to localhost by default, serves synthetic data only, and implements no users, sessions, OAuth, SSO, API keys, or identity provider. It is exempt from authentication during M0.
-  - **The first externally reachable or real-system-connected query API** MUST require authentication, MUST be governed by a separately approved authentication ADR, and MUST NOT be implemented before its milestone is explicitly authorized.
+  - **The first externally reachable or real-system-connected query API** MUST require authentication, MUST be governed by a separately approved authentication ADR, and MUST NOT be implemented before its milestone is explicitly authorized. **This rule is unchanged and remains binding for every real-system-connected or externally reachable query API except the one narrowly scoped exemption immediately below.**
+  - **Narrow exemption — the M5-A local Kubernetes experiment only** (added 2026-08-20, per [docs/m5-plan.md § 12](docs/m5-plan.md#12-authentication-scope--unresolved-governance-decision)): the explicitly named M5-A experiment's query API is real-system-connected and would otherwise trigger the rule above. It is exempt from that rule **only** for as long as **every one of the following ten conditions holds simultaneously**; violating any single condition invalidates this exemption immediately and automatically, with no grace period, reverting M5-A to the general MUST-authenticate rule:
+    1. the API binds to the loopback interface only;
+    2. the process runs only as a developer-machine experiment;
+    3. the connected cluster is a disposable, locally owned Kubernetes cluster satisfying the complete local-cluster definition in [docs/m5-plan.md § 2](docs/m5-plan.md#2-real-system-safety-boundary-binding-non-negotiable);
+    4. no cloud account or billable managed-Kubernetes resource is involved;
+    5. no employer, shared, or production environment is involved at any layer;
+    6. no real enterprise credential of any kind is used;
+    7. the process is never deployed anywhere;
+    8. the process is never externally reachable, under any network configuration;
+    9. no persistent hosting of any kind exists for the process;
+    10. the specific M5-A implementation slice has its own separate, explicit human authorization recorded in [TASKS.md](TASKS.md).
+
+    This exemption authorizes **only** the exact, explicitly named M5-A slice above — it authorizes no other real-system-connected or externally reachable query API, no production/shared/employer use of any kind, and no implementation beyond M5-A itself. It does not extend to any later M5 slice, any broadened M5-A scope, or any other milestone; each requires its own separate review of whether an exemption is warranted. A future reviewer determines whether this exemption applies by checking the ten conditions above directly against the real running system — never by interpreting intent.
 - Security-sensitive changes MUST be flagged for human review explicitly in the PR description.
 
 ---
