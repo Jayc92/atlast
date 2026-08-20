@@ -12,6 +12,7 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "@atlast/connectors": "workspace:*",
     "@atlast/graph-model": "workspace:*",
     "@atlast/impact-model": "workspace:*",
     "@atlast/overlay-model": "workspace:*",

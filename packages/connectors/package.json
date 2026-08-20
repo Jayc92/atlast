@@ -4,7 +4,26 @@
   "private": true,
   "description": "Discovery source adapters (read-only, evidence-emitting) — implementation gated on M5 authorization; synthetic fixtures only before that.",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "typecheck": "tsc --project tsconfig.json"
+    "typecheck": "tsc --project tsconfig.json",
+    "test": "vitest run",
+    "build": "tsc --project tsconfig.build.json"
+  },
+  "dependencies": {
+    "@atlast/shared": "workspace:*",
+    "@kubernetes/client-node": "2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "@types/ws": "8.18.1",
+    "vitest": "4.1.10"
   }
 }

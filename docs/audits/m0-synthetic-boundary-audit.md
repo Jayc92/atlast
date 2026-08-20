@@ -669,3 +669,89 @@ To keep this section auditable, four categories are kept explicitly distinct:
 ### 20.12 Conclusion (M4-E boundary re-audit and measurements)
 
 At `2901463da8fa5ff330f88c75847b3450b14689c8`, within the limitations stated in § 11/§ 14.12/§ 16.13/§ 18.13/§ 20.9: every Atlast product/runtime network path remains loopback-only, including the new ten-route surface (nine prior routes plus M4-B's impact route), all of which are `GET`-only; the environment-variable surface is unchanged from M0; the M4-A through M4-D delta introduces no new credential, sensitive file, employer/customer material, or external-integration-capable dependency (`packages/impact-model` depends only on `@atlast/shared`, mirroring `packages/overlay-model`'s own dependency boundary); and no `apps/web/src/**` file imports `packages/graph-model`, `packages/overlay-model`, `packages/impact-model`, fixtures, or an API server module, directly or via a deep relative path. **One finding was recorded rather than swept under this conclusion, and it is already resolved in the merged commit this section audits**: the browser's automated no-side-door guard had no rule for `packages/impact-model` despite ADR-0033 asserting one existed; it now rejects direct and deep imports, proven by two new executable probes (§ 20.4). Factual bundle, latency, memory, and cardinality measurements are recorded in § 20.5–20.8, each with its exact method, environment, and reproducibility statement (§ 20.9), its standing small-synthetic-dataset caveat (§ 20.10), and an explicit boundary between observed fact, derived measurement, interpretation, and conclusions this section does not support (§ 20.11). **This section satisfies M4-E's "final synthetic-boundary and no-side-door re-audit," "extension of the existing browser import enforcement... for `packages/impact-model`," and "factual bundle/latency/memory/cardinality measurements" obligations. It does not evaluate the M4 exit criteria and does not close the M4 milestone — both remain separate, subsequent M4-E steps within the same explicit authorization, and M5 and later milestones remain gated and unauthorized regardless of this section's findings.**
+
+---
+
+## 21. M5-A Live Kubernetes Ingestion Experiment — Evidence Record (2026-08-20)
+
+**Status:** Candidate implementation evidence — pre-merge. M5-A's first vertical slice (live post-boot Pod ingestion, one namespace, read-only, polling) has passed independent technical review; this section is the durable, factual evidence record required before checkpointing that implementation. It is **not** a merge or closeout record — the implementation is uncommitted, on branch `feat/m5-a-live-kubernetes-pod-ingestion`, and this section does not authorize a merge, a second M5 slice, or M5 closure. **No credential, token, kubeconfig, or certificate material is recorded anywhere in this section** — see § 21.6.
+
+### 21.1 Environment and Cluster Identity
+
+- **Date/time of experiment:** 2026-08-20, approximately 18:31–18:46 UTC (cluster creation through the final live-ingestion transcript in § 21.3).
+- **Kind version:** `kind v0.32.0 go1.26.3 darwin/arm64`, installed via Homebrew on this machine specifically for M5-A, per explicit human approval.
+- **Cluster name:** `atlast-m5` (disposable, local, created via `kind create cluster --name atlast-m5`).
+- **Context:** `kind-atlast-m5` (Kind's own conventional naming; matches the target-guard's required prefix, ADR-0037 § 4).
+- **Namespace:** `atlast-m5` (Active).
+- **Node runtime:** Node.js v24.15.0; `@kubernetes/client-node` 2.0.0 (ADR-0036).
+
+### 21.2 Loopback and Local-Cluster Proof
+
+`kubectl cluster-info` reported the control plane at `https://127.0.0.1:63200`; `kubectl config current-context` reported `kind-atlast-m5`; `kubectl get nodes` showed exactly one `Ready` `control-plane` node (`atlast-m5-control-plane`). Both target-guard signals (ADR-0037 § 4) hold on the real cluster: the context name carries Kind's `kind-` prefix, and the resolved API server URL's hostname is loopback (`127.0.0.1`) — confirmed by direct inspection, not assumed.
+
+### 21.3 Live Post-Boot Ingestion — Before/After Transcript
+
+1. **Atlast started first.** The M5-A experiment process was started against the empty `atlast-m5` namespace (zero Pods, confirmed via `kubectl get pods` before startup).
+2. **"Before" state, honest and pre-existing:** `GET /api/v1/entities` against the running, already-listening process returned the real M1 contract for a truly empty `EvidenceStore` — `422 INVALID_READ_COORDINATE` / `EMPTY_EVIDENCE_STORE` — the same, pre-existing, already-tested behavior every other Atlast process exhibits at zero Evidence, not a new or special-cased response.
+3. **Real Pod creation, strictly after boot:** a real Pod (`nginx:1.27`, `restart: Never`) was created in the `atlast-m5` namespace via a separate `kubectl run` invocation, after the experiment process was already listening and had already completed its first poll.
+4. **No restart, same process throughout:** the experiment process's PID was confirmed identical (via `ps -p <pid> -o lstart,command`) from before Pod creation through the final query below — no restart, no re-exec, no new process.
+5. **Kubernetes observation → EvidenceStore append:** the next poll cycle (2 s interval) observed the real Pod, mapped it to one Entity-observation Evidence record (ADR-0036 § 2), and appended it through the real, unmodified `EvidenceStore.appendEvidence(...)` — the identical interface every existing M1–M4 test already exercises, never a stub.
+6. **Query API result, same running process:** `GET /api/v1/entities` (no restart in between) returned exactly one real Entity, reconciled by the real, unmodified `m1-v1` engine.
+
+### 21.4 Reconciliation, Graph, and Provenance Result
+
+- **Canonical entity identifier:** `atlast:entity:atlast-m5-atlast-m5-live-pod`.
+- **Confidence:** `0.5`.
+- **Rule trace:** `normalized-exact-match`, citing the real Kubernetes-sourced Evidence identifiers (one per poll cycle the Pod remained present, corroborating the same fact — the same corroboration mechanism the `demo-company` fixture's own scenarios already exercise).
+- **Freshness:** `current`.
+- **Conflict/ambiguity state:** `uncontested` / `unambiguous` — this single real Pod produced neither.
+- **Dereferenced Kubernetes Evidence record** (`GET /api/v1/evidence/atlast:evidence:kubernetes/atlast-m5/atlast-m5-live-pod/1`, percent-encoded): `sourceScopedIdentity.source: "kubernetes"`, `detail: {namespace: "atlast-m5", name: "atlast-m5-live-pod"}`, `observedAt`/`recordedAt` matching the real observation instant.
+- **Proof that no `demo-company` fixture record was substituted:** the dereferenced record's `source` (`"kubernetes"`) and `detail` shape are structurally distinct from every one of the 20 `demo-company` fixture Evidence records (whose sources are `deployment-inventory`, `service-registry`, `trace-index`, etc., per § 14.8) — confirmed by direct inspection, not by name-matching alone. Separately, `apps/api/src/server.ts` (the unmodified production entrypoint) was started independently on a different port during this same session and continued to serve exactly the original 11 synthetic `demo-company` entities, unaffected — see § 21.8.
+
+### 21.5 Read-Only Security Proof
+
+- **RBAC design (ADR-0037):** a dedicated, namespace-scoped `ServiceAccount` (`atlast-m5-discovery`); a namespace-scoped `Role` (`atlast-m5-pod-reader`) granting exactly `verbs: ["get", "list", "watch"]` on `resources: ["pods"]`, `apiGroups: [""]` — no `ClusterRole` exists with that name (confirmed via `kubectl get clusterrole`, `NotFound`); a `RoleBinding` binding the two. The **applied** Role's rules were read directly from the live cluster (`kubectl get role -o yaml`) and matched the intended manifest exactly — not assumed from the manifest text alone (ADR-0037's own risk mitigation).
+- **Real read call, using the real ServiceAccount credential:** a direct HTTP `GET` against the real API server, authenticated as `system:serviceaccount:atlast-m5:atlast-m5-discovery`, returned `200` with the real Pod list.
+- **Real mutation attempt, using the identical credential:** a direct HTTP `POST` (create Pod) against the real API server, using the same credential, was rejected with **`403 Forbidden`** — `"pods is forbidden: User \"system:serviceaccount:atlast-m5:atlast-m5-discovery\" cannot create resource \"pods\"..."` — the Kubernetes API server's own authorization layer, not the connector's restraint.
+- **CI-enforced structural boundary:** `eslint.config.mjs` now restricts `@kubernetes/client-node` (direct and deep-path imports) to `packages/connectors/src/kubernetes/client.ts` alone, scoped across all of `packages/connectors/src/**`. Proven by four executable probes in `packages/connectors/src/eslint-boundary.test.ts`, spawning the real ESLint CLI, mirroring `apps/web/src/eslint-boundary.test.ts`'s established pattern — all four passing.
+- **Direct source inspection confirms zero write-capable client calls anywhere in the connector:** `client.ts` calls exactly one client method, `coreApi.listNamespacedPod(...)`; no `create*`/`patch*`/`delete*`/`replace*`/`exec*`-named method is imported, referenced, or called anywhere in `packages/connectors/src/**` or the M5-A experiment entrypoint.
+
+### 21.6 Credential-Handling Statement — No Secrets Recorded
+
+This section deliberately contains **no** ServiceAccount token, kubeconfig content, certificate-authority data, client-certificate data, client-key data, or any other credential material — by design, not by omission. The restricted kubeconfig used for the live experiment was constructed outside the repository (under `/tmp/`), was never copied into any tracked path, and is not referenced here beyond the fact of its existence and its scope (a token-authenticated context for the `atlast-m5-discovery` ServiceAccount, pointed at the real cluster's server and CA). A repository-wide scan of the complete implementation diff for certificate/token/key-shaped content (`certificate-authority-data`, `client-certificate-data`, `client-key-data`, PEM headers, JWT-shaped tokens) found zero matches.
+
+### 21.7 Identity Case Study — A Real Finding, Not a Clean Mapping
+
+**Initial real mapping attempt:** `sourceScopedIdentity.sourceNativeId = "atlast-m5/atlast-m5-live-pod"` (slash-joined namespace/name, the natural Kubernetes convention).
+
+**Result: rejected.** Running this through the real, unmodified `m1-v1` engine (`packages/graph-model/src/identity-normalization.ts`'s `normalizeIdentityKey`, ADR-0022 § 2) threw `IdentityNormalizationError`. The accepted identity grammar (`LOWERCASE_ASCII_KEY_PATTERN`) is exactly:
+
+```
+^[a-z0-9]+(?:-[a-z0-9]+)*$
+```
+
+— lowercase alphanumeric segments joined only by single hyphens. A literal `/` is outside this grammar and is rejected outright, loudly, exactly as ADR-0022 § 2 specifies.
+
+**The connector was changed — not the identity algorithm.** No line of `packages/graph-model` or any accepted ADR was modified. The connector's own `sourceNativeId` construction (`packages/connectors/src/kubernetes/evidence-mapping.ts`) was changed to hyphen-join instead: `"atlast-m5-atlast-m5-live-pod"`.
+
+**Final result, this one observed Pod:**
+
+- Canonical entity: `atlast:entity:atlast-m5-atlast-m5-live-pod`
+- Confidence: `0.5`
+- Rule: `normalized-exact-match`
+- Ambiguity/conflict: none, for this single observed Pod.
+
+**This does not universally solve Kubernetes identity, and is not presented as doing so.** Hyphen-joining namespace and name introduces its own **potential collision**, recorded here explicitly as a factual M5 finding requiring consideration before Kubernetes identity coverage broadens beyond this first Pod-only experiment: namespace/name combinations can theoretically collapse to the same hyphen-joined string if the component boundary differs. For example, a Pod named `live-pod` in namespace `atlast-m5` (`"atlast-m5" + "-" + "live-pod"` → `"atlast-m5-live-pod"`) would normalize to the _same_ key as a Pod named `m5-live-pod` in a namespace named `atlast` (`"atlast" + "-" + "m5-live-pod"` → `"atlast-m5-live-pod"`) — two genuinely distinct real Kubernetes objects, indistinguishable after this hyphen-join. This experiment's own single real Pod did not exhibit this collision, and no redesign of identity resolution is proposed or performed in this checkpoint — the finding is recorded so it is weighed deliberately, not discovered by accident, before any later M5 slice widens Kubernetes resource or namespace coverage.
+
+### 21.8 Existing Synthetic Capability — Confirmed Unaffected
+
+The unmodified, existing production entrypoint (`apps/api/src/server.ts`) was started independently during this same session, on a separate port, and served exactly the original 11 synthetic `demo-company` entities (`atlast:entity:api`, `archive`, `checkout`, `fulfillment`, `ledger`, `ledger-api`, `notifications`, `orders`, `payments`, `web`, `worker`) — unaffected by the M5-A connector's existence or activity. `initializeApplication` (the function this production entrypoint calls) is unmodified; the new `initializeApplicationExposingStores` function is additive and never called by `server.ts`.
+
+### 21.9 Dependency Review
+
+- **`@kubernetes/client-node@2.0.0`** — the one dependency ADR-0036 authorizes, exact-pinned, unchanged.
+- **`@types/ws@8.18.1`** — reviewed for genuine necessity, not assumed. Removed via `pnpm remove` and the typecheck re-run to confirm the underlying error (`TS7016: Could not find a declaration file for module 'ws'`, from `@kubernetes/client-node`'s transitive `isomorphic-ws` → `ws` dependency) reproduces exactly as before; `skipLibCheck` is not set anywhere in this repository (confirmed by inspection), so suppressing the check repository-wide would be a broader, precedent-breaking deviation, not a cleaner fix. `@types/ws` was reinstalled at the same exact pin; typecheck confirmed passing again. This mirrors how `@types/node` is already handled identically for every other package in this repository — a type-only devDependency completing an already-accepted runtime dependency's type surface, not a new capability.
+
+### 21.10 Scope Confirmation
+
+Direct inspection of the complete implementation diff confirms: `initializeApplication`'s signature, parameters, and effective behavior are unchanged (refactored to share construction logic with the new function, never altered); `apps/api/src/server.ts` is untouched; no existing route, schema, or query behavior changed; no second application _contract_ was created (`buildApplication` is called identically by both composition functions — ADR-0009's "one application shape" invariant holds); no write-capable Kubernetes operation exists anywhere in the connector; no ambient kubeconfig resolution exists (`loadFromFile` with an explicit path, `setCurrentContext` with an explicit name — never `loadFromDefault`); no credential or generated kubeconfig entered the repository (§ 21.6); and no unrelated Docker/Supabase container was inspected, stopped, or modified at any point. The complete, unmodified `./scripts/verify.sh` passed all seven stages after every change recorded in this section.

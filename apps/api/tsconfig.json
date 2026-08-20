@@ -25,6 +25,7 @@
     // override so the build resolves both packages through their real
     // package entry points instead (ADR-0024 § 14).
     "paths": {
+      "@atlast/connectors": ["../../packages/connectors/src/index.ts"],
       "@atlast/graph-model": ["../../packages/graph-model/src/index.ts"],
       "@atlast/impact-model": ["../../packages/impact-model/src/index.ts"],
       "@atlast/overlay-model": ["../../packages/overlay-model/src/index.ts"],
