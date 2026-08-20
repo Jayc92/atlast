@@ -160,4 +160,45 @@ export default defineConfig(
       ],
     },
   },
+
+  {
+    // The M5-A Kubernetes connector's structural read-only boundary
+    // (ADR-0037 § 5): `@kubernetes/client-node` may be imported only from
+    // the dedicated client wrapper, never from any other file in this
+    // connector or anywhere else. This confines the raw client — and any
+    // write-capable method it exposes — to one reviewed file, the same
+    // "one narrow file, everything else restricted" discipline the
+    // apps/web boundary above already applies to graph-model/overlay-model.
+    files: ["packages/connectors/src/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@kubernetes/client-node",
+              message:
+                "packages/connectors must import @kubernetes/client-node only from src/kubernetes/client.ts — the M5-A structural read-only boundary (ADR-0037 § 5).",
+            },
+          ],
+          patterns: [
+            {
+              group: ["@kubernetes/client-node/*"],
+              message:
+                "packages/connectors must import @kubernetes/client-node only from src/kubernetes/client.ts — the M5-A structural read-only boundary (ADR-0037 § 5).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The one authorized exception: client.ts itself is the sole file
+    // permitted to import the raw client library. A later block always
+    // wins over an earlier one for the same file in ESLint flat config.
+    files: ["packages/connectors/src/kubernetes/client.ts"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
 );

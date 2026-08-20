@@ -106,6 +106,32 @@ export function buildApplication(
 }
 
 /**
+ * Constructs a fresh, isolated store pair and seeds it. Ingestion
+ * completes **before** the caller ever builds an application over it, so
+ * no caller can observe a store that is still being seeded. Each call
+ * constructs its own fresh pair; there is no shared singleton. Shared by
+ * `initializeApplication` and `initializeApplicationExposingStores` so
+ * the two differ only in what they return to their caller, never in how
+ * the stores are constructed or seeded.
+ */
+async function initializeStores(
+  clock: Clock,
+  seedEvidence: readonly Evidence[],
+  seedOverlayFrames: readonly OverlayFrame[],
+): Promise<ApplicationDependencies> {
+  const evidenceStore = new InMemoryEvidenceStore(clock);
+  const topologyGraphStore = new InMemoryTopologyGraphStore(
+    evidenceStore,
+    clock,
+  );
+  const operationalOverlayStore = new InMemoryOperationalOverlayStore(
+    seedOverlayFrames,
+  );
+  await evidenceStore.appendEvidence(seedEvidence);
+  return { evidenceStore, topologyGraphStore, operationalOverlayStore };
+}
+
+/**
  * Asynchronously create and seed a fresh, isolated store pair, then build
  * the application over it (ADR-0024 § 12). Ingestion completes **before**
  * `buildApplication` is ever called, so the returned `FastifyInstance` is
@@ -119,17 +145,46 @@ export async function initializeApplication(
   seedOverlayFrames: readonly OverlayFrame[],
   serverOptions: FastifyServerOptions = {},
 ): Promise<FastifyInstance> {
-  const evidenceStore = new InMemoryEvidenceStore(clock);
-  const topologyGraphStore = new InMemoryTopologyGraphStore(
-    evidenceStore,
+  const dependencies = await initializeStores(
     clock,
-  );
-  const operationalOverlayStore = new InMemoryOperationalOverlayStore(
+    seedEvidence,
     seedOverlayFrames,
   );
-  await evidenceStore.appendEvidence(seedEvidence);
-  return buildApplication(
-    { evidenceStore, topologyGraphStore, operationalOverlayStore },
-    serverOptions,
+  return buildApplication(dependencies, serverOptions);
+}
+
+export interface InitializedApplication {
+  readonly application: FastifyInstance;
+  readonly dependencies: ApplicationDependencies;
+}
+
+/**
+ * M5-A only (ADR-0036/0037; docs/m5-plan.md §§ 3, 7) — never called by the
+ * existing production `apps/api/src/server.ts`, which is unmodified and
+ * continues to call `initializeApplication` above exactly as before.
+ *
+ * Identical construction and seeding to `initializeApplication`, but also
+ * returns the constructed `ApplicationDependencies` to its caller, so a
+ * post-boot Kubernetes discovery adapter can call
+ * `dependencies.evidenceStore.appendEvidence(...)` against the exact same
+ * store instance the returned, already-running application serves reads
+ * from — the seam M5-A's live post-boot ingestion proof requires. This
+ * does not create a second application shape: `buildApplication` is
+ * called exactly as `initializeApplication` calls it, with the identical
+ * route/schema/query behavior every existing test already exercises
+ * (docs/m5-plan.md § 3's ADR-0009 reconciliation note).
+ */
+export async function initializeApplicationExposingStores(
+  clock: Clock,
+  seedEvidence: readonly Evidence[],
+  seedOverlayFrames: readonly OverlayFrame[],
+  serverOptions: FastifyServerOptions = {},
+): Promise<InitializedApplication> {
+  const dependencies = await initializeStores(
+    clock,
+    seedEvidence,
+    seedOverlayFrames,
   );
+  const application = buildApplication(dependencies, serverOptions);
+  return { application, dependencies };
 }

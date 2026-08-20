@@ -12,6 +12,9 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
+      "@atlast/connectors": fileURLToPath(
+        new URL("../../packages/connectors/src/index.ts", import.meta.url),
+      ),
       "@atlast/graph-model": fileURLToPath(
         new URL("../../packages/graph-model/src/index.ts", import.meta.url),
       ),
