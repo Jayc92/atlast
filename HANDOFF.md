@@ -9,7 +9,7 @@ The canonical, model-neutral resume document for Atlast. Read this file with the
 - **Latest merged implementation commit:** `2901463` (`test: enforce browser impact-model import boundary (#82)`), squash-merged through [PR #82](https://github.com/Jayc92/atlast/pull/82) on 2026-08-19 — the M4-E `packages/impact-model` browser import-enforcement fix; no product behavior changed.
 - **Latest merged checkpoint commit:** `f04456a` (`docs: record M4-E audit and factual measurements (#83)`), squash-merged through [PR #83](https://github.com/Jayc92/atlast/pull/83) on 2026-08-20 — the M4-E synthetic-boundary/no-side-door audit and factual bundle/latency/memory/cardinality measurements, recorded in [docs/audits/m0-synthetic-boundary-audit.md § 20](docs/audits/m0-synthetic-boundary-audit.md).
 - **Verification:** the M4-D candidate passed the complete seven-stage verifier (shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 264/264, browser acceptance 46/46) before PR #79 merged; the M4-E enforcement fix (PR #82) and audit/measurement documentation (PR #83) each independently repassed the same complete unmodified verifier before merge, with GitHub Actions `verify` succeeding on both (5m38s and 4m55s respectively) and on the current `main` HEAD.
-- **Milestone state:** **M0 through M4 are complete.** The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035. M4-E's boundary re-audit, enforcement fix, factual measurements, and exit-criterion evaluation are complete and merged (§ 5 below). **Both M4 exit criteria evaluated PASS. Checkpoint `m4-complete` formally closes M4.** No implementation slice is active. **M5+ remain unauthorized** — this closure grants no successor permission.
+- **Milestone state:** **M0 through M4 are complete.** The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035. M4-E's boundary re-audit, enforcement fix, factual measurements, and exit-criterion evaluation are complete and merged (§ 5 below). **Both M4 exit criteria evaluated PASS. Checkpoint `m4-complete` formally closes M4.** M5 planning and pre-release architecture/ADR review are also now complete: [docs/m5-plan.md](docs/m5-plan.md) and ADRs [0036](docs/adr/0036-m5-kubernetes-client-and-connector-boundary.md)/[0037](docs/adr/0037-m5-read-only-credential-and-rbac-design.md) were independently reviewed, corrected, and **explicitly accepted by Joseph Carfagno on 2026-08-20**, after a separate GUARDRAILS.md § 1.4 authentication-policy amendment for the M5-A experiment merged through [PR #87](https://github.com/Jayc92/atlast/pull/87) at `9bbeec4`. **This acceptance does not authorize M5-A implementation** — no implementation slice is active anywhere. M5-A requires its own separate, explicit implementation authorization, effective only after this acceptance record merges to `main` and local `main` is synchronized cleanly.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
 ## 2. Product Summary
@@ -50,14 +50,14 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 
 ## 4. Roadmap Position
 
-| Milestone | State                 | Evidence                                 |
-| --------- | --------------------- | ---------------------------------------- |
-| M0        | Complete - 2026-07-22 | Foundation and closure audit             |
-| M1        | Complete - 2026-08-12 | S1-S8; checkpoint `m1-complete`          |
-| M2        | Complete - 2026-08-16 | M2-A-F; checkpoint `m2-complete`         |
-| M3        | Complete - 2026-08-17 | M3-A-F; PR #68; checkpoint `m3-complete` |
-| M4        | Complete - 2026-08-20 | PR #83; checkpoint `m4-complete`         |
-| M5        | Unauthorized          | No planning or implementation may begin  |
+| Milestone | State                                          | Evidence                                 |
+| --------- | ---------------------------------------------- | ---------------------------------------- |
+| M0        | Complete - 2026-07-22                          | Foundation and closure audit             |
+| M1        | Complete - 2026-08-12                          | S1-S8; checkpoint `m1-complete`          |
+| M2        | Complete - 2026-08-16                          | M2-A-F; checkpoint `m2-complete`         |
+| M3        | Complete - 2026-08-17                          | M3-A-F; PR #68; checkpoint `m3-complete` |
+| M4        | Complete - 2026-08-20                          | PR #83; checkpoint `m4-complete`         |
+| M5        | Planning accepted; implementation unauthorized | docs/m5-plan.md; ADR-0036/0037; PR #87   |
 
 M3 delivered synthetic operational health without making overlays graph truth:
 
@@ -109,7 +109,7 @@ Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-**No implementation slice is currently active.** M0 through M4 are complete. Any future work requires its own separate, explicit human authorization, exactly as every prior milestone slice required — most immediately, M5 (the read-only local Kubernetes connector), which remains gated pending that authorization. Maintenance, corrections, and factual checkpoint documentation within the accepted ADRs and without extending product behavior remain permitted, per [CLAUDE.md](CLAUDE.md).
+**No implementation slice is currently active.** M0 through M4 are complete. M5 planning (docs/m5-plan.md, ADRs 0036/0037) is accepted, and the M5-A authentication-policy prerequisite is resolved (GUARDRAILS § 1.4, PR #87) — but **M5-A implementation itself is not authorized**. It requires its own separate, explicit human authorization, effective only after the M5-P acceptance record merges to `main` and local `main` is synchronized cleanly. Maintenance, corrections, and factual checkpoint documentation within the accepted ADRs and without extending product behavior remain permitted, per [CLAUDE.md](CLAUDE.md).
 
 ## 8. Prohibited Work
 
