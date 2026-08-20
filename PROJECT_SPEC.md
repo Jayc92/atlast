@@ -2,7 +2,7 @@
 
 **Version:** 0.2.1
 **Date:** 2026-07-21 (metadata corrected 2026-07-30)
-**Status:** Approved product baseline. M0 through M3 are complete; M3 closed at checkpoint `m3-complete` after PR #68 merged at `6103ced` and post-merge verification passed on 2026-08-17. Joseph Carfagno explicitly authorized M4 planning and pre-release architecture/ADR review on 2026-08-17, then explicitly accepted the M4 implementation baseline and authorized M4-A as the only active implementation slice, not yet implemented; M4-B through M4-E and M5+ remain unauthorized ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md)). This document itself authorizes no slice or milestone. Implementation details are governed by human-approved ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining here; the vision, goals, principles, scope, and non-goals below remain the approved product baseline.
+**Status:** Approved product baseline. M0 through M4 are complete; M4 formally closed at checkpoint `m4-complete` after both M4 exit criteria were evaluated PASS ([docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), [HANDOFF.md](HANDOFF.md)). No implementation slice is currently active. M5 remains gated and unauthorized; it requires its own separate, explicit human authorization, exactly as every prior milestone required. This document itself authorizes no slice or milestone. Implementation details are governed by human-approved ADRs in [docs/adr/](docs/adr/README.md), which override any conflicting draft-era architectural wording remaining here; the vision, goals, principles, scope, and non-goals below remain the approved product baseline.
 
 ---
 
