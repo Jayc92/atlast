@@ -674,7 +674,7 @@ At `2901463da8fa5ff330f88c75847b3450b14689c8`, within the limitations stated in 
 
 ## 21. M5-A Live Kubernetes Ingestion Experiment — Evidence Record (2026-08-20)
 
-**Status:** Candidate implementation evidence — pre-merge. M5-A's first vertical slice (live post-boot Pod ingestion, one namespace, read-only, polling) has passed independent technical review; this section is the durable, factual evidence record required before checkpointing that implementation. It is **not** a merge or closeout record — the implementation is uncommitted, on branch `feat/m5-a-live-kubernetes-pod-ingestion`, and this section does not authorize a merge, a second M5 slice, or M5 closure. **No credential, token, kubeconfig, or certificate material is recorded anywhere in this section** — see § 21.6.
+**Status:** Merged, durable evidence record. M5-A's first vertical slice (live post-boot Pod ingestion, one namespace, read-only, polling) passed independent technical review and merged to `main` through [PR #89](https://github.com/Jayc92/atlast/pull/89) at `73b8275` on 2026-08-20; this section is the durable, factual evidence record for that merged implementation. This section records M5-A's own accepted scope only — it does not authorize, and must not be read as authorizing, any M5-B/M5-C/M5-D slice or the overall M5 milestone's closure; see [TASKS.md](../../TASKS.md) and [HANDOFF.md](../../HANDOFF.md) for what remains open at the M5 level. **No credential, token, kubeconfig, or certificate material is recorded anywhere in this section** — see § 21.6.
 
 ### 21.1 Environment and Cluster Identity
 

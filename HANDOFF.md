@@ -5,11 +5,11 @@ The canonical, model-neutral resume document for Atlast. Read this file with the
 ## 1. Document Control
 
 - **Last updated:** 2026-08-20
-- **Checkpoint name:** `m4-complete`
-- **Latest merged implementation commit:** `2901463` (`test: enforce browser impact-model import boundary (#82)`), squash-merged through [PR #82](https://github.com/Jayc92/atlast/pull/82) on 2026-08-19 — the M4-E `packages/impact-model` browser import-enforcement fix; no product behavior changed.
-- **Latest merged checkpoint commit:** `f04456a` (`docs: record M4-E audit and factual measurements (#83)`), squash-merged through [PR #83](https://github.com/Jayc92/atlast/pull/83) on 2026-08-20 — the M4-E synthetic-boundary/no-side-door audit and factual bundle/latency/memory/cardinality measurements, recorded in [docs/audits/m0-synthetic-boundary-audit.md § 20](docs/audits/m0-synthetic-boundary-audit.md).
-- **Verification:** the M4-D candidate passed the complete seven-stage verifier (shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 264/264, browser acceptance 46/46) before PR #79 merged; the M4-E enforcement fix (PR #82) and audit/measurement documentation (PR #83) each independently repassed the same complete unmodified verifier before merge, with GitHub Actions `verify` succeeding on both (5m38s and 4m55s respectively) and on the current `main` HEAD.
-- **Milestone state:** **M0 through M4 are complete.** The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035. M4-E's boundary re-audit, enforcement fix, factual measurements, and exit-criterion evaluation are complete and merged (§ 5 below). **Both M4 exit criteria evaluated PASS. Checkpoint `m4-complete` formally closes M4.** M5 planning and pre-release architecture/ADR review are also now complete: [docs/m5-plan.md](docs/m5-plan.md) and ADRs [0036](docs/adr/0036-m5-kubernetes-client-and-connector-boundary.md)/[0037](docs/adr/0037-m5-read-only-credential-and-rbac-design.md) were independently reviewed, corrected, and **explicitly accepted by Joseph Carfagno on 2026-08-20**, after a separate GUARDRAILS.md § 1.4 authentication-policy amendment for the M5-A experiment merged through [PR #87](https://github.com/Jayc92/atlast/pull/87) at `9bbeec4`. **This acceptance does not authorize M5-A implementation** — no implementation slice is active anywhere. M5-A requires its own separate, explicit implementation authorization, effective only after this acceptance record merges to `main` and local `main` is synchronized cleanly.
+- **Checkpoint name:** `M5-A complete — M5 remains open`
+- **Latest merged implementation commit:** `73b8275` (`feat: prove live read-only Kubernetes Pod ingestion (#89)`), squash-merged through [PR #89](https://github.com/Jayc92/atlast/pull/89) on 2026-08-20 — the M5-A first live Kubernetes ingestion slice (`packages/connectors/src/kubernetes/`, a separate additive `apps/api/src/server-m5-kubernetes-experiment.ts` entrypoint, `apps/api/src/server.ts` unchanged); its durable evidence record is [docs/audits/m0-synthetic-boundary-audit.md § 21](docs/audits/m0-synthetic-boundary-audit.md).
+- **Latest merged checkpoint commit (prior, M4):** `f04456a` (`docs: record M4-E audit and factual measurements (#83)`), squash-merged through [PR #83](https://github.com/Jayc92/atlast/pull/83) on 2026-08-20 — the M4-E synthetic-boundary/no-side-door audit and factual bundle/latency/memory/cardinality measurements, recorded in [docs/audits/m0-synthetic-boundary-audit.md § 20](docs/audits/m0-synthetic-boundary-audit.md). This M5-A closeout documentation is the current, separate checkpoint on top of it.
+- **Verification:** the M4-D candidate passed the complete seven-stage verifier (shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 264/264, browser acceptance 46/46) before PR #79 merged; the M4-E enforcement fix (PR #82) and audit/measurement documentation (PR #83) each independently repassed the same complete unmodified verifier before merge, with GitHub Actions `verify` succeeding on both (5m38s and 4m55s respectively). PR #89 (M5-A) independently repassed the same complete unmodified verifier before merge (`apps/api` suite unchanged at 123/123; connectors package added with its own passing suite) and merged with `main` synchronized cleanly afterward.
+- **Milestone state:** **M0 through M4 are complete.** The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035; both M4 exit criteria evaluated PASS; checkpoint `m4-complete` formally closed M4. M5 planning and pre-release architecture/ADR review are complete: [docs/m5-plan.md](docs/m5-plan.md) and ADRs [0036](docs/adr/0036-m5-kubernetes-client-and-connector-boundary.md)/[0037](docs/adr/0037-m5-read-only-credential-and-rbac-design.md) were independently reviewed, corrected, and explicitly accepted by Joseph Carfagno on 2026-08-20, after a separate GUARDRAILS.md § 1.4 authentication-policy amendment for the M5-A experiment merged through [PR #87](https://github.com/Jayc92/atlast/pull/87) at `9bbeec4`. **M5-A implementation was subsequently and separately, explicitly authorized by Joseph Carfagno on 2026-08-20, implemented, independently reviewed, and merged through [PR #89](https://github.com/Jayc92/atlast/pull/89) at `73b8275` on 2026-08-20; local `main` has synchronized cleanly.** Within M5-A's own accepted scope ([docs/m5-plan.md § 3](docs/m5-plan.md#3-first-slice-boundary-m5-a)), proof obligations §§ 4.1–4.3 and M5 exit criteria 1 and 3 are satisfied with merged evidence ([docs/audits/m0-synthetic-boundary-audit.md § 21](docs/audits/m0-synthetic-boundary-audit.md)). **M5-A's completion does not complete the M5 milestone**: exit criterion 2 (freshness degrades visibly on cluster/source loss) and § 4.4 (the ADR-0018 storage-decision reassessment before M5 closes) remain unsatisfied and undated, and any of M5-B/M5-C/M5-D is at most newly _eligible_ for its own separate future authorization request, per [docs/m5-plan.md § 8](docs/m5-plan.md#8-checkpoint-sequencing) — **none is authorized.** No implementation slice is currently active.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
 ## 2. Product Summary
@@ -50,14 +50,14 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 
 ## 4. Roadmap Position
 
-| Milestone | State                                          | Evidence                                 |
-| --------- | ---------------------------------------------- | ---------------------------------------- |
-| M0        | Complete - 2026-07-22                          | Foundation and closure audit             |
-| M1        | Complete - 2026-08-12                          | S1-S8; checkpoint `m1-complete`          |
-| M2        | Complete - 2026-08-16                          | M2-A-F; checkpoint `m2-complete`         |
-| M3        | Complete - 2026-08-17                          | M3-A-F; PR #68; checkpoint `m3-complete` |
-| M4        | Complete - 2026-08-20                          | PR #83; checkpoint `m4-complete`         |
-| M5        | Planning accepted; implementation unauthorized | docs/m5-plan.md; ADR-0036/0037; PR #87   |
+| Milestone | State                                    | Evidence                                 |
+| --------- | ---------------------------------------- | ---------------------------------------- |
+| M0        | Complete - 2026-07-22                    | Foundation and closure audit             |
+| M1        | Complete - 2026-08-12                    | S1-S8; checkpoint `m1-complete`          |
+| M2        | Complete - 2026-08-16                    | M2-A-F; checkpoint `m2-complete`         |
+| M3        | Complete - 2026-08-17                    | M3-A-F; PR #68; checkpoint `m3-complete` |
+| M4        | Complete - 2026-08-20                    | PR #83; checkpoint `m4-complete`         |
+| M5        | M5-A complete; M5 milestone remains open | PR #89 `73b8275`; audit § 21             |
 
 M3 delivered synthetic operational health without making overlays graph truth:
 
@@ -95,21 +95,22 @@ Both M3 exit criteria are closed:
 
 ## 6. Current Git State
 
-At the M4-complete checkpoint (this closure commit is the next commit on top of this state):
+At the M5-A-complete checkpoint (this closure documentation is the next commit on top of this state):
 
 ```text
-f04456a (HEAD -> main, origin/main, origin/HEAD) docs: record M4-E audit and factual measurements (#83)
-2901463 test: enforce browser impact-model import boundary (#82)
-8ba81d3 docs: authorize M4-E boundary re-audit and closeout (#81)
-a726caf docs: close M4 implementation slice D (#80)
-e5d4a2c fix: harden M4 impact analysis accessibility (#79)
+73b8275 (HEAD -> main, origin/main, origin/HEAD) feat: prove live read-only Kubernetes Pod ingestion (#89)
+630bfb4 docs: accept M5 planning and architecture baseline (#88)
+9bbeec4 docs: add narrowly scoped M5-A authentication exemption (#87)
+e95d535 docs: strengthen M5 verification obligations (#86)
+1757b07 docs: align project status after M4 closeout (#85)
+d2a2e7a docs: close M4 milestone (#84)
 ```
 
 Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-**No implementation slice is currently active.** M0 through M4 are complete. M5 planning (docs/m5-plan.md, ADRs 0036/0037) is accepted, and the M5-A authentication-policy prerequisite is resolved (GUARDRAILS § 1.4, PR #87) — but **M5-A implementation itself is not authorized**. It requires its own separate, explicit human authorization, effective only after the M5-P acceptance record merges to `main` and local `main` is synchronized cleanly. Maintenance, corrections, and factual checkpoint documentation within the accepted ADRs and without extending product behavior remain permitted, per [CLAUDE.md](CLAUDE.md).
+**No implementation slice is currently active.** M0 through M4 are complete. M5 planning (docs/m5-plan.md, ADRs 0036/0037) is accepted, the M5-A authentication-policy prerequisite is resolved (GUARDRAILS § 1.4, PR #87), and **M5-A itself was separately authorized, implemented, and merged** through [PR #89](https://github.com/Jayc92/atlast/pull/89) at `73b8275` — M5-A's own accepted scope ([docs/m5-plan.md § 3](docs/m5-plan.md#3-first-slice-boundary-m5-a)) is complete. **M5 the milestone is not complete and no further M5 implementation slice is authorized**: M5 exit criterion 2, the § 4.4 storage-decision reassessment, and any of M5-B/M5-C/M5-D each require their own separate, explicit future human authorization exactly as every prior slice required. Maintenance, corrections, and factual checkpoint documentation within the accepted ADRs and without extending product behavior remain permitted, per [CLAUDE.md](CLAUDE.md).
 
 ## 8. Prohibited Work
 
@@ -155,21 +156,31 @@ You are taking over as conductor for Atlast at
 
 Before acting, read HANDOFF.md, PROJECT_SPEC.md, GUARDRAILS.md, CLAUDE.md,
 TASKS.md, docs/architecture.md, docs/milestones.md, docs/m4-plan.md,
-docs/audits/m0-synthetic-boundary-audit.md § 20, and the ADR index (ADRs
-0032-0035). Inspect git status and git log; real Git state overrides stale
-text.
+docs/m5-plan.md, the ADR index (ADRs 0032-0037), and
+docs/audits/m0-synthetic-boundary-audit.md §§ 20-21. Inspect git status and
+git log; real Git state overrides stale text.
 
-M0 through M4 are complete. M4-E's boundary re-audit and impact-model
-import-enforcement fix merged through PR #82 at 2901463 on 2026-08-19; its
-audit and factual measurement documentation merged through PR #83 at
-f04456a on 2026-08-20. Both M4 exit criteria were evaluated directly against
-the merged repository state and classified PASS. Checkpoint m4-complete
-formally closes M4. No implementation slice is currently active.
+M0 through M4 are complete (checkpoint m4-complete). M5 planning and its
+architecture baseline (docs/m5-plan.md, ADRs 0036/0037) are accepted; the
+GUARDRAILS § 1.4 M5-A authentication exemption merged through PR #87. M5-A
+— the first live Kubernetes ingestion slice — was separately, explicitly
+authorized, implemented, independently reviewed, and merged through PR #89
+at 73b8275 on 2026-08-20, with its durable evidence record in
+docs/audits/m0-synthetic-boundary-audit.md § 21. Checkpoint
+"M5-A complete — M5 remains open" records that closure. No implementation
+slice is currently active.
+
+M5-A's completion does not complete the M5 milestone: exit criterion 2
+(freshness degrades visibly on cluster/source loss) and § 4.4 (the ADR-0018
+storage-decision reassessment before M5 closes) remain unsatisfied, and
+none of M5-B/M5-C/M5-D is authorized — each requires its own separate,
+explicit future human authorization.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic,
-read-only, and fail-honest boundaries. Do not plan or implement M5 or any
-later milestone work without Joseph Carfagno's own separate, explicit
-authorization — this closure grants none. Begin by reporting your
-understanding of checkpoint m4-complete and confirming no successor
-milestone is authorized.
+read-only, and fail-honest boundaries. Do not plan or implement M5-B, M5-C,
+M5-D, the ADR-0018 reassessment, or any later milestone work without Joseph
+Carfagno's own separate, explicit authorization — this closure grants none.
+Begin by reporting your understanding of checkpoint "M5-A complete — M5
+remains open" and confirming no further M5 or successor-milestone work is
+authorized.
 ```
