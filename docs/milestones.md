@@ -154,6 +154,15 @@
 - [ ] Deleting the cluster degrades freshness visibly; established facts age, nothing is corrupted.
 - [ ] With the connector disabled, all M0–M4 synthetic capability is intact.
 
+**Verification obligations (added following the 2026-08-20 M5 readiness review; proof requirements, not additional product scope — each names exactly how the exit criteria above must be demonstrated, not a new capability):**
+
+1. **Live post-boot ingestion.** A real Kubernetes observation must arrive, and be appended through the real `EvidenceStore`/ingestion path, **after** Atlast is already running — not only via a boot-time seed — and the graph must visibly change as a result, with no process restart and no human graph authoring. This is the specific mechanism that proves exit criterion 1 rather than merely asserting it.
+2. **Real Kubernetes identity case study.** M5 must run the deterministic `m1-v1` identity-normalization policy against actual Kubernetes object names (Deployment/Pod/Service/etc. from the real disposable cluster, not hand-authored fixture strings) and document the observed identifier mapping and any ambiguity or collision behavior encountered — a factual record, not an assumption that the fixture-tuned policy generalizes.
+3. **Structural read-only proof.** Documenting the connector as read-only is not sufficient. M5 must include a demonstrated security test, run against the disposable cluster, showing: the adapter's required read/list/watch operations succeed; a representative mutating operation is rejected by the Kubernetes authorization layer (not merely never attempted); and the connector's implementation contains no write-capable client code path — this is the mechanism that makes the "read-only credentials only" hard constraint above a proven property, not a stated intention.
+4. **Storage decision reassessment.** Before M5 can close, [ADR-0018](adr/0018-m1-storage-strategy.md)'s own named change conditions must be re-run against the real dataset M5's adapter actually produces — not the unchanged M1-era fixture ADR-0018 was last evaluated against (docs/m2-plan.md § 3; see the M2-F re-evaluation in [TASKS.md](../TASKS.md)). The M5 closeout must explicitly state one of: **(a)** in-memory storage remains justified against the real M5 workload, with the measurements supporting that conclusion, exactly as the M2-F re-evaluation did; or **(b)** one or more of ADR-0018's named conditions has fired, in which case M5's closeout records that finding and a new storage-decision ADR is required before any further milestone proceeds — ADR-0018 itself is not edited in either case, consistent with this project's amend-via-new-ADR convention.
+
+These four obligations do not change M5's scope, hard constraints, or exit criteria above, and none of them is itself an authorization to begin M5 work.
+
 ---
 
 ## Post-M5 (directional, uncommitted)
