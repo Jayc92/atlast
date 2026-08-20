@@ -4,13 +4,12 @@ The canonical, model-neutral resume document for Atlast. Read this file with the
 
 ## 1. Document Control
 
-- **Last updated:** 2026-08-19
-- **Checkpoint name:** `m4-d-impact-hardening-merged`
-- **Latest merged implementation commit:** `e5d4a2c` (`fix: harden M4 impact analysis accessibility (#79)`), squash-merged through [PR #79](https://github.com/Jayc92/atlast/pull/79) on 2026-08-19.
-- **Latest merged checkpoint commit:** `a726caf` (`docs: close M4 implementation slice D (#80)`), squash-merged through [PR #80](https://github.com/Jayc92/atlast/pull/80) on 2026-08-19.
-- **Verification:** the corrected M4-D candidate passed the complete seven-stage verifier: shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 264/264, and browser acceptance 46/46, plus whitespace, formatting, lint, types, and production builds. PR #79 GitHub Actions `verify` passed in 4m26s.
-- **Milestone state:** M0 through M3 and M4-A through M4-D are complete. The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035. Joseph Carfagno explicitly authorized M4-E on 2026-08-19 within its exact audit, enforcement, measurement, and closeout boundary; the release becomes operational only after this authorization record merges and local `main` synchronizes cleanly. M5+ remain unauthorized.
-- **Authorization branch:** `docs/m4-e-authorization`, based on synchronized, clean `main` at `a726caf`.
+- **Last updated:** 2026-08-20
+- **Checkpoint name:** `m4-complete`
+- **Latest merged implementation commit:** `2901463` (`test: enforce browser impact-model import boundary (#82)`), squash-merged through [PR #82](https://github.com/Jayc92/atlast/pull/82) on 2026-08-19 — the M4-E `packages/impact-model` browser import-enforcement fix; no product behavior changed.
+- **Latest merged checkpoint commit:** `f04456a` (`docs: record M4-E audit and factual measurements (#83)`), squash-merged through [PR #83](https://github.com/Jayc92/atlast/pull/83) on 2026-08-20 — the M4-E synthetic-boundary/no-side-door audit and factual bundle/latency/memory/cardinality measurements, recorded in [docs/audits/m0-synthetic-boundary-audit.md § 20](docs/audits/m0-synthetic-boundary-audit.md).
+- **Verification:** the M4-D candidate passed the complete seven-stage verifier (shared 429/429, impact-model 15/15, overlay-model 23/23, graph-model 372/372, API 123/123, web 264/264, browser acceptance 46/46) before PR #79 merged; the M4-E enforcement fix (PR #82) and audit/measurement documentation (PR #83) each independently repassed the same complete unmodified verifier before merge, with GitHub Actions `verify` succeeding on both (5m38s and 4m55s respectively) and on the current `main` HEAD.
+- **Milestone state:** **M0 through M4 are complete.** The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035. M4-E's boundary re-audit, enforcement fix, factual measurements, and exit-criterion evaluation are complete and merged (§ 5 below). **Both M4 exit criteria evaluated PASS. Checkpoint `m4-complete` formally closes M4.** No implementation slice is active. **M5+ remain unauthorized** — this closure grants no successor permission.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
 ## 2. Product Summary
@@ -51,14 +50,14 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 
 ## 4. Roadmap Position
 
-| Milestone | State                                | Evidence                                  |
-| --------- | ------------------------------------ | ----------------------------------------- |
-| M0        | Complete - 2026-07-22                | Foundation and closure audit              |
-| M1        | Complete - 2026-08-12                | S1-S8; checkpoint `m1-complete`           |
-| M2        | Complete - 2026-08-16                | M2-A-F; checkpoint `m2-complete`          |
-| M3        | Complete - 2026-08-17                | M3-A-F; PR #68; checkpoint `m3-complete`  |
-| M4        | M4-A/B/C/D complete; M4-E authorized | PR #80; M4-E gated on this record's merge |
-| M5        | Unauthorized                         | No planning or implementation may begin   |
+| Milestone | State                 | Evidence                                 |
+| --------- | --------------------- | ---------------------------------------- |
+| M0        | Complete - 2026-07-22 | Foundation and closure audit             |
+| M1        | Complete - 2026-08-12 | S1-S8; checkpoint `m1-complete`          |
+| M2        | Complete - 2026-08-16 | M2-A-F; checkpoint `m2-complete`         |
+| M3        | Complete - 2026-08-17 | M3-A-F; PR #68; checkpoint `m3-complete` |
+| M4        | Complete - 2026-08-20 | PR #83; checkpoint `m4-complete`         |
+| M5        | Unauthorized          | No planning or implementation may begin  |
 
 M3 delivered synthetic operational health without making overlays graph truth:
 
@@ -76,36 +75,45 @@ Both M3 exit criteria are closed:
 - All six accepted states are representable, visually distinguishable, and queryable in context.
 - Overlay data loss loses no topology; empty-overlay startup preserves health and topology while health-context fails honestly.
 
-## 5. M4-D Closure Evidence
+## 5. M4 Closure Evidence
 
-- Accessibility and failure-state hardening for the delivered impact panel merged through PR #79 at `e5d4a2c`.
-- The implementation gives simultaneous trust inspectors unique React-scoped label ids, closes only the trust selection implicitly opened by impact analysis, and covers honest multi-hop and missing-relationship behavior.
-- Independent review added a focused simultaneous-inspector label-resolution regression; no blocking finding remained.
-- Joseph Carfagno explicitly approved human VoiceOver QA covering the primary impact journey, empty and failure states, focus return, and simultaneous trust/impact dialog naming.
-- The complete verifier passed with 264/264 web tests and 46/46 browser cases; GitHub Actions passed in 4m26s. No API, domain, fixture, dependency, lockfile, impact-engine, or accepted-ADR behavior changed.
+**M4-D** (accessibility and failure-state hardening) merged through PR #79 at `e5d4a2c`: unique React-scoped label ids for simultaneous trust inspectors, correct close/focus ownership for the impact-opened trust selection, and honest multi-hop/missing-relationship behavior, approved after human VoiceOver QA. Verifier passed 264/264 web tests and 46/46 browser cases; GitHub Actions passed in 4m26s.
+
+**M4-E** (final boundary re-audit, enforcement fix, measurements, and exit-criterion evaluation) completed across two merged PRs, neither changing product behavior:
+
+- **PR #82** (`2901463`, 2026-08-19): closed a confirmed browser import-enforcement gap — `eslint.config.mjs` had no rule prohibiting `apps/web` from importing `packages/impact-model`, despite ADR-0033 asserting one existed. No live violation existed. Fixed by extending the existing `no-restricted-imports` boundary and adding two regression probes to `apps/web/src/eslint-boundary.test.ts`, mirroring the existing `packages/overlay-model` pattern exactly.
+- **PR #83** (`f04456a`, 2026-08-20): recorded the complete synthetic-boundary/no-side-door re-audit of the M4-A through M4-D delta, the PR #82 enforcement-fix record, and factual bundle/latency/memory/cardinality measurements — each with exact method, environment, commit, timestamp, and explicit limitations, plus a standing warning against extrapolating the small synthetic dataset — as [docs/audits/m0-synthetic-boundary-audit.md § 20](docs/audits/m0-synthetic-boundary-audit.md).
+
+**M4 exit-criterion evaluation (2026-08-20), evaluated directly against the merged repository state and re-executed rather than taken on narrative:**
+
+| #   | Exit criterion                                                                                       | Result                                                                                                                                                                                                                                                                                                                                                               |
+| --- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | An impact query returns ranked affected entities, each with a traversable, deterministic explanation | **PASS** — registered `GET /api/v1/entities/{entityId}/impact` route; pure deterministic `computeImpact` engine with its own contract-test proof; every result carries a dereferenceable `path`; the browser exposes it through the real `TrustInspector`; proven live in `tests/acceptance/specs/impact-analysis.spec.ts`                                           |
+| 2   | The synthetic scenario harness runs in CI and scores impact quality automatically                    | **PASS** — real 6-valid/3-invalid scenario catalog; fixture-backed exact-match scoring test rerun live against the merged commit (**6/6 scripted scenarios matched exactly**); a deliberately mutated expectation proven to fail; GitHub Actions `verify` confirmed successful on both the harness's introducing merge (PR #75) and the current `main` HEAD (PR #83) |
+
+**Checkpoint `m4-complete`: M4 is formally complete as of 2026-08-20.** This evaluation and closure make no claim of enterprise-scale performance, production scalability, absence of memory leaks, predictive AI, live Kubernetes discovery, or any other M5+ capability — the § 20 measurements are explicit that they describe only this small synthetic dataset on this one machine. **This closure authorizes nothing beyond M4; M5 remains gated and unauthorized.**
 
 ## 6. Current Git State
 
-At the M4-D-closeout checkpoint before this authorization commit:
+At the M4-complete checkpoint (this closure commit is the next commit on top of this state):
 
 ```text
-a726caf (HEAD -> main, origin/main, origin/HEAD) docs: close M4 implementation slice D (#80)
+f04456a (HEAD -> main, origin/main, origin/HEAD) docs: record M4-E audit and factual measurements (#83)
+2901463 test: enforce browser impact-model import boundary (#82)
+8ba81d3 docs: authorize M4-E boundary re-audit and closeout (#81)
+a726caf docs: close M4 implementation slice D (#80)
 e5d4a2c fix: harden M4 impact analysis accessibility (#79)
-7fd6beb docs: close M4-C and authorize M4-D (#78)
-dc4a90a feat: add M4 browser impact panel (#77)
-aa61c7f docs: close M4-B and authorize M4-C (#76)
 ```
 
 Always inspect real Git state before trusting this snapshot.
 
 ## 7. Authorized Work
 
-M4-E is explicitly authorized and becomes operational only after this authorization record merges and local `main` synchronizes cleanly. Its exact boundary is [docs/m4-plan.md § 6](docs/m4-plan.md#6-proposed-implementation-slices) and [TASKS.md](TASKS.md): perform the final synthetic-boundary and no-side-door re-audit; extend the existing browser import enforcement and focused tests to prohibit direct or deep `packages/impact-model` imports; record factual bundle, latency, memory, and cardinality measurements; evaluate the M4 exit criteria; and prepare the factual audit and milestone checkpoint closeout. Directly corresponding tests and documentation are authorized. No new product behavior is authorized.
+**No implementation slice is currently active.** M0 through M4 are complete. Any future work requires its own separate, explicit human authorization, exactly as every prior milestone slice required — most immediately, M5 (the read-only local Kubernetes connector), which remains gated pending that authorization. Maintenance, corrections, and factual checkpoint documentation within the accepted ADRs and without extending product behavior remain permitted, per [CLAUDE.md](CLAUDE.md).
 
 ## 8. Prohibited Work
 
-- Any M4-E work before this authorization record merges and local `main` synchronizes cleanly, or beyond the exact boundary above.
-- Any M5+ planning or implementation before separate authorization.
+- Any M5+ planning or implementation before separate, explicit authorization.
 - Real systems, credentials, employer/customer data, connectors, authentication, deployment, or external publication.
 - Product writes or mutation routes.
 - Browser imports from fixtures, graph-model, overlay-model, impact-model, repository/storage, or API server modules.
@@ -146,26 +154,22 @@ You are taking over as conductor for Atlast at
 (GitHub: https://github.com/Jayc92/atlast).
 
 Before acting, read HANDOFF.md, PROJECT_SPEC.md, GUARDRAILS.md, CLAUDE.md,
-TASKS.md, docs/architecture.md, docs/milestones.md, docs/m4-plan.md, and the
-ADR index (ADRs 0032-0035). Inspect git status and git log; real Git state
-overrides stale text.
+TASKS.md, docs/architecture.md, docs/milestones.md, docs/m4-plan.md,
+docs/audits/m0-synthetic-boundary-audit.md § 20, and the ADR index (ADRs
+0032-0035). Inspect git status and git log; real Git state overrides stale
+text.
 
-M0 through M3 and M4-A through M4-D are complete. M4-D was independently
-reviewed, fully verified, human-VoiceOver-QA-approved, and merged through PR
-#79 at e5d4a2c; its closeout merged through PR #80 at a726caf on 2026-08-19.
-Checkpoint m4-d-impact-hardening-merged remains the current implementation
-boundary. Joseph Carfagno explicitly authorized M4-E on 2026-08-19, but the
-release becomes operational only after its authorization record merges and
-local main synchronizes cleanly. M5+ are unauthorized.
+M0 through M4 are complete. M4-E's boundary re-audit and impact-model
+import-enforcement fix merged through PR #82 at 2901463 on 2026-08-19; its
+audit and factual measurement documentation merged through PR #83 at
+f04456a on 2026-08-20. Both M4 exit criteria were evaluated directly against
+the merged repository state and classified PASS. Checkpoint m4-complete
+formally closes M4. No implementation slice is currently active.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic,
-read-only, and fail-honest boundaries. After the M4-E authorization record is
-confirmed merged and local main is synchronized cleanly, implement only the
-exact audit, browser impact-model import-enforcement, factual measurement,
-exit-criterion evaluation, and milestone-closeout boundary in docs/m4-plan.md
-and TASKS.md. Add directly corresponding tests and factual documentation only;
-do not change product behavior, dependencies, fixtures, accepted ADRs, or
-verification tooling. Do not plan or implement M5+ work. Begin by reporting
-your understanding of checkpoint m4-d-impact-hardening-merged and the M4-E
-activation precondition.
+read-only, and fail-honest boundaries. Do not plan or implement M5 or any
+later milestone work without Joseph Carfagno's own separate, explicit
+authorization — this closure grants none. Begin by reporting your
+understanding of checkpoint m4-complete and confirming no successor
+milestone is authorized.
 ```
