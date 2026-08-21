@@ -807,3 +807,68 @@ Throughout this entire experiment, `docker ps` was re-checked at each stage and 
 ### 22.10 Conclusion
 
 M5 exit criterion 2 — "Deleting the cluster degrades freshness visibly; established facts age, nothing is corrupted" — is satisfied by direct, real-system evidence: the established Kubernetes-derived fact remained present, its real provenance remained dereferenceable and unaltered, no corruption or phantom replacement occurred, the experiment process never restarted, and its freshness classification transitioned honestly from `current` through `stale` to `historical` as a pure function of elapsed time against its last real observation — proven via the existing pinned-read contract, without waiting 30 real days and without weakening any accepted threshold, Clock, or derivation rule.
+
+## 23. ADR-0018 Real-M5-Workload Storage Reassessment (2026-08-21)
+
+**Status:** Complete reassessment record. **Why required:** [docs/m5-plan.md § 4.4](../m5-plan.md#4-proof-obligations) and [docs/milestones.md](../milestones.md#m5--read-only-local-kubernetes-connector-gated)'s verification obligation 4 both require [ADR-0018](../adr/0018-m1-storage-strategy.md)'s own named change conditions to be re-run against the real dataset the Kubernetes connector actually produced, before M5 can close. § 21/§ 22 established the real M5 workload's shape; this section measures it against ADR-0018's exact conditions. **No implementation change, ADR edit, or storage migration is made or proposed by this section.**
+
+### 23.1 Observed M5 Cardinality
+
+From § 21/§ 22's merged evidence: one real Kubernetes-derived Entity/assertion revision, corroborated by **3,707** provenance Evidence identifiers accumulated over roughly two hours of 2-second polling before the disposable cluster was deleted.
+
+### 23.2 Measurement Methodology
+
+A temporary, non-repository Node script (`/tmp/atlast-adr0018-measurement.mjs`, written, run, and deleted within this same session — the identical ad-hoc-measurement convention § 20.7 already used for the browser-memory figure; confirmed absent via `git status --short` before and after) exercised the **exact, unmodified production read/freshness path**: `InMemoryTopologyGraphStore.getSubject` (the same method `GET /api/v1/entities/{entityId}` composes) → `SnapshotResolver` → `reconcileEvidenceAtHorizon` → `buildAssertionReadResult` → `latestSupportingObservedAt`'s per-provenance `EvidenceStore.getEvidenceByIdentifier` loop.
+
+The synthetic workload used the real, unmodified `mapObservedPodToEvidence` (`@atlast/connectors`) to generate Evidence records shaped identically to the real M5-A connector's output (same `sourceScopedIdentity`, same `observation`/`detail` shape), for one synthetic Pod, at three cardinalities — **20** (the existing `demo-company` fixture scale), **1,000**, and **3,707** (the real observed M5 cardinality) — each in its own freshly constructed `InMemoryEvidenceStore`/`InMemoryTopologyGraphStore` pair (no state shared across cardinalities). A deterministic, monotonically incrementing injected `Clock` (never `Date.now()`, never wall-clock, never random) supplied a distinct `asOf` on every call, so every `"latest"` read was a genuine snapshot-cache miss — the same effective behavior real advancing wall-clock time produces on every distinct request, not an artificially cheap repeated cache hit. Each cardinality ran **5 discarded warm-up reads** followed by a **fixed sample of 30 timed reads** (`process.hrtime.bigint()`), from which median, p95, min, and max were computed. No Kubernetes, no network, and no new dependency were involved; no production file was modified.
+
+**Environment:** Node.js `v24.15.0`, `arm64`, `darwin` (same machine and Node version as every other measurement in this document).
+
+### 23.3 Latency Results
+
+| Cardinality | Samples | Median      | p95          | Min         | Max          |
+| ----------- | ------- | ----------- | ------------ | ----------- | ------------ |
+| 20          | 30      | 1.57 ms     | 2.70 ms      | 1.06 ms     | 4.27 ms      |
+| 1,000       | 30      | 670.13 ms   | 709.40 ms    | 656.55 ms   | 731.49 ms    |
+| 3,707       | 30      | 9,273.59 ms | 10,625.98 ms | 9,071.15 ms | 10,744.31 ms |
+
+The growth is markedly **superlinear**: a 50× cardinality increase (20 → 1,000) produced a ~427× latency increase; a further 3.707× cardinality increase (1,000 → 3,707) produced a ~13.8× latency increase — closely matching **quadratic** scaling (3.707² ≈ 13.74). **Root cause identified by direct code inspection, not merely inferred from the curve shape:** `packages/graph-model/src/reconciliation.ts`'s `standingFilteredObservations` re-scans a subject's **entire accumulated observation history** (`subjectState.observations.filter(...)`) once per distinct-`observedAt` reconciliation step; because this M5 workload has one step per poll (3,707 distinct `observedAt` values, never batched), total reconciliation work is the sum `1 + 2 + ... + n ≈ n²/2` — an O(n²) cost in the number of corroborating observations for one subject, not the O(n) the freshness-dereference loop alone would suggest. This is a real, previously unmeasured characteristic of the accepted `m1-v1` reconciliation engine under sustained single-subject corroboration, not a defect introduced by the M5 connector itself.
+
+### 23.4 Memory Result
+
+RSS (`process.memoryUsage().rss`) was sampled before store construction, after `appendEvidence`, and after the 30 timed reads, at each cardinality, **within one long-lived measurement process** (all three cardinalities ran sequentially in the same Node process for measurement convenience). **Limitation, disclosed rather than smoothed over:** because RSS is a monotonic OS-level figure that does not reliably shrink after garbage collection, the _baseline_ RSS reported for the 1,000 and 3,707 cardinalities is inflated by retained memory from the earlier cardinalities measured in the same process — those baseline figures are **not** clean per-cardinality readings and must not be read as "the memory cost of holding exactly N Evidence records" in isolation. The **within-cardinality** delta (after-reads minus after-append, measured entirely within that cardinality's own timed-read loop) is directly meaningful: **+51,712 KiB** at n=20, **+443,216 KiB** at n=1,000, **+782,432 KiB** at n=3,707 — consistent with each read allocating temporary, uncollected garbage (arrays, snapshot structures) roughly in proportion to the same superlinear pattern the latency figures show, but this document does not claim a precise per-record byte cost from this data. A clean, isolated-process-per-cardinality memory measurement was not performed, consistent with keeping this reassessment the smallest measurement sufficient to resolve the open ADR-0018 question — the latency result alone already does that unambiguously (§ 23.5).
+
+### 23.5 ADR-0018 Condition-by-Condition Assessment
+
+**CONDITION 1**
+Exact wording: "the M2 planning re-evaluation against measured interactive query patterns (mandatory, named above)."
+Evidence: [docs/m5-plan.md § 4.4](../m5-plan.md#4-proof-obligations) and [docs/milestones.md](../milestones.md) verification obligation 4 name this exact scheduled M5-level re-evaluation.
+Result: **N/A — scheduled review trigger.** This section is that review.
+
+**CONDITION 2**
+Exact wording: "Fixture suites or M2 interactive latency measurably exceeding in-memory comfort (concrete trigger for the SQLite evaluation)."
+Evidence: § 23.3 — a real, measured **9.27-second median** single-read latency at the real observed M5 cardinality (3,707), roughly **300× worse** than the sub-30 ms "comfortably interactive" latency this project's own M2-F/M4-E measurements established as the standing in-memory comfort baseline ([TASKS.md](../../TASKS.md) M2-F entry; [§ 20.6](#20-m4-e-measurements)).
+Result: **FIRED.** No accepted numeric threshold exists anywhere in ADR-0018 or an earlier reassessment — this conclusion rests on the measured number itself against the qualitative "comfortably interactive" bar this project has consistently used, not on a fabricated pass/fail line. **Precision note:** ADR-0018's own 2026-07-23 wording names this condition as the "concrete trigger for the SQLite evaluation," but that phrase describes what ADR-0018 originally expected this condition to trigger _consideration of_, not what this measurement has shown to be the actual cause. The root-cause decomposition in § 23.3 identifies the dominant cost as an O(n²) reconciliation-algorithm characteristic, not a storage-engine limitation — "condition 2 fired" and "a different storage engine is required" are **not** the same finding; see § 23.6.
+
+**CONDITION 3**
+Exact wording: "A committed requirement for durable state beyond regenerable fixtures (e.g., human annotations, when that mechanism is approved) — introduces the first data that is _not_ rebuildable, which changes the persistence calculus fundamentally."
+Evidence: no annotation or other non-regenerable-data mechanism exists anywhere in M5-A or the freshness proof; the real M5 dataset itself was fully ephemeral (§ 22.4-22.5 — it lived only in the now-terminated experiment process's memory and is gone).
+Result: **NOT FIRED.**
+
+**CONDITION 4**
+Exact wording: "Measured traversal/temporal query patterns at M2+ scale that relational or graph engines demonstrably serve better."
+Evidence: no `TopologyGraphStore.traverse` call was ever exercised by any M5 proof; no Relationship existed (Pods only). The measured cost (§ 23.3) is a per-subject reconciliation/freshness cost, not a traversal or join pattern a relational/graph engine's own strengths would address.
+Result: **NOT FIRED** — no traversal/relational-shaped pattern was exercised, so nothing here demonstrates a relational or graph engine would serve this workload better; the actual measured problem (§ 23.3's root cause) is an `m1-v1` reconciliation algorithmic characteristic, not a storage-engine choice.
+
+### 23.6 Final Storage Conclusion
+
+**Conclusion B: one or more ADR-0018 change conditions fired** (condition 2, § 23.5) **— a new storage-decision ADR is required before any further M5 slice or later milestone proceeds.** Per this project's amend-via-new-ADR convention, [ADR-0018](../adr/0018-m1-storage-strategy.md) itself is **not** edited by this finding and remains Accepted, unchanged. **No storage migration is performed or proposed by this section** — the required new ADR, and any implementation it might eventually authorize, remain separate, future, explicitly-authorized work. **That required ADR is [ADR-0038](../adr/0038-m5-reconciliation-scaling-remedy.md), Accepted 2026-08-21** — it retains in-memory storage and requires the reconciliation algorithm's complexity to be fixed instead; that acceptance settles the architecture decision only and does not itself authorize implementation.
+
+**Important scope note on what actually fired:** the measured problem is not "in-memory storage in general is too slow for M5" — it is a specific, identified O(n²) characteristic of the accepted `m1-v1` reconciliation engine's per-step provenance filtering (§ 23.3) under sustained single-subject corroboration, a pattern no prior M0-M4 synthetic fixture (max 20 Evidence records total) or M5-A's own bounded proofs ever exercised at this scale. **[ADR-0038](../adr/0038-m5-reconciliation-scaling-remedy.md) has since resolved which of these the eventual remedy is**: a reconciliation-algorithm change, not a storage-engine change or connector-side corroboration deduplication — this section's own measurements are unchanged by that resolution and remain the evidentiary record ADR-0038 was built on.
+
+### 23.7 Limitations
+
+- This is a single-machine, single-run measurement (n=30 samples per cardinality), not a load test, not a statistical distribution study, and not a production-scale benchmark.
+- The memory figures carry the cross-cardinality contamination caveat in § 23.4; only the within-cardinality deltas are treated as meaningful.
+- The measurement uses a synthetic Evidence set shaped like the real M5-A connector's output, not the original (now-gone) 3,707-record dataset itself — chosen because ADR-0018's conditions concern _cardinality-driven_ latency, which this reproduces exactly, without recreating the Kind cluster.
+- No claim is made about behavior at cardinalities beyond 3,707, about concurrent load, about a warmer/cooler V8 JIT state than this run exhibited, or about any milestone beyond M5.
