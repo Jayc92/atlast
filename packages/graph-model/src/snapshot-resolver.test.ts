@@ -832,10 +832,95 @@ describe("SnapshotResolver — failed snapshots are not cached", () => {
       firstAttemptListEvidenceCalls,
     );
 
+    // A second attempt at the identical identity still fails — the failure
+    // itself is never cached; `assertReferentialIntegrity` is re-evaluated
+    // fresh on every call, exactly as before ADR-0038-A (this is the actual
+    // contractual property this test protects: no stale success, no
+    // papered-over failure). What *is* now different, deliberately (ADR-0038
+    // Complexity Boundary (B)): reconciliation at this same horizon
+    // succeeded on the first attempt and is a pure function of
+    // `(evidenceRecords, horizon, policy)` alone, independent of the
+    // referential-integrity outcome — so `SnapshotResolver` correctly reuses
+    // that cached `ReconciliationResult` instead of re-fetching Evidence and
+    // re-reconciling from scratch merely to re-derive the identical
+    // historical revisions a second time.
     await expect(resolver.resolvePinnedSnapshot(identity)).rejects.toThrow();
-    // A second attempt re-loads Evidence and re-attempts the build — proof
-    // the failed result was never cached.
-    expect(store.listEvidenceCalls()).toBeGreaterThan(callsAfterFirstFailure);
+    expect(store.listEvidenceCalls()).toBe(callsAfterFirstFailure);
+  });
+
+  it("still re-fetches and re-reconciles at a genuinely new horizon after a failure at a different horizon", async () => {
+    const relationshipOnly = buildEntityEvidence(
+      1,
+      TIMESTAMP,
+      "deployment-inventory",
+      "checkout",
+      "service",
+    );
+    const relationshipEvidence: Evidence = {
+      schemaVersion: "atlast-domain-v1",
+      identifier: "atlast:evidence:demo/trace-index/0002",
+      observedAt: "2026-08-11T00:00:00.000Z",
+      recordedAt: "2026-08-11T00:00:00.000Z",
+      recordedSequence: 2,
+      sourceScopedIdentity: {
+        source: "trace-index",
+        sourceNativeId: "checkout-payment-call",
+      },
+      observation: {
+        observationKind: "relationship",
+        relationshipType: "calls",
+        sourceEntityIdentity: {
+          source: "trace-index",
+          sourceNativeId: "checkout",
+        },
+        targetEntityIdentity: {
+          source: "trace-index",
+          sourceNativeId: "payments",
+        },
+      },
+      detail: null,
+    };
+    const paymentsEntity = buildEntityEvidence(
+      3,
+      TIMESTAMP,
+      "deployment-inventory",
+      "payments",
+      "service",
+    );
+    const store = await buildStoreWithEvidence([
+      relationshipOnly,
+      relationshipEvidence,
+      paymentsEntity,
+    ]);
+    const resolver = new SnapshotResolver(store, neverCallClock());
+
+    // horizon 2: "payments" has not yet been observed — referential
+    // integrity fails.
+    await expect(
+      resolver.resolvePinnedSnapshot({
+        asOf: "2026-09-01T00:00:00.000Z",
+        horizon: 2,
+        derivationVersion: "m1-v1",
+      }),
+    ).rejects.toThrow();
+    const callsAfterHorizonTwoFailure = store.listEvidenceCalls();
+
+    // horizon 3: "payments" now exists — a genuinely different horizon,
+    // never before reconciled, must still be freshly fetched and
+    // reconciled, not served from the horizon-2 cache entry.
+    const succeeded = await resolver.resolvePinnedSnapshot({
+      asOf: "2026-09-01T00:00:00.000Z",
+      horizon: 3,
+      derivationVersion: "m1-v1",
+    });
+    expect(store.listEvidenceCalls()).toBeGreaterThan(
+      callsAfterHorizonTwoFailure,
+    );
+    expect(succeeded.subjects.map((view) => view.subject.identifier)).toEqual([
+      "atlast:entity:checkout",
+      "atlast:entity:payments",
+      "atlast:relationship:checkout-payment-call",
+    ]);
   });
 });
 
@@ -1018,5 +1103,137 @@ describe("SnapshotResolver — no mutable collection leaks from returned state",
       }
     }
     assertFrozen(snapshot, new Set());
+  });
+});
+
+/**
+ * ADR-0038-A: eliminate unnecessary complete-history reconstruction from
+ * ordinary current-state reads by caching the pure `ReconciliationResult`
+ * by `(horizon, derivationVersion)` — never by `asOf`, and never using
+ * wall-clock time as an invalidator. These tests prove: (A) a repeated
+ * `"latest"` read at an unchanged horizon does not re-fetch or re-reconcile;
+ * (B) newly appended Evidence — which advances the horizon — is reflected
+ * on the very next `"latest"` read, never served stale; and (D) the visible
+ * assertion/subject content a cache hit returns is identical to what a
+ * fresh, uncached resolution of the same horizon would produce.
+ */
+function sequencedClock(readings: readonly string[]): Clock {
+  let nextIndex = 0;
+  return () => {
+    const reading = readings[nextIndex];
+    if (reading === undefined) {
+      throw new Error(
+        `sequencedClock exhausted: ${String(nextIndex)} calls made, only ${String(readings.length)} readings supplied`,
+      );
+    }
+    nextIndex += 1;
+    return reading;
+  };
+}
+
+describe("SnapshotResolver — ADR-0038-A reconciliation-result caching", () => {
+  it("does not re-fetch or re-reconcile on a second latest read at an unchanged horizon", async () => {
+    const store = await buildStoreWithEvidence([
+      buildEntityEvidence(
+        1,
+        TIMESTAMP,
+        "deployment-inventory",
+        "checkout",
+        "service",
+      ),
+    ]);
+    const resolver = new SnapshotResolver(
+      store,
+      sequencedClock(["2026-09-01T00:00:00.000Z", "2026-09-01T00:00:00.500Z"]),
+    );
+
+    const first = await resolver.resolveLatestSnapshot();
+    const listEvidenceCallsAfterFirst = store.listEvidenceCalls();
+    expect(listEvidenceCallsAfterFirst).toBeGreaterThan(0);
+
+    const second = await resolver.resolveLatestSnapshot();
+
+    // No new Evidence was appended between the two reads, so the horizon is
+    // identical — the second read must not have re-fetched Evidence.
+    expect(store.listEvidenceCalls()).toBe(listEvidenceCallsAfterFirst);
+    // The two reads used different `asOf` values (distinct Snapshot
+    // identities and checksums), but the underlying visible assertion/
+    // subject content — reused from the cached `ReconciliationResult` — is
+    // identical, proving the cache hit did not change the answer.
+    expect(second.identity.asOf).not.toBe(first.identity.asOf);
+    expect(second.subjects).toEqual(first.subjects);
+    expect(second.subjectCount).toBe(first.subjectCount);
+  });
+
+  it("reflects newly appended Evidence on the very next latest read, never serving stale cached state", async () => {
+    const store = await buildStoreWithEvidence([
+      buildEntityEvidence(
+        1,
+        TIMESTAMP,
+        "deployment-inventory",
+        "checkout",
+        "service",
+      ),
+    ]);
+    const resolver = new SnapshotResolver(
+      store,
+      sequencedClock(["2026-09-01T00:00:00.000Z", "2026-09-01T00:00:01.000Z"]),
+    );
+
+    const beforeAppend = await resolver.resolveLatestSnapshot();
+    expect(
+      beforeAppend.subjects.map((view) => view.subject.identifier),
+    ).toEqual(["atlast:entity:checkout"]);
+
+    await store.appendEvidence([
+      buildEntityEvidence(
+        2,
+        "2026-09-01T00:00:00.500Z",
+        "deployment-inventory",
+        "payments",
+        "service",
+      ),
+    ]);
+
+    const afterAppend = await resolver.resolveLatestSnapshot();
+    expect(afterAppend.subjects.map((view) => view.subject.identifier)).toEqual(
+      ["atlast:entity:checkout", "atlast:entity:payments"],
+    );
+    expect(afterAppend.identity.horizon).toBeGreaterThan(
+      beforeAppend.identity.horizon,
+    );
+  });
+
+  it("a cache hit produces subjects/assertions identical to a fresh, uncached resolution of the same horizon", async () => {
+    const store = await buildStoreWithEvidence([
+      buildEntityEvidence(
+        1,
+        TIMESTAMP,
+        "deployment-inventory",
+        "checkout",
+        "service",
+      ),
+      buildEntityEvidence(2, TIMESTAMP, "trace-index", "checkout", "service"),
+    ]);
+
+    const cachedPathResolver = new SnapshotResolver(
+      store,
+      sequencedClock(["2026-09-01T00:00:00.000Z", "2026-09-01T00:00:00.500Z"]),
+    );
+    await cachedPathResolver.resolveLatestSnapshot();
+    const cacheHitSnapshot = await cachedPathResolver.resolveLatestSnapshot();
+
+    // A second, independent resolver against the same store has never
+    // reconciled this horizon — its own resolution is necessarily
+    // uncached, a fresh, from-scratch computation.
+    const freshResolver = new SnapshotResolver(
+      store,
+      sequencedClock(["2026-09-01T00:00:00.500Z"]),
+    );
+    const freshSnapshot = await freshResolver.resolveLatestSnapshot();
+
+    expect(cacheHitSnapshot.subjects).toEqual(freshSnapshot.subjects);
+    expect(cacheHitSnapshot.subjectCount).toBe(freshSnapshot.subjectCount);
+    expect(cacheHitSnapshot.checksum).toBe(freshSnapshot.checksum);
   });
 });
