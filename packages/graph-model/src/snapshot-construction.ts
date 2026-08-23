@@ -41,7 +41,19 @@
  * I/O, no randomness, and no code path calls `Date.now()` or argument-less
  * `new Date()`. The caller's `evidenceRecords` array and its records are
  * never mutated or frozen — only the newly derived `Snapshot` either
- * function returns is deep-frozen.
+ * function returns is deep-frozen. This purity is unchanged by ADR-0038-A
+ * (below): the reconciliation step and the post-reconciliation composition
+ * step (filter/referential-integrity/subjects/checksum/freeze) are now two
+ * separate, still-pure, still-cache-free functions —
+ * `reconcileEvidenceAtHorizon` (unchanged, `./reconciliation.ts`) and the
+ * new package-internal `composeSnapshotFromReconciliationResult` (below) —
+ * so that `SnapshotResolver`, the one stateful/caching layer this package
+ * already has (ADR-0023), can reuse an already-computed
+ * `ReconciliationResult` across multiple `asOf` values at the same
+ * `(horizon, derivationVersion)` without this module gaining any cache of
+ * its own. `buildSnapshot`/`buildSnapshotFromHorizonSelectedEvidence`
+ * themselves are behaviorally identical to before this change — they still
+ * always reconcile exactly once per call.
  */
 import {
   snapshotIdentitySchema,
@@ -53,7 +65,10 @@ import {
 import { sortByIdentifier } from "./collection-order.ts";
 import type { M1V1DerivationPolicy } from "./derivation-policy.ts";
 import { resolveDerivationPolicy } from "./derivation-version-lookup.ts";
-import { reconcileEvidenceAtHorizon } from "./reconciliation.ts";
+import {
+  reconcileEvidenceAtHorizon,
+  type ReconciliationResult,
+} from "./reconciliation.ts";
 import {
   InvalidReadCoordinateError,
   ReferentialIntegrityError,
@@ -237,24 +252,25 @@ function deriveVisibleSubjectViews(
 }
 
 /**
- * The shared core of both entry points, run against an already-validated
- * resolved identity and an already-resolved policy: reconcile, filter to
- * visible assertions, enforce referential integrity, derive visible
- * subjects, and build the checksum. Neither semantic horizon validity nor
- * derivation-version resolution happens here — each caller performs those
- * differently (§ see module docstring) before reaching this point.
+ * **Package-internal.** Not exported from `./index.ts`; imported directly by
+ * `./snapshot-resolver.ts` only (ADR-0038-A). Composes a `Snapshot` from an
+ * **already-computed** `ReconciliationResult` and a resolved identity:
+ * filter to visible assertions, enforce referential integrity, derive
+ * visible subjects, build the checksum, and freeze. Deliberately takes no
+ * `evidenceRecords` and never calls `reconcileEvidenceAtHorizon` itself —
+ * that is the one, sole reconciliation step this function's caller controls
+ * (directly, or via a cached prior result), so an already-derived
+ * `ReconciliationResult` is never redundantly recomputed merely to compose a
+ * `Snapshot` at a different `asOf` over the same `(horizon, derivationVersion)`.
+ * This function itself remains pure: no `Clock`, no cache, no I/O, no
+ * randomness — exactly the same purity `constructSnapshot` (below) always
+ * had, since this is that same logic, unmodified, just no longer bundled
+ * with the reconciliation call.
  */
-function constructSnapshot(
-  evidenceRecords: readonly Evidence[],
+export function composeSnapshotFromReconciliationResult(
+  reconciliationResult: ReconciliationResult,
   resolvedIdentity: SnapshotIdentity,
-  policy: M1V1DerivationPolicy,
 ): Snapshot {
-  const reconciliationResult = reconcileEvidenceAtHorizon(
-    evidenceRecords,
-    resolvedIdentity.horizon,
-    policy,
-  );
-
   const visibleAssertions = reconciliationResult.assertions.filter(
     (assertion) =>
       isTimestampWithinValidity(assertion.validity, resolvedIdentity.asOf),
@@ -282,6 +298,36 @@ function constructSnapshot(
     subjectCount: subjects.length,
     subjects,
   });
+}
+
+/**
+ * The shared core of both public entry points, run against an
+ * already-validated resolved identity and an already-resolved policy:
+ * reconcile once, then compose. Neither semantic horizon validity nor
+ * derivation-version resolution happens here — each caller performs those
+ * differently (§ see module docstring) before reaching this point. Behavior
+ * is unchanged from before ADR-0038-A: this function still always
+ * reconciles from the given `evidenceRecords` exactly once per call, with no
+ * cache of its own — the same purity `buildSnapshot`/
+ * `buildSnapshotFromHorizonSelectedEvidence` have always documented.
+ * `SnapshotResolver` alone may skip calling this function's reconciliation
+ * step by reusing a prior `ReconciliationResult` via
+ * `composeSnapshotFromReconciliationResult` directly.
+ */
+function constructSnapshot(
+  evidenceRecords: readonly Evidence[],
+  resolvedIdentity: SnapshotIdentity,
+  policy: M1V1DerivationPolicy,
+): Snapshot {
+  const reconciliationResult = reconcileEvidenceAtHorizon(
+    evidenceRecords,
+    resolvedIdentity.horizon,
+    policy,
+  );
+  return composeSnapshotFromReconciliationResult(
+    reconciliationResult,
+    resolvedIdentity,
+  );
 }
 
 /**

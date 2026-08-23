@@ -83,9 +83,13 @@ import {
   ACTIVE_DERIVATION_VERSION,
   resolveDerivationPolicy,
 } from "./derivation-version-lookup.ts";
+import {
+  reconcileEvidenceAtHorizon,
+  type ReconciliationResult,
+} from "./reconciliation.ts";
 import { InvalidReadCoordinateError } from "./repository-errors.ts";
 import {
-  buildSnapshotFromHorizonSelectedEvidence,
+  composeSnapshotFromReconciliationResult,
   type Snapshot,
 } from "./snapshot-construction.ts";
 
@@ -140,6 +144,43 @@ export class SnapshotResolver {
     string,
     Promise<Snapshot>
   >();
+  /**
+   * ADR-0038-A: reconciliation is a pure function of `(evidenceRecords,
+   * horizon, policy)` alone — it never depends on `asOf` (`reconciliation.ts`
+   * takes no `asOf` parameter). Once computed for a given `(horizon,
+   * derivationVersion)`, the complete `ReconciliationResult` is safe to
+   * reuse for every future request at that same `(horizon,
+   * derivationVersion)` regardless of `asOf`, because Evidence is
+   * append-only and a horizon's watermark, once reached, never changes
+   * retroactively (the same invariant the `snapshotBuildsByIdentity` cache
+   * above already relies on for the stronger, asOf-inclusive key). This
+   * cache is what lets a `"latest"` read — whose `asOf` differs on every
+   * call — reuse a still-valid reconciliation result instead of
+   * recomputing the complete historical revision sequence from scratch
+   * merely because `asOf` advanced. Never keyed by, or invalidated using,
+   * wall-clock time.
+   *
+   * Deliberately a **single most-recent slot, not an unbounded map**: a
+   * `ReconciliationResult` itself holds the complete historical revision
+   * set at its horizon (provenance sizes 1..horizon), so its own memory
+   * footprint grows with the square of the horizon (ADR-0038 Complexity
+   * Boundary (C)). A performance-validation run of this same change
+   * (ADR-0038-A) that cached one entry per distinct horizon under
+   * continuous polling — the real M5 workload's own pattern — measurably
+   * exhausted the Node heap: retaining many past horizons' full revision
+   * histories simultaneously is *worse* than the pre-ADR-0038-A baseline,
+   * not better. A single-slot cache bounds memory to exactly one
+   * `ReconciliationResult` (the most recently computed horizon) regardless
+   * of how many distinct horizons are ever requested over a session's
+   * lifetime, while still fully serving this ADR's actual target: repeated
+   * `"latest"` reads at whatever the *current* horizon is. A pinned read at
+   * an older horizon that is not the single cached entry simply falls back
+   * to a fresh reconciliation — exactly the same behavior as before
+   * ADR-0038-A, no regression, just no cache benefit for that one request.
+   */
+  private mostRecentReconciliationResult:
+    | { readonly cacheKey: string; readonly result: ReconciliationResult }
+    | undefined;
 
   constructor(evidenceStore: EvidenceStore, clock: Clock) {
     this.evidenceStore = evidenceStore;
@@ -232,13 +273,56 @@ export class SnapshotResolver {
   private async buildSnapshotForIdentity(
     identity: SnapshotIdentity,
   ): Promise<Snapshot> {
-    const horizonSelectedEvidence = await loadAllEvidenceAtHorizon(
-      this.evidenceStore,
+    const reconciliationResult = await this.resolveReconciliationResult(
       identity.horizon,
+      identity.derivationVersion,
     );
-    return buildSnapshotFromHorizonSelectedEvidence(
-      horizonSelectedEvidence,
+    return composeSnapshotFromReconciliationResult(
+      reconciliationResult,
       identity,
     );
+  }
+
+  /**
+   * ADR-0038-A: the one place this resolver may skip a full reconciliation.
+   * A cache hit at `(horizon, derivationVersion)` returns the exact same
+   * `ReconciliationResult` reference already derived for a prior request at
+   * that same horizon — regardless of that prior request's own `asOf` — so
+   * `composeSnapshotFromReconciliationResult` can compose a fresh `Snapshot`
+   * at the caller's own `asOf` without re-deriving the complete historical
+   * revision sequence. A cache miss still performs exactly the same
+   * `EvidenceStore.listEvidence`-bounded load and the same
+   * `reconcileEvidenceAtHorizon` call this resolver always performed before
+   * ADR-0038-A — the historical-materialization cost itself is unchanged
+   * and unavoidable the first time a horizon is genuinely reconciled
+   * (ADR-0038 Complexity Boundary (C)); only the *repeated* cost on every
+   * subsequent read at that same horizon is eliminated.
+   */
+  private async resolveReconciliationResult(
+    horizon: number,
+    derivationVersion: string,
+  ): Promise<ReconciliationResult> {
+    const reconciliationCacheKey = `${String(horizon)}|${derivationVersion}`;
+    if (
+      this.mostRecentReconciliationResult?.cacheKey === reconciliationCacheKey
+    ) {
+      return this.mostRecentReconciliationResult.result;
+    }
+
+    const horizonSelectedEvidence = await loadAllEvidenceAtHorizon(
+      this.evidenceStore,
+      horizon,
+    );
+    const policy = resolveDerivationPolicy(derivationVersion);
+    const reconciliationResult = reconcileEvidenceAtHorizon(
+      horizonSelectedEvidence,
+      horizon,
+      policy,
+    );
+    this.mostRecentReconciliationResult = {
+      cacheKey: reconciliationCacheKey,
+      result: reconciliationResult,
+    };
+    return reconciliationResult;
   }
 }
