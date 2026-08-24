@@ -8,18 +8,18 @@ Atlast is an AI-powered Engineering Topology Platform: continuous system discove
 
 ## Current Project State
 
-**M0 through M3 and M4-A through M4-D are complete.** M4-D was independently reviewed, fully verified, explicitly approved after human VoiceOver QA, and merged through PR #79 at `e5d4a2c` on 2026-08-19 with GitHub Actions `verify` passing in 4m26s. Checkpoint `m4-d-impact-hardening-merged` records that closure. **Joseph Carfagno explicitly authorized M4-E on 2026-08-19; that release becomes operational only after its documentation PR merges and local `main` synchronizes cleanly. M5+ remain unauthorized.** See [TASKS.md](TASKS.md) and [HANDOFF.md](HANDOFF.md).
+**M0 through M5 are complete.** M4-E's boundary re-audit, enforcement fix, and factual measurements merged through PR #82 and PR #83; checkpoint `m4-complete` formally closed M4. M5 — the read-only local Kubernetes connector — was subsequently authorized and implemented (M5-A live ingestion, PR #89; the source-loss freshness proof, PR #91), and closed after the mandatory ADR-0018 storage reassessment: condition 2 fired on the real M5 workload and was resolved by [ADR-0038](docs/adr/0038-m5-reconciliation-scaling-remedy.md)'s reconciliation-algorithm remedy (PRs #92–#95), not a storage-engine change. **All three M5 exit criteria and all four M5 verification obligations evaluated PASS. Checkpoint `m5-complete` formally closes M5.** See [TASKS.md](TASKS.md), [HANDOFF.md](HANDOFF.md), and [docs/milestones.md](docs/milestones.md).
 
 Permitted work right now, and nothing beyond it:
 
 - **Maintenance and corrections to the completed M0 foundation and the merged, formally complete S1–S8 slices** (bug fixes, documentation fixes, dependency/security maintenance within the accepted ADRs) — the S1/S2 contract surface, S3 fixture catalog, S4 temporal foundations, S5 reconciliation engine, S6 snapshot layer and in-memory repositories, S7 query API v1 routes and error contract in `apps/api`, and S8's boundary re-audit, exhaustive API traceability test, and documentation closeout.
 - **Maintenance of the approved M1 planning documents** (corrections and review responses to [docs/m1-plan.md](docs/m1-plan.md) and ADRs 0014–0025) and of the checkpoint documentation ([HANDOFF.md](HANDOFF.md), per the checkpoint protocol below).
 - **Maintenance and corrections to completed M2 and M3 work** within accepted ADRs 0026-0031 and without extending product behavior.
-- **Maintenance and factual checkpoint documentation for completed M4-A through M4-D** within accepted ADRs 0032-0035 and without extending product behavior.
-- **M4-E, once its authorization record merges and local `main` synchronizes cleanly:** the final synthetic-boundary and no-side-door re-audit, extension of the existing browser import enforcement to prohibit direct or deep `packages/impact-model` imports, factual bundle/latency/memory/cardinality measurements, M4 exit-criterion evaluation and milestone closeout, directly corresponding tests, and factual checkpoint documentation. No new product behavior is authorized.
+- **Maintenance and factual checkpoint documentation for completed M4-A through M4-E** within accepted ADRs 0032-0035 and without extending product behavior.
+- **Maintenance and factual checkpoint documentation for completed M5** (M5-A live ingestion, the source-loss freshness proof, and the ADR-0018/ADR-0038 storage-decision reassessment) within accepted ADRs 0036-0038 and without extending product behavior.
 - **Checkpoint documentation maintenance** that keeps merged facts, verification evidence, and milestone gates accurate.
 
-**M4-A through M4-D are complete. M4-E is explicitly authorized but remains dormant until its authorization record merges and local `main` synchronizes cleanly. M5 and every later milestone remain unauthorized.**
+**M0 through M5 are complete. M5-B and M5-C were not required for M5 closure, were not authorized, and remain unimplemented, deferred future-expansion proposals. Post-M5 work — including M5-B, M5-C, and every later milestone — remains unauthorized.**
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
@@ -32,12 +32,12 @@ The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is 
 
 Predictive AI, multi-cloud integrations, and multi-source enterprise reconciliation are post-M5 and unscheduled.
 
-**M0 through M3 and M4-A through M4-D are complete; checkpoint `m4-d-impact-hardening-merged` is the current project boundary:**
+**M0 through M5 are complete; checkpoint `m5-complete` is the current project boundary:**
 
-- Maintenance, corrections, and explicitly released M1 slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod, named by accepted ADR-0005, was introduced in S1 with its justification-at-PR).
-- **M1, M2, and M3 are formally complete, and M4-A through M4-D are merged.** M4-E may begin only after its authorization record merges and local `main` synchronizes cleanly, and only within its exact audit/measurement/closeout boundary; do NOT plan or implement M5+ work without separate explicit authorization.
+- Maintenance, corrections, and explicitly released slice work are permitted, but only using the technologies the accepted ADRs name — dependencies beyond them still require justification and, if significant, a new ADR (Zod, named by accepted ADR-0005, was introduced in S1 with its justification-at-PR).
+- **M1 through M5 are formally complete and merged.** Do NOT plan or implement M5-B, M5-C, or any post-M5 work without separate explicit authorization.
 - Do NOT commit new technology choices outside the accepted ADRs — proposals go through ADRs against [docs/architecture.md § 6](docs/architecture.md#6-technology-selection-criteria-draft--human-approval-required) and require human approval.
-- Do NOT connect anything to a real system or handle real credentials — synthetic data only through M4; M5's only real target is a disposable local cluster.
+- Do NOT connect anything to a real system or handle real credentials — M5's completed connector targeted only a disposable local cluster (now deleted); no further real-system connection is authorized until a future milestone is separately authorized.
 
 When asked to do any of the above, point to this section and confirm the milestone gate has moved before proceeding.
 

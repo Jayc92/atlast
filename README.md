@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 through M3 and M4-A through M4-D complete; M4-E explicitly authorized.** M4-D merged through [PR #79](https://github.com/Jayc92/atlast/pull/79) at `e5d4a2c` after independent review, complete verification, and explicit human VoiceOver-QA approval. Checkpoint `m4-d-impact-hardening-merged` records that closure. M4-E becomes operational only after its authorization record merges and local `main` synchronizes cleanly. **M5+ remain unauthorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 through M5 complete; paused at checkpoint `m5-complete`.** M4 closed at checkpoint `m4-complete` (PR #82/#83). M5, the read-only local Kubernetes connector, was subsequently authorized, implemented, and closed: all three M5 exit criteria and all four M5 verification obligations evaluated PASS, including the mandatory ADR-0018 storage reassessment (resolved via [ADR-0038](docs/adr/0038-m5-reconciliation-scaling-remedy.md)'s reconciliation-algorithm remedy rather than a storage-engine change). See [docs/milestones.md](docs/milestones.md) and [HANDOFF.md](HANDOFF.md) for the complete evidence trail. **No post-M5 milestone is authorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -129,7 +129,7 @@ Playwright writes generated artifacts — traces and screenshots (retained only 
 
 ## Contributing
 
-M0 through M3 and M4-A through M4-D are complete ([TASKS.md](TASKS.md)); checkpoint `m4-d-impact-hardening-merged` records the merged M4-D implementation, review, verification, and human-QA evidence. M4-E is explicitly authorized within its audit/measurement/closeout boundary and becomes operational only after its authorization record merges and local `main` synchronizes cleanly. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **M5+ remain unauthorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
+M0 through M5 are complete ([TASKS.md](TASKS.md)); checkpoint `m5-complete` records the merged M5 implementation, real-system verification evidence, and the ADR-0018 storage-decision reassessment. M5-B and M5-C were not required for M5 closure and remain unimplemented, deferred future-expansion proposals. See [docs/milestones.md](docs/milestones.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md). **No post-M5 milestone is authorized.** All contributions must comply with [GUARDRAILS.md](GUARDRAILS.md).
 
 ## License
 
