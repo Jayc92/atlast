@@ -94,8 +94,14 @@ interface FinishedRevision extends Omit<RevisionDraft, "signature"> {
   readonly validTo?: string;
 }
 
-/** ADR-0022 § 8: confidence(s) = base + span × (1 − 2^−(s − 1)), unrounded. */
-function computeConfidence(
+/**
+ * ADR-0022 § 8: confidence(s) = base + span × (1 − 2^−(s − 1)), unrounded.
+ * Exported (ADR-0038-B) so the incremental fast path
+ * (`incremental-reconciliation.ts`) computes confidence identically to this
+ * reference implementation, rather than duplicating the formula — this
+ * function's own behavior is unchanged.
+ */
+export function computeConfidence(
   distinctSourceCount: number,
   policy: M1V1DerivationPolicy,
 ): number {
@@ -129,9 +135,10 @@ function resolveMergingAlias(
  * Derive the canonical claim for one Evidence observation (ADR-0022 § 6):
  * relationship endpoints resolve through the same normalization to stable
  * Entity identifiers; unresolvable endpoints fail loudly naming the record
- * and the endpoint role.
+ * and the endpoint role. Exported (ADR-0038-B) for the same reuse reason as
+ * `computeConfidence` above — this function's own behavior is unchanged.
  */
-function deriveCanonicalClaim(
+export function deriveCanonicalClaim(
   evidenceRecord: Evidence,
   policy: M1V1DerivationPolicy,
 ): CanonicalClaim {
@@ -176,6 +183,43 @@ function deriveCanonicalClaim(
       "target",
     ),
   };
+}
+
+/**
+ * Derive one Evidence record's subject identity (ADR-0022 §§ 2, 4):
+ * normalize `sourceScopedIdentity.sourceNativeId`, resolve it through the
+ * policy's single-hop merging aliases, and build the stable Entity or
+ * Relationship subject identifier. Extracted, unchanged in behavior, from
+ * the main reconciliation loop below (ADR-0038-B) and exported so the
+ * incremental fast path (`incremental-reconciliation.ts`) derives subject
+ * identity identically to this reference implementation, never by
+ * duplicating the normalization/alias logic.
+ */
+export function deriveSubjectIdentity(
+  evidenceRecord: Evidence,
+  policy: M1V1DerivationPolicy,
+): {
+  readonly subjectIdentifier: string;
+  readonly subjectKind: "entity" | "relationship";
+  readonly normalizedKey: string;
+} {
+  const normalizedKey = resolveMergingAlias(
+    normalizeIdentityKey(
+      evidenceRecord.sourceScopedIdentity.sourceNativeId,
+      policy,
+      evidenceRecord.identifier,
+    ),
+    policy,
+  );
+  const subjectKind =
+    evidenceRecord.observation.observationKind === "entity"
+      ? "entity"
+      : "relationship";
+  const subjectIdentifier =
+    subjectKind === "entity"
+      ? buildEntityIdentifier(normalizedKey)
+      : buildRelationshipIdentifier(normalizedKey);
+  return { subjectIdentifier, subjectKind, normalizedKey };
 }
 
 /** Distinct standing claim keys for a subject, deterministically ordered. */
@@ -328,22 +372,8 @@ export function reconcileEvidenceAtHorizon(
 
     // Apply the group atomically (recordedSequence order within the group).
     for (const evidenceRecord of stepRecords) {
-      const normalizedKey = resolveMergingAlias(
-        normalizeIdentityKey(
-          evidenceRecord.sourceScopedIdentity.sourceNativeId,
-          policy,
-          evidenceRecord.identifier,
-        ),
-        policy,
-      );
-      const subjectKind =
-        evidenceRecord.observation.observationKind === "entity"
-          ? "entity"
-          : "relationship";
-      const subjectIdentifier =
-        subjectKind === "entity"
-          ? buildEntityIdentifier(normalizedKey)
-          : buildRelationshipIdentifier(normalizedKey);
+      const { subjectIdentifier, subjectKind, normalizedKey } =
+        deriveSubjectIdentity(evidenceRecord, policy);
 
       let subjectState = subjectStates.get(subjectIdentifier);
       if (subjectState === undefined) {

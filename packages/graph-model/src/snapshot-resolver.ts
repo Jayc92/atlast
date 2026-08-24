@@ -84,6 +84,11 @@ import {
   resolveDerivationPolicy,
 } from "./derivation-version-lookup.ts";
 import {
+  advanceOrFallback,
+  buildIncrementalStateFromReference,
+  type IncrementalReconciliationState,
+} from "./incremental-reconciliation.ts";
+import {
   reconcileEvidenceAtHorizon,
   type ReconciliationResult,
 } from "./reconciliation.ts";
@@ -145,42 +150,37 @@ export class SnapshotResolver {
     Promise<Snapshot>
   >();
   /**
-   * ADR-0038-A: reconciliation is a pure function of `(evidenceRecords,
+   * ADR-0038-A/B: reconciliation is a pure function of `(evidenceRecords,
    * horizon, policy)` alone — it never depends on `asOf` (`reconciliation.ts`
    * takes no `asOf` parameter). Once computed for a given `(horizon,
-   * derivationVersion)`, the complete `ReconciliationResult` is safe to
-   * reuse for every future request at that same `(horizon,
-   * derivationVersion)` regardless of `asOf`, because Evidence is
-   * append-only and a horizon's watermark, once reached, never changes
-   * retroactively (the same invariant the `snapshotBuildsByIdentity` cache
-   * above already relies on for the stronger, asOf-inclusive key). This
-   * cache is what lets a `"latest"` read — whose `asOf` differs on every
-   * call — reuse a still-valid reconciliation result instead of
-   * recomputing the complete historical revision sequence from scratch
-   * merely because `asOf` advanced. Never keyed by, or invalidated using,
+   * derivationVersion)`, a `ReconciliationResult` is safe to reuse for every
+   * future request at that same `(horizon, derivationVersion)` regardless of
+   * `asOf`, because Evidence is append-only and a horizon's watermark, once
+   * reached, never changes retroactively (the same invariant the
+   * `snapshotBuildsByIdentity` cache above already relies on for the
+   * stronger, asOf-inclusive key). Never keyed by, or invalidated using,
    * wall-clock time.
    *
    * Deliberately a **single most-recent slot, not an unbounded map**: a
-   * `ReconciliationResult` itself holds the complete historical revision
-   * set at its horizon (provenance sizes 1..horizon), so its own memory
-   * footprint grows with the square of the horizon (ADR-0038 Complexity
-   * Boundary (C)). A performance-validation run of this same change
-   * (ADR-0038-A) that cached one entry per distinct horizon under
-   * continuous polling — the real M5 workload's own pattern — measurably
-   * exhausted the Node heap: retaining many past horizons' full revision
-   * histories simultaneously is *worse* than the pre-ADR-0038-A baseline,
-   * not better. A single-slot cache bounds memory to exactly one
-   * `ReconciliationResult` (the most recently computed horizon) regardless
-   * of how many distinct horizons are ever requested over a session's
-   * lifetime, while still fully serving this ADR's actual target: repeated
-   * `"latest"` reads at whatever the *current* horizon is. A pinned read at
-   * an older horizon that is not the single cached entry simply falls back
-   * to a fresh reconciliation — exactly the same behavior as before
-   * ADR-0038-A, no regression, just no cache benefit for that one request.
+   * `ReconciliationResult`'s own size grows with the square of its horizon
+   * (ADR-0038 Complexity Boundary (C)) — a performance-validation run that
+   * cached one entry per distinct horizon under continuous polling (the
+   * real M5 workload's own pattern) measurably exhausted the Node heap.
+   * A single-slot cache bounds memory to exactly one `ReconciliationResult`
+   * regardless of session length, and only its own horizon's forward
+   * advancement (ADR-0038-B, `advanceOrFallback`) or replacement matters —
+   * never a second, competing full-history cache.
+   *
+   * Only the `"latest"` path (`resolveLatestSnapshot`) may advance this
+   * state incrementally (ADR-0038-B) or overwrite it with a newer horizon's
+   * result. A pinned/cursor-bound request whose horizon does not exactly
+   * match this slot always falls back to a one-off, non-persisted
+   * `reconcileEvidenceAtHorizon` call — historical/pinned reads never drive
+   * or mutate the advancing incremental state (§ "Historical / Pinned
+   * Reads" in ADR-0038-B's own implementation record).
    */
-  private mostRecentReconciliationResult:
-    | { readonly cacheKey: string; readonly result: ReconciliationResult }
-    | undefined;
+  private mostRecentIncrementalState:
+    IncrementalReconciliationState | undefined;
 
   constructor(evidenceStore: EvidenceStore, clock: Clock) {
     this.evidenceStore = evidenceStore;
@@ -208,7 +208,7 @@ export class SnapshotResolver {
       horizon: currentWatermark,
       derivationVersion: ACTIVE_DERIVATION_VERSION,
     };
-    return this.resolveAndCache(identity);
+    return this.resolveAndCache(identity, true);
   }
 
   /**
@@ -223,7 +223,7 @@ export class SnapshotResolver {
   async resolvePinnedSnapshot(identity: SnapshotIdentity): Promise<Snapshot> {
     const resolvedIdentity = snapshotIdentitySchema.parse(identity);
     resolveDerivationPolicy(resolvedIdentity.derivationVersion);
-    return this.resolveAndCache(resolvedIdentity);
+    return this.resolveAndCache(resolvedIdentity, false);
   }
 
   /**
@@ -242,7 +242,7 @@ export class SnapshotResolver {
   ): Promise<Snapshot> {
     const resolvedIdentity = snapshotIdentitySchema.parse(identity);
     resolveDerivationPolicy(resolvedIdentity.derivationVersion);
-    return this.resolveAndCache(resolvedIdentity);
+    return this.resolveAndCache(resolvedIdentity, false);
   }
 
   /**
@@ -255,14 +255,20 @@ export class SnapshotResolver {
    * own identity's cache key, a failure at one identity can never affect a
    * different identity's own cache entry or result.
    */
-  private resolveAndCache(identity: SnapshotIdentity): Promise<Snapshot> {
+  private resolveAndCache(
+    identity: SnapshotIdentity,
+    allowIncrementalAdvance: boolean,
+  ): Promise<Snapshot> {
     const cacheKey = identityCacheKey(identity);
     const existingBuild = this.snapshotBuildsByIdentity.get(cacheKey);
     if (existingBuild !== undefined) {
       return existingBuild;
     }
 
-    const buildPromise = this.buildSnapshotForIdentity(identity);
+    const buildPromise = this.buildSnapshotForIdentity(
+      identity,
+      allowIncrementalAdvance,
+    );
     this.snapshotBuildsByIdentity.set(cacheKey, buildPromise);
     buildPromise.catch(() => {
       this.snapshotBuildsByIdentity.delete(cacheKey);
@@ -272,10 +278,12 @@ export class SnapshotResolver {
 
   private async buildSnapshotForIdentity(
     identity: SnapshotIdentity,
+    allowIncrementalAdvance: boolean,
   ): Promise<Snapshot> {
     const reconciliationResult = await this.resolveReconciliationResult(
       identity.horizon,
       identity.derivationVersion,
+      allowIncrementalAdvance,
     );
     return composeSnapshotFromReconciliationResult(
       reconciliationResult,
@@ -284,29 +292,40 @@ export class SnapshotResolver {
   }
 
   /**
-   * ADR-0038-A: the one place this resolver may skip a full reconciliation.
-   * A cache hit at `(horizon, derivationVersion)` returns the exact same
-   * `ReconciliationResult` reference already derived for a prior request at
-   * that same horizon — regardless of that prior request's own `asOf` — so
-   * `composeSnapshotFromReconciliationResult` can compose a fresh `Snapshot`
-   * at the caller's own `asOf` without re-deriving the complete historical
-   * revision sequence. A cache miss still performs exactly the same
-   * `EvidenceStore.listEvidence`-bounded load and the same
-   * `reconcileEvidenceAtHorizon` call this resolver always performed before
-   * ADR-0038-A — the historical-materialization cost itself is unchanged
-   * and unavoidable the first time a horizon is genuinely reconciled
-   * (ADR-0038 Complexity Boundary (C)); only the *repeated* cost on every
-   * subsequent read at that same horizon is eliminated.
+   * ADR-0038-A/B: the one place this resolver may skip a full, from-scratch
+   * reconciliation.
+   *
+   * - An exact `(horizon, derivationVersion)` match against the single
+   *   cached slot always returns the same `ReconciliationResult` reference
+   *   (ADR-0038-A), regardless of caller or mode.
+   * - Otherwise, only when `allowIncrementalAdvance` is true (the
+   *   `"latest"` path only — never pinned or cursor-bound reads) and the
+   *   requested horizon is strictly ahead of the cached slot's own horizon
+   *   at the same `derivationVersion`, this delegates to
+   *   `advanceOrFallback` (ADR-0038-B), which itself either safely extends
+   *   the cached state using only the newly appended Evidence, or falls
+   *   back to a complete `reconcileEvidenceAtHorizon` replay — never a
+   *   partially trusted incremental answer. Either way, the returned state
+   *   becomes the new single cached slot.
+   * - Any other case (no cached state; a different `derivationVersion`; a
+   *   pinned/cursor-bound request; or a requested horizon at or behind the
+   *   cached slot's own horizon) performs a complete, one-off
+   *   `reconcileEvidenceAtHorizon` call and does **not** touch the cached
+   *   slot — historical/pinned reads never drive or mutate the advancing
+   *   incremental state.
    */
   private async resolveReconciliationResult(
     horizon: number,
     derivationVersion: string,
+    allowIncrementalAdvance: boolean,
   ): Promise<ReconciliationResult> {
-    const reconciliationCacheKey = `${String(horizon)}|${derivationVersion}`;
+    const cachedState = this.mostRecentIncrementalState;
     if (
-      this.mostRecentReconciliationResult?.cacheKey === reconciliationCacheKey
+      cachedState !== undefined &&
+      cachedState.horizon === horizon &&
+      cachedState.derivationVersion === derivationVersion
     ) {
-      return this.mostRecentReconciliationResult.result;
+      return cachedState.referenceResult;
     }
 
     const horizonSelectedEvidence = await loadAllEvidenceAtHorizon(
@@ -314,15 +333,44 @@ export class SnapshotResolver {
       horizon,
     );
     const policy = resolveDerivationPolicy(derivationVersion);
+
+    const canAdvanceFromCache =
+      allowIncrementalAdvance &&
+      cachedState !== undefined &&
+      cachedState.derivationVersion === derivationVersion &&
+      cachedState.horizon < horizon;
+
+    if (canAdvanceFromCache) {
+      const outcome = advanceOrFallback(
+        cachedState,
+        horizonSelectedEvidence,
+        horizon,
+        derivationVersion,
+        policy,
+      );
+      this.mostRecentIncrementalState = outcome.state;
+      return outcome.state.referenceResult;
+    }
+
     const reconciliationResult = reconcileEvidenceAtHorizon(
       horizonSelectedEvidence,
       horizon,
       policy,
     );
-    this.mostRecentReconciliationResult = {
-      cacheKey: reconciliationCacheKey,
-      result: reconciliationResult,
-    };
+    const freshState = buildIncrementalStateFromReference(
+      horizonSelectedEvidence,
+      reconciliationResult,
+      horizon,
+      derivationVersion,
+    );
+    // Cache the result exactly as ADR-0038-A always did, regardless of
+    // caller mode (a repeated identical pinned/cursor-bound request still
+    // benefits from the single slot) — never regressing it backward to an
+    // older horizon than whatever is already cached. Only *advancing* the
+    // cache incrementally (above) is restricted to the "latest" path.
+    if (cachedState === undefined || cachedState.horizon <= horizon) {
+      this.mostRecentIncrementalState = freshState;
+    }
     return reconciliationResult;
   }
 }
