@@ -47,14 +47,23 @@ import { registerTraversalRoutes } from "./routes/traversal.ts";
  * payload to exactly the deterministic response the shell promises. This
  * route's behavior is unchanged by S7 — only the application it is now
  * registered alongside has grown.
+ *
+ * `datasetMode` (ADR-0040 § 1, M6-A) is the accepted dataset-mode
+ * observability surface: it reports, authoritatively, whether this running
+ * process was seeded from the synthetic `demo-company` fixture catalog or
+ * from the real Kubernetes connector — never both in one process (ADR-0040
+ * §§ 1, 5). A tester (or the browser's own source/freshness UI, M6-B) reads
+ * this field to know unambiguously which topology they are looking at,
+ * rather than inferring it from which entities happen to appear.
  */
 const healthResponseJsonSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["status", "service"],
+  required: ["status", "service", "datasetMode"],
   properties: {
     status: { type: "string", enum: ["ok"] },
     service: { type: "string", enum: ["atlast-api"] },
+    datasetMode: { type: "string", enum: ["fixture", "connector"] },
   },
 } as const;
 
@@ -65,14 +74,29 @@ export interface ApplicationDependencies {
 }
 
 /**
+ * The two mutually exclusive M6-A dataset modes (ADR-0040 § 1): `"fixture"`
+ * seeds from the synthetic `demo-company` catalog (the existing, unmodified
+ * M0–M5 default); `"connector"` seeds from, and is kept live by, the real
+ * Kubernetes connector. A single running process is always exactly one of
+ * these — never both, and never switched at runtime.
+ */
+export type DatasetMode = "fixture" | "connector";
+
+const DEFAULT_DATASET_MODE: DatasetMode = "fixture";
+
+/**
  * Build the fully assembled application: `/health`, the eight M1/M2 query
  * routes, the M3 health-context route, the M4 impact route, and the closed
  * error boundary. Every
  * call requires the complete repository dependency pair — there is no
- * default, throwaway, or health-only variant (ADR-0024 § 12).
+ * default, throwaway, or health-only variant (ADR-0024 § 12). `datasetMode`
+ * defaults to `"fixture"` so every existing call site's behavior (including
+ * every pre-existing test) is unaffected unless it explicitly opts into
+ * `"connector"` (ADR-0040 § 1).
  */
 export function buildApplication(
   dependencies: ApplicationDependencies,
+  datasetMode: DatasetMode = DEFAULT_DATASET_MODE,
   serverOptions: FastifyServerOptions = {},
 ): FastifyInstance {
   const application = fastify({
@@ -89,7 +113,7 @@ export function buildApplication(
         },
       },
     },
-    () => ({ status: "ok", service: "atlast-api" }),
+    () => ({ status: "ok", service: "atlast-api", datasetMode }),
   );
 
   registerEntityRoutes(application, dependencies);
@@ -137,12 +161,14 @@ async function initializeStores(
  * `buildApplication` is ever called, so the returned `FastifyInstance` is
  * fully populated the moment it exists — no caller can obtain an instance
  * whose store is still being seeded. Each call constructs its own fresh
- * pair; there is no shared singleton.
+ * pair; there is no shared singleton. `datasetMode` defaults to `"fixture"`
+ * so every existing caller's behavior is unaffected (ADR-0040 § 1).
  */
 export async function initializeApplication(
   clock: Clock,
   seedEvidence: readonly Evidence[],
   seedOverlayFrames: readonly OverlayFrame[],
+  datasetMode: DatasetMode = DEFAULT_DATASET_MODE,
   serverOptions: FastifyServerOptions = {},
 ): Promise<FastifyInstance> {
   const dependencies = await initializeStores(
@@ -150,7 +176,7 @@ export async function initializeApplication(
     seedEvidence,
     seedOverlayFrames,
   );
-  return buildApplication(dependencies, serverOptions);
+  return buildApplication(dependencies, datasetMode, serverOptions);
 }
 
 export interface InitializedApplication {
@@ -159,25 +185,28 @@ export interface InitializedApplication {
 }
 
 /**
- * M5-A only (ADR-0036/0037; docs/m5-plan.md §§ 3, 7) — never called by the
- * existing production `apps/api/src/server.ts`, which is unmodified and
- * continues to call `initializeApplication` above exactly as before.
+ * Originally M5-A only (ADR-0036/0037; docs/m5-plan.md §§ 3, 7); now also
+ * the composition-root seam `apps/api/src/connector-mode.ts` uses for the
+ * unified, normal production entrypoint's `"connector"` dataset mode
+ * (M6-A, ADR-0040 §§ 2, 5).
  *
  * Identical construction and seeding to `initializeApplication`, but also
  * returns the constructed `ApplicationDependencies` to its caller, so a
  * post-boot Kubernetes discovery adapter can call
  * `dependencies.evidenceStore.appendEvidence(...)` against the exact same
  * store instance the returned, already-running application serves reads
- * from — the seam M5-A's live post-boot ingestion proof requires. This
- * does not create a second application shape: `buildApplication` is
- * called exactly as `initializeApplication` calls it, with the identical
- * route/schema/query behavior every existing test already exercises
- * (docs/m5-plan.md § 3's ADR-0009 reconciliation note).
+ * from — the seam M5-A's live post-boot ingestion proof first required and
+ * M6-A's normal-website proof now reuses. This does not create a second
+ * application shape: `buildApplication` is called exactly as
+ * `initializeApplication` calls it, with the identical route/schema/query
+ * behavior every existing test already exercises (docs/m5-plan.md § 3's
+ * ADR-0009 reconciliation note).
  */
 export async function initializeApplicationExposingStores(
   clock: Clock,
   seedEvidence: readonly Evidence[],
   seedOverlayFrames: readonly OverlayFrame[],
+  datasetMode: DatasetMode = DEFAULT_DATASET_MODE,
   serverOptions: FastifyServerOptions = {},
 ): Promise<InitializedApplication> {
   const dependencies = await initializeStores(
@@ -185,6 +214,10 @@ export async function initializeApplicationExposingStores(
     seedEvidence,
     seedOverlayFrames,
   );
-  const application = buildApplication(dependencies, serverOptions);
+  const application = buildApplication(
+    dependencies,
+    datasetMode,
+    serverOptions,
+  );
   return { application, dependencies };
 }

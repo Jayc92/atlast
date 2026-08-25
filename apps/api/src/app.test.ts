@@ -14,6 +14,7 @@ import {
   type Evidence,
 } from "@atlast/shared";
 import { InMemoryEvidenceStore } from "@atlast/graph-model";
+import { listPods, mapObservedPodToEvidence } from "@atlast/connectors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { initializeApplication } from "./app.ts";
 import {
@@ -21,6 +22,26 @@ import {
   loadFullDemoCompanySeedEvidence,
 } from "./test-support/demo-company-fixture.ts";
 import { parseJsonBody } from "./test-support/parse-response.ts";
+
+// Test C (M6-A independent review, § 12): fixture-mode startup must never
+// invoke Kubernetes discovery. `app.ts` never imports `@atlast/connectors`
+// itself — this mock exists purely as a runtime tripwire, so a future
+// accidental call from the fixture path fails loudly here rather than
+// silently reaching a real or stubbed cluster.
+vi.mock("@atlast/connectors", () => ({
+  listPods: vi.fn(() =>
+    Promise.reject(
+      new Error(
+        "listPods must never be invoked during fixture-mode startup (test C)",
+      ),
+    ),
+  ),
+  mapObservedPodToEvidence: vi.fn(() => {
+    throw new Error(
+      "mapObservedPodToEvidence must never be invoked during fixture-mode startup (test C)",
+    );
+  }),
+}));
 
 const FIXED_TEST_CLOCK = () => "2026-08-11T00:00:00.000Z";
 
@@ -41,6 +62,55 @@ describe("GET /health", () => {
       expect(response.json()).toStrictEqual({
         status: "ok",
         service: "atlast-api",
+        datasetMode: "fixture",
+      });
+    } finally {
+      await application.close();
+    }
+  });
+
+  it("reports datasetMode 'fixture' when no dataset mode is passed at all — the default/no-config startup shape stays fixture mode (ADR-0040 § 1)", async () => {
+    // No fourth argument at all — every pre-existing call site in this
+    // codebase calls initializeApplication exactly this way, and must keep
+    // resolving to fixture mode without any change on their part.
+    const application = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      [],
+      loadFullDemoCompanyOverlayFrames(),
+    );
+    try {
+      const response = await application.inject({
+        method: "GET",
+        url: "/health",
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toStrictEqual({
+        status: "ok",
+        service: "atlast-api",
+        datasetMode: "fixture",
+      });
+    } finally {
+      await application.close();
+    }
+  });
+
+  it("reports datasetMode 'connector' only when explicitly requested (ADR-0040 § 1)", async () => {
+    const application = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      [],
+      [],
+      "connector",
+    );
+    try {
+      const response = await application.inject({
+        method: "GET",
+        url: "/health",
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toStrictEqual({
+        status: "ok",
+        service: "atlast-api",
+        datasetMode: "connector",
       });
     } finally {
       await application.close();
@@ -237,6 +307,27 @@ describe("initializeApplication", () => {
     } finally {
       await applicationA.close();
       await applicationB.close();
+    }
+  });
+
+  it("never invokes Kubernetes discovery during fixture-mode startup, and still serves the expected fixture-seeded state (test C)", async () => {
+    const application = await initializeApplication(
+      FIXED_TEST_CLOCK,
+      loadFullDemoCompanySeedEvidence(),
+      loadFullDemoCompanyOverlayFrames(),
+    );
+    try {
+      expect(vi.mocked(listPods)).not.toHaveBeenCalled();
+      expect(vi.mocked(mapObservedPodToEvidence)).not.toHaveBeenCalled();
+
+      const response = await application.inject({
+        method: "GET",
+        url: "/api/v1/entities?limit=1",
+      });
+      expect(response.statusCode).toBe(200);
+      expect(parseJsonBody(response, entityPageSchema).items).toHaveLength(1);
+    } finally {
+      await application.close();
     }
   });
 });

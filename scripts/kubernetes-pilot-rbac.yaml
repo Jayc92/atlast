@@ -1,0 +1,46 @@
+# M6-A read-only RBAC manifest (ADR-0037 §§ 1-2; accepted docs/m6-plan.md § 8,
+# Option B). Grants exactly get/list/watch on Pods, in exactly one namespace,
+# to a dedicated ServiceAccount — never the ambient/default kubeconfig
+# context. No wildcard verb, no wildcard resource, no ClusterRole, no write
+# verb. Scoped to Pods only for M6-A; ADR-0039's additive
+# Deployments/ReplicaSets/Services grant is out of scope for this slice.
+#
+# This manifest is a documented prerequisite the tester explicitly applies
+# themselves (kubectl apply -f), before running scripts/connect-kubernetes-pilot.sh
+# — it is never applied automatically by that script. Edit the two
+# `atlast-m6-a` namespace references below if your disposable cluster uses a
+# different namespace name; nothing else needs to change.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: atlast-m6-a
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: atlast-m6-a-discovery
+  namespace: atlast-m6-a
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: atlast-m6-a-pod-reader
+  namespace: atlast-m6-a
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: atlast-m6-a-pod-reader-binding
+  namespace: atlast-m6-a
+subjects:
+  - kind: ServiceAccount
+    name: atlast-m6-a-discovery
+    namespace: atlast-m6-a
+roleRef:
+  kind: Role
+  name: atlast-m6-a-pod-reader
+  apiGroup: rbac.authorization.k8s.io

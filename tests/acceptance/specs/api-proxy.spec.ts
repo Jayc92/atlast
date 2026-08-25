@@ -16,6 +16,7 @@ test("the built preview proxies /api/health to the built API unchanged", async (
   expect(await response.json()).toEqual({
     status: "ok",
     service: "atlast-api",
+    datasetMode: "fixture",
   });
 });
 
