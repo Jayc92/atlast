@@ -116,6 +116,11 @@ export default defineConfig(
               message:
                 "apps/web must never import an API server module — read only through the query API over HTTP (ADR-0026 § 3).",
             },
+            {
+              name: "@atlast/connectors",
+              message:
+                "apps/web must never import packages/connectors — real-system discovery, credentials, and the Kubernetes client boundary stay server-side only; the browser reads discovered data only through the query API (ADR-0026 § 3; ADR-0040 § 1, M6-A).",
+            },
           ],
           patterns: [
             {
@@ -135,6 +140,15 @@ export default defineConfig(
               ],
               message:
                 "apps/web must never import packages/overlay-model — read only through the query API (ADR-0026 § 3).",
+            },
+            {
+              group: [
+                "@atlast/connectors/*",
+                "**/packages/connectors/**",
+                "**/connectors/**",
+              ],
+              message:
+                "apps/web must never import packages/connectors — real-system discovery, credentials, and the Kubernetes client boundary stay server-side only; the browser reads discovered data only through the query API (ADR-0026 § 3; ADR-0040 § 1, M6-A).",
             },
             {
               group: [

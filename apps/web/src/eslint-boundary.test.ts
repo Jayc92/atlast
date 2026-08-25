@@ -153,6 +153,26 @@ describe("ADR-0026 § 5 restricted-import boundary — direct proof", () => {
     );
   }, 30_000);
 
+  it("rejects a direct @atlast/connectors import (ADR-0040 § 1, M6-A)", () => {
+    const messages = lintProbeSource(
+      "__probe_connectors__.ts",
+      'import { listPods } from "@atlast/connectors";\nexport const probe = listPods;\n',
+    );
+    expect(messages.some((m) => m.ruleId === "no-restricted-imports")).toBe(
+      true,
+    );
+  }, 30_000);
+
+  it("rejects a deep relative import reaching into packages/connectors (ADR-0040 § 1, M6-A)", () => {
+    const messages = lintProbeSource(
+      "__probe_connectors_relative__.ts",
+      'import { listPods } from "../../../packages/connectors/src/kubernetes/client.ts";\nexport const probe = listPods;\n',
+    );
+    expect(messages.some((m) => m.ruleId === "no-restricted-imports")).toBe(
+      true,
+    );
+  }, 30_000);
+
   it("does not reject the approved @atlast/shared import", () => {
     const messages = lintProbeSource(
       "__probe_shared_allowed__.ts",
