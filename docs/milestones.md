@@ -167,6 +167,20 @@ These four obligations did not change M5's scope, hard constraints, or exit crit
 
 ---
 
+## M6 — Internal Pilot Validation (proposed; planning authorized, not yet accepted)
+
+**Status note (2026-08-24):** M6 is a **candidate** milestone, not yet part of the authorized sequence above. Joseph Carfagno explicitly authorized M6 planning and ADR drafting only, after M5 formally closed at checkpoint `m5-complete`. [docs/m6-plan.md](m6-plan.md) (Proposed) and Proposed ADRs 0039–0041 propose it (ADR-0042 was drafted and, on the same-day adversarial review, rejected and folded into [docs/m6-plan.md § 8](m6-plan.md#8-connectscan-experience) — historical record only, not part of the baseline requiring acceptance); none of that is Accepted, and no M6 exit criterion below is authorized scope until the baseline is explicitly accepted and this section is updated to reflect that. This section is recorded now, in stub form, only to keep this document internally consistent with [TASKS.md](../TASKS.md) and [docs/adr/README.md](adr/README.md) — it grants no implementation permission.
+
+**Goal (proposed):** Prove that a technically competent internal employee who did not build Atlast can independently connect an approved disposable local Kubernetes sandbox, see the real discovered topology in the browser, judge its accuracy, run a hypothetical change through the existing impact workflow, and judge the resulting analysis — end to end, without a developer driving it for them. This is a product-testability proof, not a broad accuracy or scale claim ([docs/m6-plan.md § 3](m6-plan.md#3-target-tester-and-milestone-purpose)).
+
+**Scope (proposed):** the minimum truthful Kubernetes topology beyond M5's Pods-only coverage (Deployment→ReplicaSet→Pod, Service→Pod, both via Kubernetes-native facts only); unifying connector-derived Evidence with the normal browser-facing application, since it is currently invisible to it; a minimum visual source/freshness distinction; a self-service CLI connect/scan flow; and a pilot-evaluation artifact kept structurally separate from the Evidence/domain model.
+
+**Real-system safety boundary (proposed):** unchanged from M5 — a disposable local cluster on the tester's own workstation only. M6 does not expand this boundary; any shared or company-hosted sandbox would require its own separate PROJECT_SPEC amendment, not authorized by this stub or by any M6 planning document.
+
+**Exit criteria (proposed, not authorized):** see [docs/m6-plan.md § 14](m6-plan.md#14-m6-exit-criteria) for the complete, current candidate list.
+
+---
+
 ## Post-M5 (directional, uncommitted)
 
 None of the following is scheduled; each graduates only by becoming a real milestone with exit criteria, human approval, and spec compliance:

@@ -19,7 +19,7 @@ Permitted work right now, and nothing beyond it:
 - **Maintenance and factual checkpoint documentation for completed M5** (M5-A live ingestion, the source-loss freshness proof, and the ADR-0018/ADR-0038 storage-decision reassessment) within accepted ADRs 0036-0038 and without extending product behavior.
 - **Checkpoint documentation maintenance** that keeps merged facts, verification evidence, and milestone gates accurate.
 
-**M0 through M5 are complete. M5-B and M5-C were not required for M5 closure, were not authorized, and remain unimplemented, deferred future-expansion proposals. Post-M5 work — including M5-B, M5-C, and every later milestone — remains unauthorized.**
+**M0 through M5 are complete. M5-B and M5-C were not required for M5 closure, were not authorized, and remain unimplemented, deferred future-expansion proposals. Post-M5 work — including M5-B, M5-C, and every later milestone — remains unauthorized**, with one narrow exception recorded here for accuracy: **Joseph Carfagno has explicitly authorized M6 planning and ADR drafting only** ([docs/m6-plan.md](docs/m6-plan.md) and Proposed ADRs 0039–0041, drafted and awaiting independent review; ADR-0042 was drafted and, on the same-day adversarial review, rejected and folded into [docs/m6-plan.md § 8](docs/m6-plan.md#8-connectscan-experience) — it is historical record only, not part of the baseline requiring acceptance). **This authorizes no M6 implementation, no expansion of the M5 real-system safety boundary, and no acceptance of the M6 baseline** — those each require their own separate, explicit human decision, exactly as every prior milestone's baseline required.
 
 The authorized milestone sequence ([docs/milestones.md](docs/milestones.md)) is synthetic-first:
 
