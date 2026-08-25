@@ -4,12 +4,12 @@ The canonical, model-neutral resume document for Atlast. Read this file with the
 
 ## 1. Document Control
 
-- **Last updated:** 2026-08-24
-- **Checkpoint name:** `m5-complete`
-- **Latest merged implementation commit:** `5a35174` (`perf: incrementally reconcile advancing evidence (#95)`), squash-merged through [PR #95](https://github.com/Jayc92/atlast/pull/95) on 2026-08-24 — ADR-0038 Complexity Boundary (A), the guarded incremental reconciler completing the M5 storage-decision remedy; its durable evidence record is [docs/audits/m0-synthetic-boundary-audit.md § 23.10](docs/audits/m0-synthetic-boundary-audit.md).
-- **Latest merged checkpoint commit (prior, M5-A):** `73b8275` (`feat: prove live read-only Kubernetes Pod ingestion (#89)`), squash-merged through [PR #89](https://github.com/Jayc92/atlast/pull/89) on 2026-08-20. This M5 closeout documentation is the current, separate checkpoint on top of the merged M5 evidence chain (PR #89, #91–#95).
-- **Verification:** PR #89 (M5-A), PR #91 (source-loss freshness proof), PR #92/#93 (ADR-0038 acceptance and amendment), PR #94 (Complexity Boundary B), and PR #95 (Complexity Boundary A) each independently passed the complete, unmodified seven-stage verifier before merge, with GitHub Actions `verify` succeeding on every one. Directly on the merged `main` HEAD (`5a35174`) at this checkpoint: shared **429/429**, impact-model **15/15**, graph-model **386/386**, overlay-model **23/23**, connectors **14/14**, web **266/266**, api **123/123**, browser acceptance **46/46** — all seven stages pass.
-- **Milestone state:** **M0 through M5 are complete.** The M4 baseline remains [docs/m4-plan.md](docs/m4-plan.md) plus ADRs 0032-0035; checkpoint `m4-complete` formally closed M4. M5 planning and pre-release architecture/ADR review ([docs/m5-plan.md](docs/m5-plan.md), ADRs [0036](docs/adr/0036-m5-kubernetes-client-and-connector-boundary.md)/[0037](docs/adr/0037-m5-read-only-credential-and-rbac-design.md)) were accepted 2026-08-20 after the GUARDRAILS.md § 1.4 M5-A authentication-policy amendment ([PR #87](https://github.com/Jayc92/atlast/pull/87) at `9bbeec4`). **M5-A implementation** (live Kubernetes ingestion, read-only proof, identity case study) **merged through [PR #89](https://github.com/Jayc92/atlast/pull/89) at `73b8275`**, satisfying M5 exit criteria 1/3 and proof obligations 1–3 ([audit § 21](docs/audits/m0-synthetic-boundary-audit.md)). **The source-loss freshness proof merged through [PR #91](https://github.com/Jayc92/atlast/pull/91) at `f414047`**, satisfying M5 exit criterion 2 ([audit § 22](docs/audits/m0-synthetic-boundary-audit.md)). **The mandatory ADR-0018 storage reassessment found condition 2 fired** on the real M5 workload (a 9.27 s median current-state read at n = 3,707); root-cause analysis identified `m1-v1` reconciliation's repeated full-history reconstruction, not the storage engine, as the cause ([audit § 23](docs/audits/m0-synthetic-boundary-audit.md)). **[ADR-0038](docs/adr/0038-m5-reconciliation-scaling-remedy.md), accepted 2026-08-21, retained in-memory storage and resolved this by fixing the reconciliation algorithm** — Complexity Boundary B ([PR #94](https://github.com/Jayc92/atlast/pull/94)) and Complexity Boundary A ([PR #95](https://github.com/Jayc92/atlast/pull/95)) — bringing the same read to a 26.18 ms median, satisfying M5 verification obligation 4 with **final conclusion (a): in-memory storage remains justified against the real M5 workload.** **All three M5 exit criteria and all four M5 verification obligations evaluated PASS. Checkpoint `m5-complete` formally closes M5.** M5-B (Deployments/Services) and M5-C (a real `watch` stream) were not required for this closure, were not authorized, and remain unimplemented, deferred future-expansion proposals. No implementation slice is currently active. **This closure authorizes nothing beyond M5 — post-M5 work remains gated and unauthorized.**
+- **Last updated:** 2026-08-25
+- **Checkpoint name:** `m6-a-normal-website-kubernetes-merged`
+- **Latest merged implementation commit:** `2288d6503675e03c1d635cd5de02ce64e44aac5e` (`feat: show real Kubernetes data in normal Atlast (#100)`), squash-merged through [PR #100](https://github.com/Jayc92/atlast/pull/100) on 2026-08-25 — M6-A composition-root unification and the normal-website real-Kubernetes vertical proof; its durable evidence record, including the independent review's required corrections, is [docs/audits/m0-synthetic-boundary-audit.md § 24](docs/audits/m0-synthetic-boundary-audit.md).
+- **Latest merged checkpoint commit (prior):** `5a35174` (`perf: incrementally reconcile advancing evidence (#95)`), squash-merged through [PR #95](https://github.com/Jayc92/atlast/pull/95) on 2026-08-24, the final commit of the `m5-complete` checkpoint. This M6-A closeout documentation is the current, separate checkpoint on top of the merged M6 baseline-acceptance ([PR #98](https://github.com/Jayc92/atlast/pull/98)) and M6-A implementation ([PR #100](https://github.com/Jayc92/atlast/pull/100)).
+- **Verification:** PR #100 (M6-A) independently passed the complete, unmodified seven-stage verifier before merge, with GitHub Actions `verify` succeeding. Directly on the merged `main` HEAD (`2288d65`) at this checkpoint: shared **429/429**, impact-model **15/15**, graph-model **386/386**, overlay-model **23/23**, connectors **14/14**, web **268/268**, api **134/134**, browser acceptance **46/46** — all seven stages pass.
+- **Milestone state:** **M0 through M5 are complete** (checkpoint `m5-complete`, 2026-08-24; see § 6 below for the full M5 closure evidence, unchanged by this checkpoint). **M6 — Internal Pilot Validation — has an Accepted baseline** ([docs/m6-plan.md](docs/m6-plan.md) plus ADR-0039, ADR-0040, ADR-0041; ADR-0042 Rejected, folded into `docs/m6-plan.md § 8`), accepted 2026-08-24 and merged through [PR #98](https://github.com/Jayc92/atlast/pull/98). **M6-A — composition-root unification and the normal-website real-Kubernetes proof — is now complete.** Explicitly authorized by Joseph Carfagno on 2026-08-24 (Gate 5 of the Accepted M6 baseline), implemented, independently and adversarially reviewed (which required correcting a weakened mutation-rejection proof, an audit file-count error, and two indirectly-covered automated tests before checkpointing), corrected with a genuine live re-verification against a real disposable Kind cluster, and **merged through [PR #100](https://github.com/Jayc92/atlast/pull/100) at `2288d65` on 2026-08-25** — local `main` has synchronized cleanly (fast-forward, clean working tree). Real Kubernetes Pod Evidence now reaches the normal Atlast application's authoritative stores, the normal `/api/v1` API, and the normal Atlast website, with Trust Inspector/detail surfaces exposing the existing trust/provenance state and read-only enforcement proven by an actual Kubernetes-rejected mutation ([audit § 24](docs/audits/m0-synthetic-boundary-audit.md)). **M6-A's completion does not complete M6. M6-B and M6-C remain unauthorized. No implementation slice is currently active.** This closure authorizes nothing beyond M6-A — no M6 exit criterion is evaluated or satisfied by this checkpoint.
 - **Precedence:** [PROJECT_SPEC.md](PROJECT_SPEC.md), [GUARDRAILS.md](GUARDRAILS.md), [docs/milestones.md](docs/milestones.md), approved plans, Accepted ADRs, [TASKS.md](TASKS.md), and [CLAUDE.md](CLAUDE.md) override this summary wherever they conflict.
 
 ## 2. Product Summary
@@ -50,14 +50,15 @@ No credential, token, machine secret, employer data, customer data, or proprieta
 
 ## 4. Roadmap Position
 
-| Milestone | State                 | Evidence                                  |
-| --------- | --------------------- | ----------------------------------------- |
-| M0        | Complete - 2026-07-22 | Foundation and closure audit              |
-| M1        | Complete - 2026-08-12 | S1-S8; checkpoint `m1-complete`           |
-| M2        | Complete - 2026-08-16 | M2-A-F; checkpoint `m2-complete`          |
-| M3        | Complete - 2026-08-17 | M3-A-F; PR #68; checkpoint `m3-complete`  |
-| M4        | Complete - 2026-08-20 | PR #83; checkpoint `m4-complete`          |
-| M5        | Complete - 2026-08-24 | PR #89, #91-#95; checkpoint `m5-complete` |
+| Milestone | State                                   | Evidence                                                                                                     |
+| --------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| M0        | Complete - 2026-07-22                   | Foundation and closure audit                                                                                 |
+| M1        | Complete - 2026-08-12                   | S1-S8; checkpoint `m1-complete`                                                                              |
+| M2        | Complete - 2026-08-16                   | M2-A-F; checkpoint `m2-complete`                                                                             |
+| M3        | Complete - 2026-08-17                   | M3-A-F; PR #68; checkpoint `m3-complete`                                                                     |
+| M4        | Complete - 2026-08-20                   | PR #83; checkpoint `m4-complete`                                                                             |
+| M5        | Complete - 2026-08-24                   | PR #89, #91-#95; checkpoint `m5-complete`                                                                    |
+| M6        | Open — baseline accepted; M6-A complete | Baseline: PR #98. M6-A: PR #100; checkpoint `m6-a-normal-website-kubernetes-merged`. M6-B/M6-C unauthorized. |
 
 M3 delivered synthetic operational health without making overlays graph truth:
 
@@ -125,27 +126,27 @@ The same n = 3,707 cold read now medians **26.18 ms** (p95 28.14 ms), under this
 
 ## 7. Current Git State
 
-At the `m5-complete` checkpoint (this closure documentation is the next commit on top of this state):
+At the `m6-a-normal-website-kubernetes-merged` checkpoint (this closure documentation is the next commit on top of this state):
 
 ```text
-5a35174 (HEAD -> main, origin/main, origin/HEAD) perf: incrementally reconcile advancing evidence (#95)
+2288d65 (HEAD -> main, origin/main, origin/HEAD) feat: show real Kubernetes data in normal Atlast (#100)
+a54f6a5 docs: propose M6 internal pilot baseline (#98)
+0f31cf2 docs: align project status after M5 closeout (#99)
+c69f00c docs: align project status after M5 closeout (#97)
+403522c docs: close M5 milestone (#96)
+5a35174 perf: incrementally reconcile advancing evidence (#95)
 69f89a5 perf: avoid repeated current-state reconciliation (#94)
-64e13f9 docs: clarify ADR-0038 complexity boundary (#93)
-a5b32ef docs: accept ADR-0038 reconciliation scaling remedy (#92)
-f414047 docs: record M5 source-loss freshness proof (#91)
-b84365f docs: close M5-A live Kubernetes ingestion slice (#90)
-73b8275 feat: prove live read-only Kubernetes Pod ingestion (#89)
 ```
 
 Always inspect real Git state before trusting this snapshot.
 
 ## 8. Authorized Work
 
-**No implementation slice is currently active.** M0 through M5 are complete. M5's own scope — M5-A live ingestion ([PR #89](https://github.com/Jayc92/atlast/pull/89)), the source-loss freshness proof ([PR #91](https://github.com/Jayc92/atlast/pull/91)), and the ADR-0018 storage reassessment resolved through ADR-0038 ([PR #92](https://github.com/Jayc92/atlast/pull/92)–[PR #95](https://github.com/Jayc92/atlast/pull/95)) — is complete; see § 6 above. **Post-M5 work (M5-B, M5-C, predictive AI, multi-cloud integrations, multi-source enterprise reconciliation, advisory remediation recommendations) requires its own separate, explicit future human authorization exactly as every prior milestone required.** Maintenance, corrections, and factual checkpoint documentation within the accepted ADRs and without extending product behavior remain permitted, per [CLAUDE.md](CLAUDE.md).
+**No implementation slice is currently active.** M0 through M5 are complete (§ 6). The M6 baseline is Accepted ([PR #98](https://github.com/Jayc92/atlast/pull/98)) and **M6-A — composition-root unification and the normal-website real-Kubernetes proof — is complete** ([PR #100](https://github.com/Jayc92/atlast/pull/100); § 1, [audit § 24](docs/audits/m0-synthetic-boundary-audit.md)). **M6-B (the Kubernetes topology extension, minimum visual productization, and pilot-feedback artifact) and M6-C (the deterministic pilot sandbox and real-tester acceptance run) require their own separate, explicit future human authorization exactly as every prior milestone's next slice required — this checkpoint grants neither.** Maintenance, corrections, and factual checkpoint documentation within the accepted ADRs and without extending product behavior remain permitted, per [CLAUDE.md](CLAUDE.md).
 
 ## 9. Prohibited Work
 
-- Any post-M5 planning or implementation before separate, explicit authorization.
+- Any M6-B, M6-C, or other post-M6-A planning or implementation before separate, explicit authorization.
 - Real systems, credentials, employer/customer data, connectors, authentication, deployment, or external publication.
 - Product writes or mutation routes.
 - Browser imports from fixtures, graph-model, overlay-model, impact-model, repository/storage, or API server modules.
@@ -186,33 +187,39 @@ You are taking over as conductor for Atlast at
 (GitHub: https://github.com/Jayc92/atlast).
 
 Before acting, read HANDOFF.md, PROJECT_SPEC.md, GUARDRAILS.md, CLAUDE.md,
-TASKS.md, docs/architecture.md, docs/milestones.md, docs/m4-plan.md,
-docs/m5-plan.md, the ADR index (ADRs 0032-0038), and
-docs/audits/m0-synthetic-boundary-audit.md §§ 20-23. Inspect git status and
+TASKS.md, docs/architecture.md, docs/milestones.md, docs/m5-plan.md,
+docs/m6-plan.md, the ADR index (ADRs 0036-0041), and
+docs/audits/m0-synthetic-boundary-audit.md §§ 21-24. Inspect git status and
 git log; real Git state overrides stale text.
 
-M0 through M5 are complete (checkpoints m4-complete, m5-complete). M5-A —
-the first live Kubernetes ingestion slice — merged through PR #89 at
-73b8275 on 2026-08-20 (audit § 21). The source-loss freshness proof merged
-through PR #91 at f414047 (audit § 22), satisfying M5 exit criterion 2. The
-mandatory ADR-0018 storage reassessment found condition 2 fired on the real
-M5 workload (audit § 23); ADR-0038, accepted 2026-08-21, retained in-memory
-storage and resolved it by fixing the m1-v1 reconciliation algorithm across
-two implementation checkpoints, merged through PR #94 and PR #95 — the same
-n=3,707 cold read now medians 26.18 ms. Final ADR-0018 conclusion: (a)
-in-memory storage remains justified; no storage migration is required. All
-three M5 exit criteria and all four M5 verification obligations evaluated
-PASS. Checkpoint "m5-complete" records this closure. No implementation
-slice is currently active.
+M0 through M5 are complete (checkpoints m4-complete, m5-complete). M6 —
+Internal Pilot Validation — has an Accepted baseline (docs/m6-plan.md plus
+ADR-0039, ADR-0040, ADR-0041; ADR-0042 Rejected), merged through PR #98 at
+a54f6a5 on 2026-08-24. M6-A — composition-root unification and the
+normal-website real-Kubernetes proof — was separately authorized (Gate 5 of
+the Accepted baseline) and is now complete: real connector-derived
+Kubernetes Pod Evidence reaches the normal Atlast application's
+authoritative stores, the normal /api/v1 API, and the normal Atlast
+website, with read-only enforcement proven by an actual Kubernetes-rejected
+mutation (audit § 24). Merged through PR #100 at 2288d65 on 2026-08-25,
+following an independent adversarial review that required corrections
+(strengthening the mutation-rejection proof to a real, live 403 result;
+fixing an audit file-count error; adding two previously indirectly-covered
+automated tests) before this checkpoint. Checkpoint
+"m6-a-normal-website-kubernetes-merged" records this closure. No
+implementation slice is currently active.
 
-M5-B (Deployments/Services) and M5-C (a real watch stream) were not
-required for M5 closure, were not authorized, and remain unimplemented,
-deferred future-expansion proposals.
+M6-A's completion does not complete M6. M6-B (the Kubernetes topology
+extension, minimum visual productization, and pilot-feedback artifact) and
+M6-C (the deterministic pilot sandbox and real-tester acceptance run) were
+not required for this closure, were not authorized, and remain
+unimplemented, deferred future-expansion proposals.
 
 Preserve synthetic-only, query-API-only, Evidence-first, deterministic,
-read-only, and fail-honest boundaries. Do not plan or implement M5-B, M5-C,
-or any post-M5 milestone work without Joseph Carfagno's own separate,
-explicit authorization — this closure grants none. Begin by reporting your
-understanding of checkpoint "m5-complete" and confirming no post-M5 work is
+read-only, and fail-honest boundaries. Do not plan or implement M6-B, M6-C,
+or any other post-M6-A milestone work without Joseph Carfagno's own
+separate, explicit authorization — this closure grants none. Begin by
+reporting your understanding of checkpoint
+"m6-a-normal-website-kubernetes-merged" and confirming no post-M6-A work is
 authorized.
 ```

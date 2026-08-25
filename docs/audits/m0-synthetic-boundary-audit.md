@@ -968,9 +968,9 @@ At n = 3,707, this is a **~240× improvement** over the Boundary-B-only COLD bas
 
 **Not yet done, correctly:** this candidate is uncommitted on branch `perf/adr-0038-incremental-reconciliation`; no PR has been opened; TASKS.md/HANDOFF.md are not updated; M5 is not marked complete; M5-B and M5-C remain unauthorized.
 
-## 24. M6-A Composition-Root/Normal-Website Kubernetes Proof — Evidence Record (2026-08-25, checkpointed for review)
+## 24. M6-A Composition-Root/Normal-Website Kubernetes Proof — Evidence Record (2026-08-25, merged)
 
-**Status: implemented on branch `feat/m6-a-normal-ui-kubernetes`, independently reviewed, corrected per that review, and committed for a pull request against `main`. Not yet merged.** Gate 5 (M6-A implementation authorization) of the Accepted M6 baseline ([docs/m6-plan.md](../m6-plan.md), [ADR-0040](../adr/0040-m6-composition-root-unification.md)) was explicitly granted by Joseph Carfagno on 2026-08-24; this section records the factual result of that implementation attempt, its independent review, and the corrections that review required. **This section does not mark M6-A, M6, or any exit criterion complete** — that remains a separate governance determination after merge.
+**Status: implemented, independently reviewed, corrected per that review, and merged to `main` through [PR #100](https://github.com/Jayc92/atlast/pull/100) at `2288d6503675e03c1d635cd5de02ce64e44aac5e` on 2026-08-25.** Gate 5 (M6-A implementation authorization) of the Accepted M6 baseline ([docs/m6-plan.md](../m6-plan.md), [ADR-0040](../adr/0040-m6-composition-root-unification.md)) was explicitly granted by Joseph Carfagno on 2026-08-24; this section is now the durable, merged evidence record of that implementation, its independent review, and the corrections that review required. A subsequent post-merge evaluation directly against the merged repository state found M6-A's accepted A–J boundary (real Pod created post-boot; connector Evidence reaching the normal authoritative store; normal API/website exposure; Trust Inspector/detail correlation; fixture substitution excluded; source-loss preservation; a real, live 403-rejected mutation; no M6-B topology work required) fully satisfied. **This section marks M6-A complete. It does not mark M6, or any M6 milestone exit criterion, complete** — M6 remains open, and M6-B/M6-C remain unauthorized.
 
 ### 24.1 Composition-root/store-ownership proof
 
@@ -1018,4 +1018,4 @@ Direct inspection of the complete diff confirms: no Deployment/ReplicaSet/Servic
 
 No dataset-mode UI badge exists yet (§ 24.2) — a real, current limitation, explicitly deferred to M6-B rather than implemented now, since doing so would have broadened this slice beyond its accepted boundary.
 
-**Not yet done, correctly:** TASKS.md/HANDOFF.md are not updated to claim M6-A closure; M6-A, M6, and every exit criterion remain unmarked as complete; the PR against `main` remains open and unmerged; M6-B and M6-C remain unauthorized.
+**Done, correctly, as part of this same documentation-only closeout:** [PR #100](https://github.com/Jayc92/atlast/pull/100) merged to `main` at `2288d65`; TASKS.md and HANDOFF.md updated to record M6-A's completion. **Correctly still not done:** M6, and every M6 milestone exit criterion, remain unmarked as complete; M6-B and M6-C remain unauthorized; no implementation slice is active.
