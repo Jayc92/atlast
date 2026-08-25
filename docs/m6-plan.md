@@ -247,7 +247,7 @@ Explicitly not part of the first slice, and not authorized by this plan:
 - **M6-B (proposed shape):** the Kubernetes topology extension (ADR-0039: Deployments, ReplicaSets, Services, UID-based ownership matching, and the full six-state Service-relationship vocabulary), the minimum visual productization (§ 9), and the pilot-feedback artifact (ADR-0041).
 - **M6-C (proposed shape, evidence/closeout slice — not primarily code):** build the deterministic pilot sandbox (§ 12), run the acceptance test (§ 14) with a real tester, record the scorecard, evaluate the exit criteria (§ 15) directly against the merged repository state, and prepare the milestone closeout.
 
-No slice beyond M6-A is authorized by this plan. Each later slice requires its own separate, explicit human authorization after its predecessor merges and `main` synchronizes cleanly.
+Neither M6-A nor any later slice is authorized by this plan. Each later slice requires its own separate, explicit human authorization after its predecessor merges and `main` synchronizes cleanly.
 
 ## 21. Dependencies and Technology
 
