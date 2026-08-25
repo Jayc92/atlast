@@ -1,9 +1,9 @@
 # ADR-0040: M6 Browser-Facing Composition-Root Unification
 
-**Status:** Proposed
-**Date:** 2026-08-24 (revised 2026-08-24 after independent adversarial review — see revision note)
+**Status:** Accepted
+**Date:** 2026-08-24 (revised 2026-08-24 after independent adversarial review; accepted 2026-08-24 as part of the complete M6 baseline — see acceptance note)
 
-> **Drafting note:** This ADR is drafted under Joseph Carfagno's 2026-08-24 authorization of M6 planning and ADR drafting only ([docs/m6-plan.md](../m6-plan.md)). It authorizes no implementation. It requires independent review and explicit human acceptance before any M6 slice referencing it can be released.
+> **Acceptance note (2026-08-24):** Joseph Carfagno explicitly accepted this ADR on 2026-08-24 as part of the complete M6 baseline ([docs/m6-plan.md](../m6-plan.md)), after both an adversarial review and a genuinely independent final review found no substantive blocker. **Acceptance authorizes no implementation.** The first M6 implementation slice referencing this ADR (M6-A, per [docs/m6-plan.md § 20](../m6-plan.md#20-proposed-implementation-slices-shapes-only--none-authorized)) requires its own separate, explicit human authorization, effective only after this acceptance record merges to `main` and local `main` synchronizes cleanly.
 
 > **Revision note (adversarial review pass):** the first draft correctly identified the composition-root split as the primary blocker and correctly rejected mixing synthetic and connector data in one store, but left two things underspecified: (1) it never named the full set of dataset-mode alternatives or stated why a _visible_ mode indicator matters, beyond "one store"; (2) it said nothing about the connector's operational lifecycle (pre-flight failure, mid-session source loss, shutdown, double-start risk) — the exact set of real failure modes a pilot will actually hit. Both are addressed below (§§ 1, 6).
 
@@ -101,4 +101,4 @@ The existing M5-A experiment entrypoint MAY remain in the repository as historic
 - Implementation review finds the opt-in configuration cannot be added to `server.ts` without materially complicating its existing, simple startup-failure and shutdown handling — in which case a cleaner split (e.g., a thin wrapper entrypoint that itself calls the unified composition function) may be the better implementation, without changing this ADR's underlying decision that there is exactly one production store the browser reads from.
 - A future milestone needs the fixture-seeded and connector-seeded paths to run simultaneously in one process — not needed by M6 and not authorized here; would require its own ADR addressing the sequence-number and provenance-mixing questions § 1's Option A rejection explicitly defers.
 
-This Proposed ADR does not itself authorize implementation. The first M6 implementation slice referencing it requires its own separate, explicit human authorization, effective only after this ADR's acceptance record merges to `main` with local `main` synchronized cleanly.
+This Accepted ADR does not itself authorize implementation. The first M6 implementation slice referencing it requires its own separate, explicit human authorization, effective only after this acceptance record merges to `main` with local `main` synchronized cleanly.

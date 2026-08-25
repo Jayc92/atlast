@@ -1,9 +1,9 @@
 # ADR-0039: M6 Kubernetes Topology Extension (Deployments, ReplicaSets, Services)
 
-**Status:** Proposed
-**Date:** 2026-08-24 (revised 2026-08-24 after independent adversarial review — see revision note)
+**Status:** Accepted
+**Date:** 2026-08-24 (revised 2026-08-24 after independent adversarial review; accepted 2026-08-24 as part of the complete M6 baseline — see acceptance note)
 
-> **Drafting note:** This ADR is drafted under Joseph Carfagno's 2026-08-24 authorization of M6 planning and ADR drafting only ([docs/m6-plan.md](../m6-plan.md)). It authorizes no implementation. It requires independent review and explicit human acceptance before any M6 slice referencing it can be released.
+> **Acceptance note (2026-08-24):** Joseph Carfagno explicitly accepted this ADR on 2026-08-24 as part of the complete M6 baseline ([docs/m6-plan.md](../m6-plan.md)), after both an adversarial review and a genuinely independent final review found no substantive blocker. **Acceptance authorizes no implementation.** The first M6 implementation slice referencing this ADR (M6-B, per [docs/m6-plan.md § 20](../m6-plan.md#20-proposed-implementation-slices-shapes-only--none-authorized)) requires its own separate, explicit human authorization, effective only after this acceptance record merges to `main` and local `main` synchronizes cleanly.
 
 > **Revision note (adversarial review pass):** the first draft correctly identified ownerReference determinism and Service-selector cardinality but was incomplete on three points a rigorous review found: (1) it did not state that one Deployment legitimately owns multiple ReplicaSets simultaneously during a rolling update, which is normal multiplicity, not ambiguity; (2) it did not require ownership-edge matching to use Kubernetes UID rather than name, leaving a real delete/recreate false-continuity risk unaddressed; (3) it collapsed Service→Pod semantics into a single "zero, one, or many" bucket without distinguishing a **known** zero-match result from **missing evidence** from **no selector at all** from **EndpointSlice-backed** Services — four genuinely different states this milestone's own "prefer UNKNOWN over invented topology" principle requires to be told apart. All three are corrected below (§§ 2, 5, 3 respectively).
 
@@ -125,4 +125,4 @@ Kubernetes objects can be deleted and recreated with the same namespace/name —
 - A later milestone genuinely requires Deployment/Service coverage across multiple namespaces or clusters — out of this ADR's one-namespace, one-cluster scope, and [docs/m6-plan.md § 2](../m6-plan.md#2-real-system-safety-boundary-binding-unchanged-from-m5)'s boundary already forbids the multi-cluster case regardless.
 - A future product decision decides the identity-continuity limitation (§ 5) must be resolved rather than merely disclosed — that would require its own ADR amending the accepted `m1-v1` identity policy, a materially larger decision than this milestone's scope.
 
-This Proposed ADR does not itself authorize implementation. The first M6 implementation slice referencing it requires its own separate, explicit human authorization, effective only after this ADR's acceptance record merges to `main` with local `main` synchronized cleanly.
+This Accepted ADR does not itself authorize implementation. The first M6 implementation slice referencing it requires its own separate, explicit human authorization, effective only after this acceptance record merges to `main` with local `main` synchronized cleanly.

@@ -1,9 +1,9 @@
 # ADR-0041: M6 Pilot-Feedback Storage Boundary
 
-**Status:** Proposed
-**Date:** 2026-08-24 (revised 2026-08-24 after independent adversarial review — see revision note)
+**Status:** Accepted
+**Date:** 2026-08-24 (revised 2026-08-24 after independent adversarial review; accepted 2026-08-24 as part of the complete M6 baseline — see acceptance note)
 
-> **Drafting note:** This ADR is drafted under Joseph Carfagno's 2026-08-24 authorization of M6 planning and ADR drafting only ([docs/m6-plan.md](../m6-plan.md)). It authorizes no implementation. It requires independent review and explicit human acceptance before any M6 slice referencing it can be released.
+> **Acceptance note (2026-08-24):** Joseph Carfagno explicitly accepted this ADR on 2026-08-24 as part of the complete M6 baseline ([docs/m6-plan.md](../m6-plan.md)), after both an adversarial review and a genuinely independent final review found no substantive blocker. **Acceptance authorizes no implementation.** The first M6 implementation slice referencing this ADR (M6-B, per [docs/m6-plan.md § 20](../m6-plan.md#20-proposed-implementation-slices-shapes-only--none-authorized)) requires its own separate, explicit human authorization, effective only after this acceptance record merges to `main` and local `main` synchronizes cleanly.
 
 > **Revision note (adversarial review pass):** the first draft's boundary decision (§ 1) and one-directional-reference design (§ 3) survived review unchanged. Its verdict vocabulary (§ 2) did not: a four-verdict scheme (`correct`/`incorrect`/`missing`/`uncertain`) conflates Atlast's own honest, computed unknown states (e.g. a known-zero-match Service, per [ADR-0039 § 3](0039-m6-kubernetes-topology-extension.md#3-selection-relationship-service--pod-via-label-selector-matching)) with the tester's subjective uncertainty about a claim Atlast _did_ make confidently — two different things a scorecard must not merge. § 2 is revised below to a vocabulary that distinguishes them. A concrete lifecycle model and explicit sensitive-notes handling are also added (§§ 5, 6), which the first draft left implicit.
 
@@ -118,4 +118,4 @@ The artifact's free-text notes fields may reference sandbox environment details 
 - A future, separately authorized multi-pilot phase finds the conceptual schema in §§ 2–3 insufficient — requires its own ADR amendment to the artifact's shape (using `schemaVersion` to migrate), not a decision to fold it into the domain model.
 - A future product decision decides pilot/user feedback should become a first-class, permanent Atlast capability — a materially different, larger product decision than this milestone's one-off internal pilot, requiring its own separate ADR and human product decision.
 
-This Proposed ADR does not itself authorize implementation. The first M6 implementation slice referencing it requires its own separate, explicit human authorization, effective only after this ADR's acceptance record merges to `main` with local `main` synchronized cleanly.
+This Accepted ADR does not itself authorize implementation. The first M6 implementation slice referencing it requires its own separate, explicit human authorization, effective only after this acceptance record merges to `main` with local `main` synchronized cleanly.
