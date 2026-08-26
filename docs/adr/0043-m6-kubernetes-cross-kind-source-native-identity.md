@@ -1,6 +1,6 @@
 # ADR-0043: Kubernetes Cross-Kind Source-Native Identity
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-08-26
 
 ## Context
@@ -54,15 +54,15 @@ An adversarial extension of this same test — objects literally _named_ `servic
 
 ### 3. A deliberate, accepted residual: same-kind decorative collapsing is preserved, not eliminated
 
-`Service/checkout`, `Service/checkout-service`, and `Service/checkout-svc` still normalize to the _same_ key as each other (`atlast-m6-a-service-checkout`) — this is **not** a defect this ADR leaves unfixed; it is the frozen policy's own, already-accepted "colloquial synonym" behavior (the same mechanism that already collapses `svc-checkout`/`checkout-service`/`service-checkout` in the original fixture domain), now correctly scoped to _within one kind_ rather than bleeding _across kinds_. Three genuinely distinct real Service objects in one namespace literally named `checkout`, `checkout-service`, and `checkout-svc` simultaneously would be a contrived scenario no real cluster administrator creates; this residual is accepted, not solved, by this decision.
+`Service/checkout`, `Service/checkout-service`, and `Service/checkout-svc` still normalize to the _same_ key as each other (`atlast-m6-a-service-checkout`) — this is **not** a defect this ADR leaves unfixed; it is the frozen policy's own, already-accepted "colloquial synonym" behavior (the same mechanism that already collapses `svc-checkout`/`checkout-service`/`service-checkout` in the original fixture domain), now correctly scoped to _within one kind_ rather than bleeding _across kinds_. This same-kind decorative-affix collapsing remains possible for any two same-kind objects whose names differ only by a recognized decorative affix; it is inherited unchanged from the frozen, Accepted `m1-v1` policy ([ADR-0022](0022-m1-reconciliation-policy-and-assertion-derivation.md) § 1), and this ADR does not solve, worsen, or make any probability claim about how often real Kubernetes naming produces it. This ADR's scope is specifically the newly proven **cross-kind** collapse caused by the omission of Kubernetes kind from source-native identity (§§ 1–2 above); eliminating same-kind decorative equivalence entirely would require its own separate derivation-policy decision — a new derivation version (`m1-v2`) amending or removing the accepted `decorativeAffixes` list — and is out of scope for this ADR.
 
 ### 3a. This decision inherits, and does not resolve, the M5 § 21.7 hyphen-boundary-ambiguity risk — now with one more segment
 
 `docs/audits/m0-synthetic-boundary-audit.md § 21.7` already disclosed, and explicitly declined to fix, a real risk in hyphen-joining two components (namespace and name) into one identity string: two genuinely distinct real objects can theoretically produce the identical joined string if the hyphen boundary between components is reinterpreted differently (its own worked example: a Pod `live-pod` in namespace `atlast-m5` versus a Pod `m5-live-pod` in namespace `atlast`). This ADR's `<namespace>-<kind>-<name>` encoding is a **three-segment instance of the exact same general risk category**, not a new one — some combination of `(namespace, kind, name)` could in principle produce the same joined string as a different combination if a namespace or name component itself contains hyphens positioned adversarially. This ADR fixes the cross-kind collision (§§ 2–3) and does not attempt to, and does not claim to, resolve the broader hyphen-boundary-ambiguity risk class § 21.7 already disclosed — that remains open, exactly as before, now applying to one more segment boundary than it did previously.
 
-### 3b. Explicit, unresolved textual tension with ADR-0039 § 5 (flagged for human acceptance, not silently resolved)
+### 3b. ADR-0043 narrowly clarifies ADR-0039 § 5
 
-[ADR-0039](0039-m6-kubernetes-topology-extension.md) § 5 states: "Atlast's human-facing entity identity remains namespace/name-based, unchanged from the accepted `m1-v1` policy — this ADR does not propose changing it." That sentence was written entirely in the context of the UID-vs-name, same-kind delete/recreate question (§ 4 above) and never discusses or rules on the cross-kind case this ADR addresses. Read narrowly, this decision is compatible with it. Read literally, "remains namespace/name-based" could be understood to forbid _any_ extension of that shape, including a kind-qualified one — since `namespace-kind-name` is no longer purely "namespace/name-based" in the most literal sense. **This ADR does not assume the narrow reading is correct.** Accepting this ADR should be understood as also narrowly clarifying that ADR-0039 § 5's sentence was scoped to the UID question, not as a decision this ADR can make unilaterally by asserting compatibility. This is offered to the human reviewer as an explicit open question, not resolved here.
+[ADR-0039](0039-m6-kubernetes-topology-extension.md) § 5 states: "Atlast's human-facing entity identity remains namespace/name-based, unchanged from the accepted `m1-v1` policy — this ADR does not propose changing it." That sentence was written entirely in the context of the UID-vs-name, same-kind delete/recreate question (§ 4 above). Accepting this ADR resolves, rather than leaves open, how that sentence reads against the cross-kind case: "namespace/name-based" in ADR-0039 § 5 preserves the accepted **continuity** choice — name-based identity rather than UID-based identity, so that delete/recreate does not become UID-distinct merely because this ADR exists. It does **not** mean Kubernetes resource kind is forbidden from participating in the connector's own opaque `sourceNativeId` representation. This ADR therefore supersedes/clarifies ADR-0039 § 5 only to the minimum extent necessary to permit `<namespace>-<kind>-<name>`, while preserving ADR-0039's UID/delete-recreate decision unchanged. ADR-0039 itself is not edited; this clarification is recorded here, per this project's amend/clarify-via-new-ADR convention.
 
 ### 4. Kubernetes UID is explicitly rejected as canonical identity
 
@@ -98,7 +98,7 @@ Both the ownership (`Deployment → ReplicaSet`, `ReplicaSet → Pod`) and selec
 - **Trailing kind suffix** (`<namespace>-<name>-<kind>`). Rejected: identical failure mode via `suffixes: ["-service"]`.
 - **Kubernetes UID as canonical identity.** Rejected: directly contradicts the explicit ADR-0039 § 5 text; changes delete/recreate continuity semantics; a materially larger decision this ADR does not make.
 - **Amend `M1_V1_DERIVATION_POLICY`'s decorative-affix list** (e.g., remove `service`/`svc` from it, or make stripping kind-aware). Rejected: directly modifies the frozen, Accepted ADR-0022 policy, whose own text requires any field change to be a new derivation version (`m1-v2`) — a materially larger decision than a connector-local encoding fix, and it would only address the affix-stripping collision, not the more fundamental no-kind-discriminator collision that exists even without any affix involved.
-- **Asymmetric encoding — qualify only Deployments/ReplicaSets/Services, leave Pods at the historical bare shape.** Rejected: no principled reason survives scrutiny once the M5-A/M6-A identifier shape is correctly classified as historical evidence, not a live compatibility promise (§ 9 below); an asymmetric rule adopted merely to avoid changing existing Pod identifiers would be exactly the kind of implementation-convenience-driven inconsistency this project's own architecture discipline rejects elsewhere.
+- **Asymmetric encoding — qualify only Deployments/ReplicaSets/Services, leave Pods at the historical bare shape.** Rejected: no principled reason survives scrutiny once the M5-A/M6-A identifier shape is correctly classified as historical evidence, not a live compatibility promise (see "Backward-Compatibility Position" below); an asymmetric rule adopted merely to avoid changing existing Pod identifiers would be exactly the kind of implementation-convenience-driven inconsistency this project's own architecture discipline rejects elsewhere.
 - **Do nothing; rely on sandbox-naming avoidance only.** Sufficient for the current M6-B candidate's own deterministic sandbox (already applied, disclosed in `docs/audits/m0-synthetic-boundary-audit.md § 25.2`), but leaves the defect live for any real future deployment following an ordinary Kubernetes naming convention — rejected as the _general_ answer, though not incompatible with this ADR's own adoption timeline.
 
 ## Tradeoffs
@@ -117,7 +117,7 @@ Both the ownership (`Deployment → ReplicaSet`, `ReplicaSet → Pod`) and selec
 
 - **A future contributor could "simplify" the encoding back to a leading or trailing kind token without re-deriving why that fails.** Mitigation: § 2's reasoning and the collision table must be preserved as an explicit code comment at the implementation site, mirroring how this project already documents the UID-matching and hyphen-join rationales.
 - **The residual same-kind decorative-collapsing behavior (§ 3) could be mistaken for an unaddressed defect during future review.** Mitigation: explicitly named and accepted here, not silently left ambiguous.
-- **Changing the Pod identifier shape could surprise a reviewer expecting M5-A/M6-A stability.** Mitigation: § 9 below states the compatibility position explicitly, for human acceptance, rather than assuming it.
+- **Changing the Pod identifier shape could surprise a reviewer expecting M5-A/M6-A stability.** Mitigation: the "Backward-Compatibility Position" section below states the compatibility decision explicitly, and it has been explicitly accepted (see "Acceptance Record" below) rather than assumed.
 - **This decision could be mistaken for a complete fix of Kubernetes identity collision risk.** It is not: § 3a's hyphen-boundary-ambiguity risk (extending M5 § 21.7) and § 3's same-kind decorative collapsing both remain, disclosed and accepted, not solved. Mitigation: both are named explicitly here rather than left for a future reviewer to rediscover.
 
 ## Why This Fits Atlast
@@ -126,7 +126,7 @@ Both the ownership (`Deployment → ReplicaSet`, `ReplicaSet → Pod`) and selec
 - **Boring core, isolated intelligence**: the fix is entirely connector-local, reusing the existing, unmodified normalization/reconciliation/impact pipeline exactly as the M5-A hyphen-join precedent already established — no new derivation machinery.
 - **E1 — Evidence-first data model**: every fact continues to carry the same provenance/confidence/freshness triple; this decision only corrects which subject that triple attaches to.
 
-## Backward-Compatibility Position (for explicit human decision)
+## Backward-Compatibility Position (accepted decision)
 
 No Accepted ADR, publicly documented API contract, persisted data store, or live bookmarked/deep-linked state was found to depend on the specific M5-A/M6-A Kubernetes-connector-derived identifier shape continuing unchanged:
 
@@ -136,12 +136,24 @@ No Accepted ADR, publicly documented API contract, persisted data store, or live
 - Storage is in-memory only; both M5-A's and M6-A's real disposable clusters were already deleted at the close of their own sessions, and no currently-running process depends on their specific past identifiers resolving to anything.
 - Historical audit text (§ 21.7, § 22, § 25.2) records what was factually observed at the time and is preserved unedited by this decision (§ 8 above) — it is historical evidence, not a live contract.
 
-**Recommended position, offered for explicit human acceptance, not assumed:** M5-A and M6-A were bounded local experiments preceding the independent employee pilot (M6-C). Their exact Kubernetes-connector-derived Entity identifier strings are historical evidence of what those experiments produced, not a production compatibility promise. M6-B may therefore intentionally and symmetrically change Kubernetes-connector-derived Entity identifier shapes once, now, before M6-C, to establish the correct cross-kind identity invariant — without requiring any data migration, without rewriting historical audit text, and without special-casing any resource kind.
+**Accepted position:** M5-A and M6-A were bounded local experiments preceding the independent employee pilot (M6-C). Their exact Kubernetes-connector-derived Entity identifier strings were experimental historical outputs, not a production compatibility guarantee — no Accepted ADR, published API contract, persisted data store, or live dependency in the current repository was found to depend on them continuing unchanged. M6-B therefore intentionally and symmetrically changes Kubernetes-connector-derived Entity identifier shapes once, now, before M6-C, to establish the correct cross-kind identity invariant. No historical audit record is rewritten by this decision, and no persistent-data migration exists or is required.
 
 ## Conditions That Would Justify Changing This Decision
 
 - A future resource kind's own idiomatic Kubernetes name is found to begin or end with one of the frozen policy's literal decorative affixes as a _namespace's_ own leading/trailing token (not merely the object's own name) — would require re-verifying § 2's middle-placement safety argument against that specific case, not necessarily a different encoding.
-- A future need to reference a Kubernetes-connector-derived identifier from outside this process (a durable, versioned external contract) would require this ADR's compatibility position (§ 9) to be revisited before that contract is finalized.
+- A future need to reference a Kubernetes-connector-derived identifier from outside this process (a durable, versioned external contract) would require this ADR's accepted "Backward-Compatibility Position" to be revisited before that contract is finalized.
 - A future decision to resolve the M5 § 21.7 namespace/name hyphen-boundary ambiguity, or to adopt UID-based identity continuity, would each require their own separate ADR — neither is proposed or authorized here.
 
-This Proposed ADR does not itself authorize implementation. Adopting it requires explicit human acceptance, exactly as every other M6 ADR required, before any M6-B implementation file changes to use this encoding.
+## Acceptance Record
+
+**Accepted 2026-08-26 by Joseph Carfagno.** This acceptance explicitly records agreement with:
+
+- the cross-kind identity invariant (§§ 1, "Contractual Invariants This Decision Must Preserve");
+- the symmetric, middle-placed `<namespace>-<kind>-<name>` kind qualification (§§ 1–2, 6);
+- the one-time change to Kubernetes-derived Pod Entity identifier shape, accepted now, before M6-C (§ 6 and the "Backward-Compatibility Position" section below);
+- the narrow clarification of ADR-0039 § 5 (§ 3b above);
+- preservation of `M1_V1_DERIVATION_POLICY` unchanged, with no `m1-v2` authorized (§ 5);
+- rejection of Kubernetes UID as canonical/human-facing Entity identity (§ 4);
+- preservation of historical M5/M6-A audit identifiers unchanged as historical fact (§ 8).
+
+**Acceptance of this ADR does not itself authorize implementation.** M6-B corrective implementation may resume only after: (1) this acceptance record merges to `main`; (2) local `main` synchronizes cleanly with `origin/main`; and (3) Joseph Carfagno separately, explicitly authorizes the corrective M6-B continuation. M6-C remains unauthorized by this acceptance.
