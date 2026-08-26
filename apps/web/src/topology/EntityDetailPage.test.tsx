@@ -202,6 +202,16 @@ describe("EntityDetailPage", () => {
           url.includes("/api/v1/entities/atlast%3Aentity%3Aservice%2Fcheckout"),
         detail,
       ),
+      // The M6-B dataset-mode badge (TopologyShell) issues its own,
+      // separate /api/health request on every topology page — unrelated
+      // to this test's pinned-identity assertion, but every page render
+      // triggers it, so it must resolve rather than throw as "no route
+      // matched."
+      jsonRoute((url) => url.includes("/api/health"), {
+        status: "ok",
+        service: "atlast-api",
+        datasetMode: "fixture",
+      }),
     ]);
 
     renderEntityDetail(
@@ -219,12 +229,16 @@ describe("EntityDetailPage", () => {
       name: "Relationship workspace",
     });
     // A complete pin goes directly to the detail and traversal reads; it does
-    // not perform the unpinned inventory probe used to resolve latest.
-    expect(fetchStub).toHaveBeenCalledTimes(2);
+    // not perform the unpinned inventory probe used to resolve latest. The
+    // dataset-mode badge's own /api/health call is a third, independent
+    // request every topology page now makes.
+    expect(fetchStub).toHaveBeenCalledTimes(3);
     expect(
-      fetchStub.mock.calls.every(([url]) =>
-        url.includes(`horizon=${String(FIXTURE_IDENTITY.horizon)}`),
-      ),
+      fetchStub.mock.calls
+        .filter(([url]) => !url.includes("/api/health"))
+        .every(([url]) =>
+          url.includes(`horizon=${String(FIXTURE_IDENTITY.horizon)}`),
+        ),
     ).toBe(true);
     expect(screen.getByText(/Snapshot: pinned/)).toBeDefined();
   });

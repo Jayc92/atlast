@@ -1,13 +1,19 @@
 import { describe, expect, it } from "vitest";
+import type { ObservedPod } from "./observed-pod.ts";
 import { mapObservedPodToEvidence } from "./evidence-mapping.ts";
 
 const OBSERVED_AT = "2026-08-20T18:00:00.000Z";
 const RECORDED_AT = "2026-08-20T18:00:01.000Z";
 
+/** M6-B added `labels`/`controllerOwnerReference` to `ObservedPod` (ADR-0039 §§ 2, 3) — neither affects this file's own, unmodified Pod Entity-observation mapping. */
+function bareObservedPod(namespace: string, name: string): ObservedPod {
+  return { namespace, name, labels: {}, controllerOwnerReference: null };
+}
+
 describe("mapObservedPodToEvidence", () => {
   it("maps an observed Pod into a valid Entity-observation Evidence record", () => {
     const evidence = mapObservedPodToEvidence({
-      pod: { namespace: "atlast-m5", name: "atlast-m5-boot-probe" },
+      pod: bareObservedPod("atlast-m5", "atlast-m5-boot-probe"),
       recordedSequence: 1,
       observedAt: OBSERVED_AT,
       recordedAt: RECORDED_AT,
@@ -21,7 +27,7 @@ describe("mapObservedPodToEvidence", () => {
       recordedSequence: 1,
       sourceScopedIdentity: {
         source: "kubernetes",
-        sourceNativeId: "atlast-m5-atlast-m5-boot-probe",
+        sourceNativeId: "atlast-m5-pod-atlast-m5-boot-probe",
       },
       observation: {
         observationKind: "entity",
@@ -35,7 +41,7 @@ describe("mapObservedPodToEvidence", () => {
   });
 
   it("produces a distinct identifier for a distinct recordedSequence, never reusing one", () => {
-    const pod = { namespace: "atlast-m5", name: "same-pod" };
+    const pod = bareObservedPod("atlast-m5", "same-pod");
     const first = mapObservedPodToEvidence({
       pod,
       recordedSequence: 1,
@@ -63,7 +69,7 @@ describe("mapObservedPodToEvidence", () => {
     // regresses back to a slash.
     const LOWERCASE_ASCII_KEY_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
     const evidence = mapObservedPodToEvidence({
-      pod: { namespace: "atlast-m5", name: "atlast-m5-live-pod" },
+      pod: bareObservedPod("atlast-m5", "atlast-m5-live-pod"),
       recordedSequence: 1,
       observedAt: OBSERVED_AT,
       recordedAt: RECORDED_AT,
@@ -77,7 +83,7 @@ describe("mapObservedPodToEvidence", () => {
   it("rejects a recordedSequence the shared Evidence schema itself rejects, rather than swallowing it", () => {
     expect(() =>
       mapObservedPodToEvidence({
-        pod: { namespace: "atlast-m5", name: "same-pod" },
+        pod: bareObservedPod("atlast-m5", "same-pod"),
         recordedSequence: 0,
         observedAt: OBSERVED_AT,
         recordedAt: RECORDED_AT,

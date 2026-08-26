@@ -77,19 +77,27 @@ describe("fetchHealth", () => {
   it("validates and returns a correct payload", async () => {
     stubFetch({
       ok: true,
-      jsonPayload: { status: "ok", service: "atlast-api" },
+      jsonPayload: {
+        status: "ok",
+        service: "atlast-api",
+        datasetMode: "fixture",
+      },
     });
     const result = await fetchHealth(new AbortController().signal);
     expect(result).toEqual({
       ok: true,
-      data: { status: "ok", service: "atlast-api" },
+      data: { status: "ok", service: "atlast-api", datasetMode: "fixture" },
     });
   });
 
   it("requests the exact relative path", async () => {
     const fetchStub = stubFetch({
       ok: true,
-      jsonPayload: { status: "ok", service: "atlast-api" },
+      jsonPayload: {
+        status: "ok",
+        service: "atlast-api",
+        datasetMode: "fixture",
+      },
     });
     await fetchHealth(new AbortController().signal);
     expect(fetchStub.mock.calls[0]?.[0]).toBe("/api/health");

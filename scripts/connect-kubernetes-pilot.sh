@@ -126,17 +126,20 @@ KUBECONFIG="${restricted_kubeconfig}" kubectl config set-context "${KIND_CONTEXT
 KUBECONFIG="${restricted_kubeconfig}" kubectl config use-context "${KIND_CONTEXT}" >/dev/null
 printf 'Restricted kubeconfig written to a private temp file (never inside this repository).\n'
 
-# --- Stage 5: read proof, and a mutation POLICY preflight (ADR-0037 § 6) ---
-print_stage "Stage 5/8: proving read succeeds, and a policy-level mutation preflight, using the restricted credential"
+# --- Stage 5: read proof across the complete M6-B RBAC grant, and a
+# mutation POLICY preflight (ADR-0037 § 6, ADR-0039 § 4) ---
+print_stage "Stage 5/8: proving read succeeds across pods/deployments/replicasets/services, and a policy-level mutation preflight, using the restricted credential"
 # `kubectl auth can-i` exits 0 for "yes" and nonzero for "no" — both are
 # expected, meaningful outcomes here, never a script failure, so `|| true`
 # prevents `set -e` from treating the expected "no" as fatal. This is a
 # POLICY QUERY only — it asks the API server whether an operation would be
 # allowed, without attempting it. It is not, by itself, ADR-0037 § 6's
 # required live-rejection proof; see Stage 6 below for that.
-can_list="$(KUBECONFIG="${restricted_kubeconfig}" kubectl auth can-i list pods -n "${NAMESPACE}" || true)"
-[ "${can_list}" = "yes" ] || fail "Restricted credential cannot list Pods in ${NAMESPACE} (expected 'yes', got '${can_list}'). Check the applied RBAC manifest."
-printf 'Read proof: list pods -> yes.\n'
+for resource_kind in pods deployments replicasets services; do
+  can_list="$(KUBECONFIG="${restricted_kubeconfig}" kubectl auth can-i list "${resource_kind}" -n "${NAMESPACE}" || true)"
+  [ "${can_list}" = "yes" ] || fail "Restricted credential cannot list ${resource_kind} in ${NAMESPACE} (expected 'yes', got '${can_list}'). Check the applied RBAC manifest."
+  printf 'Read proof: list %s -> yes.\n' "${resource_kind}"
+done
 can_create="$(KUBECONFIG="${restricted_kubeconfig}" kubectl auth can-i create pods -n "${NAMESPACE}" || true)"
 [ "${can_create}" = "no" ] || fail "Restricted credential CAN create Pods in ${NAMESPACE} (expected 'no', got '${can_create}') — this is a least-privilege violation of ADR-0037 § 2 and must not proceed."
 printf 'POLICY PREFLIGHT: can-i create pods -> no.\n'
@@ -170,6 +173,26 @@ case "${mutation_output}" in
 ${mutation_output}" ;;
 esac
 printf 'LIVE AUTHORIZATION PROOF: real delete-pod attempt -> HTTP 403 Forbidden (Kubernetes itself rejected it, not a policy query).\n'
+
+# The identical proof, repeated once against one of M6-B's newly-granted
+# resource kinds (ADR-0039 § 4) — confirming the additive Role grant
+# widened only reads, never mutation, for the new resources too.
+mutation_target_deployment="atlast-m6-a-mutation-proof-target-deployment"
+set +e
+deployment_mutation_output="$(KUBECONFIG="${restricted_kubeconfig}" kubectl --context "${KIND_CONTEXT}" \
+  delete deployment "${mutation_target_deployment}" -n "${NAMESPACE}" --v=6 2>&1)"
+deployment_mutation_exit_code=$?
+set -e
+if [ "${deployment_mutation_exit_code}" -eq 0 ]; then
+  fail "The real mutation attempt (delete deployment) UNEXPECTEDLY SUCCEEDED using the restricted credential. This is a least-privilege violation of ADR-0039 § 4 and must not proceed. Full output:
+${deployment_mutation_output}"
+fi
+case "${deployment_mutation_output}" in
+  *"403 Forbidden"*) ;;
+  *) fail "The real Deployment mutation attempt failed, but not with the expected HTTP 403 Forbidden. Full output:
+${deployment_mutation_output}" ;;
+esac
+printf 'LIVE AUTHORIZATION PROOF: real delete-deployment attempt -> HTTP 403 Forbidden.\n'
 
 # --- Stage 7: launch the normal Atlast API in connector mode ---
 print_stage "Stage 7/8: launching the normal Atlast API in connector dataset mode"

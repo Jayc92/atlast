@@ -1,9 +1,11 @@
-# M6-A read-only RBAC manifest (ADR-0037 §§ 1-2; accepted docs/m6-plan.md § 8,
-# Option B). Grants exactly get/list/watch on Pods, in exactly one namespace,
-# to a dedicated ServiceAccount — never the ambient/default kubeconfig
-# context. No wildcard verb, no wildcard resource, no ClusterRole, no write
-# verb. Scoped to Pods only for M6-A; ADR-0039's additive
-# Deployments/ReplicaSets/Services grant is out of scope for this slice.
+# M6-A/M6-B read-only RBAC manifest (ADR-0037 §§ 1-2, ADR-0039 § 4; accepted
+# docs/m6-plan.md § 8, Option B). Grants exactly get/list/watch on Pods,
+# Services, Deployments, and ReplicaSets, in exactly one namespace, to a
+# dedicated ServiceAccount — never the ambient/default kubeconfig context.
+# No wildcard verb, no wildcard resource, no ClusterRole, no write verb.
+# M6-A originally scoped this Role to Pods only; M6-B adds Services (core)
+# and Deployments/ReplicaSets (apps) additively, per ADR-0039 § 4's exact
+# text — the mechanism is unchanged, only the Role's own resource list grew.
 #
 # This manifest is a documented prerequisite the tester explicitly applies
 # themselves (kubectl apply -f), before running scripts/connect-kubernetes-pilot.sh
@@ -28,7 +30,10 @@ metadata:
   namespace: atlast-m6-a
 rules:
   - apiGroups: [""]
-    resources: ["pods"]
+    resources: ["pods", "services"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
     verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
