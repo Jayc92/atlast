@@ -11,9 +11,19 @@
  */
 import { z } from "zod";
 
+/**
+ * `datasetMode` (ADR-0040 § 1, M6-A): the running process's authoritative,
+ * visible dataset-source indicator. Added here so this client-side schema
+ * matches `apps/api/src/app.ts`'s real, already-shipped `/health` response
+ * shape — this was a real gap between the server's M6-A response and this
+ * package's own contract, found while wiring the M6-B dataset-mode badge;
+ * `checkHealth` was previously unused in production, so the mismatch never
+ * surfaced as a runtime failure.
+ */
 export const healthCheckResultSchema = z.strictObject({
   status: z.literal("ok"),
   service: z.literal("atlast-api"),
+  datasetMode: z.enum(["fixture", "connector"]),
 });
 
 export type HealthCheckResult = z.infer<typeof healthCheckResultSchema>;

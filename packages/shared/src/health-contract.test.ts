@@ -6,22 +6,53 @@ import { describe, expect, it } from "vitest";
 import { healthCheckResultSchema } from "./health-contract.ts";
 
 describe("healthCheckResultSchema", () => {
-  it("accepts the exact deterministic payload", () => {
+  it("accepts the exact deterministic fixture-mode payload", () => {
     expect(
       healthCheckResultSchema.safeParse({
         status: "ok",
         service: "atlast-api",
+        datasetMode: "fixture",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("accepts the exact deterministic connector-mode payload (ADR-0040 § 1)", () => {
+    expect(
+      healthCheckResultSchema.safeParse({
+        status: "ok",
+        service: "atlast-api",
+        datasetMode: "connector",
       }).success,
     ).toBe(true);
   });
 
   it.each([
-    ["a different status", { status: "degraded", service: "atlast-api" }],
+    [
+      "a different status",
+      { status: "degraded", service: "atlast-api", datasetMode: "fixture" },
+    ],
     [
       "a different service name",
-      { status: "ok", service: "not-the-atlast-api" },
+      {
+        status: "ok",
+        service: "not-the-atlast-api",
+        datasetMode: "fixture",
+      },
     ],
-    ["an extra field", { status: "ok", service: "atlast-api", extra: true }],
+    [
+      "an invalid datasetMode value",
+      { status: "ok", service: "atlast-api", datasetMode: "synthetic" },
+    ],
+    [
+      "an extra field",
+      {
+        status: "ok",
+        service: "atlast-api",
+        datasetMode: "fixture",
+        extra: true,
+      },
+    ],
+    ["a missing datasetMode field", { status: "ok", service: "atlast-api" }],
     ["a missing field", { status: "ok" }],
     ["an empty object", {}],
   ])("rejects %s", (_description: string, payload: unknown) => {

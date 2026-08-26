@@ -1,25 +1,44 @@
 /**
- * M6-A connector dataset mode (ADR-0040 §§ 2, 5, 6; accepted `docs/m6-plan.md
- * § 7`). Extracted from the raw `server.ts` entrypoint into its own,
- * dependency-injectable module specifically so its pre-flight, store-
- * ownership, and polling-lifecycle behavior can be proven by focused tests
- * against a stubbed connector — never a real cluster, and never a spawned
- * subprocess (mirroring how `apps/api/src/test-support/stub-repositories.ts`
- * already lets this package test behavior no real in-memory store can be
- * coerced into).
+ * Connector dataset mode (M6-A, ADR-0040 §§ 2, 5, 6, accepted `docs/m6-plan.md
+ * § 7`; extended M6-B, ADR-0039 §§ 1, 2, 3). Extracted from the raw
+ * `server.ts` entrypoint into its own, dependency-injectable module
+ * specifically so its pre-flight, atomic-cycle, store-ownership, and
+ * polling-lifecycle behavior can be proven by focused tests against a
+ * stubbed connector — never a real cluster, and never a spawned subprocess
+ * (mirroring how `apps/api/src/test-support/stub-repositories.ts` already
+ * lets this package test behavior no real in-memory store can be coerced
+ * into).
  *
- * Real Kubernetes Pod Evidence enters the exact same `EvidenceStore`/
+ * Real Kubernetes Evidence enters the exact same `EvidenceStore`/
  * `TopologyGraphStore` pair the returned `application` serves reads from —
  * never a second, separate store (ADR-0040 §§ 2, 4). This module never
  * seeds `demo-company` fixture Evidence; connector mode and fixture mode
  * are mutually exclusive in one process (ADR-0040 § 1).
+ *
+ * **Atomic observation cycle (M6-B pre-implementation inspection finding,
+ * binding for this module):** `packages/graph-model/src/snapshot-construction
+ * .ts`'s `assertReferentialIntegrity` rejects an entire topology snapshot
+ * build — not merely one offending relationship — if any visible
+ * Relationship claim's endpoint does not resolve to an observed Entity
+ * subject. Every poll cycle here therefore lists all four resource kinds
+ * before deriving or appending anything; if any one list call fails, the
+ * whole cycle's Evidence is discarded (never partially appended), exactly
+ * like the already-proven M5 source-loss/poll-failure behavior this module
+ * carries forward unmodified.
  */
 import type { FastifyInstance } from "fastify";
 import { type Clock } from "@atlast/graph-model";
 import {
+  deriveEvidenceForCycle,
+  listDeployments as realListDeployments,
   listPods as realListPods,
-  mapObservedPodToEvidence as realMapObservedPodToEvidence,
+  listReplicaSets as realListReplicaSets,
+  listServices as realListServices,
+  type KubernetesListOptions,
+  type ObservedDeployment,
   type ObservedPod,
+  type ObservedReplicaSet,
+  type ObservedService,
 } from "@atlast/connectors";
 import {
   initializeApplicationExposingStores,
@@ -39,19 +58,36 @@ export interface ConnectorModeOptions {
 }
 
 /**
- * The exact, narrow surface this module depends on from `@atlast/connectors`
- * — injectable so tests can stub connector behavior (a preflight failure, a
- * mid-session poll failure, a specific observed Pod set) without a real
- * cluster. Defaults to the real, unmodified connector exports.
+ * The exact, narrow I/O surface this module depends on from
+ * `@atlast/connectors` — injectable so tests can stub connector behavior (a
+ * preflight failure, a mid-session poll failure, a specific observed
+ * resource set) without a real cluster. `deriveEvidenceForCycle` is
+ * deliberately NOT part of this port — it is already pure and
+ * independently tested in `packages/connectors`, exactly as
+ * `mapObservedPodToEvidence` was under M6-A — only the four real-cluster
+ * list calls are ever stubbed here. Defaults to the real, unmodified
+ * connector exports.
  */
 export interface ConnectorPort {
-  readonly listPods: typeof realListPods;
-  readonly mapObservedPodToEvidence: typeof realMapObservedPodToEvidence;
+  readonly listPods: (
+    options: KubernetesListOptions,
+  ) => Promise<readonly ObservedPod[]>;
+  readonly listDeployments: (
+    options: KubernetesListOptions,
+  ) => Promise<readonly ObservedDeployment[]>;
+  readonly listReplicaSets: (
+    options: KubernetesListOptions,
+  ) => Promise<readonly ObservedReplicaSet[]>;
+  readonly listServices: (
+    options: KubernetesListOptions,
+  ) => Promise<readonly ObservedService[]>;
 }
 
 export const REAL_CONNECTOR_PORT: ConnectorPort = {
   listPods: realListPods,
-  mapObservedPodToEvidence: realMapObservedPodToEvidence,
+  listDeployments: realListDeployments,
+  listReplicaSets: realListReplicaSets,
+  listServices: realListServices,
 };
 
 export interface ConnectorModeHandle {
@@ -71,14 +107,39 @@ export interface ConnectorModeHandle {
 }
 
 /**
- * Starts M6-A connector dataset mode: a mandatory pre-flight `listPods` call
- * (exercising the accepted ADR-0037 § 4 target guard and a real read) that
- * must succeed before any store or application is constructed — a failure
- * here rejects this function's own promise, and no application is ever
- * created, exactly mirroring `initializeApplication`'s existing "ingestion
- * completes before any application is ever produced" invariant applied to
- * discovery instead of fixture seeding. Only after that succeeds does this
- * function construct the store pair (via `initializeApplicationExposingStores`,
+ * Lists all four resource kinds for one cycle. Callers rely on this being
+ * all-or-nothing: `Promise.all` rejects as soon as any one list call
+ * rejects, before any of the others' results are used — the atomic
+ * observation cycle's read half.
+ */
+async function listResourceCycle(
+  connector: ConnectorPort,
+  listOptions: KubernetesListOptions,
+): Promise<{
+  readonly deployments: readonly ObservedDeployment[];
+  readonly replicaSets: readonly ObservedReplicaSet[];
+  readonly pods: readonly ObservedPod[];
+  readonly services: readonly ObservedService[];
+}> {
+  const [deployments, replicaSets, pods, services] = await Promise.all([
+    connector.listDeployments(listOptions),
+    connector.listReplicaSets(listOptions),
+    connector.listPods(listOptions),
+    connector.listServices(listOptions),
+  ]);
+  return { deployments, replicaSets, pods, services };
+}
+
+/**
+ * Starts connector dataset mode: a mandatory pre-flight cycle (all four
+ * list operations, exercising the accepted ADR-0037 § 4 target guard and
+ * real reads across the complete M6-B RBAC grant) that must succeed before
+ * any store or application is constructed — a failure here rejects this
+ * function's own promise, and no application is ever created, exactly
+ * mirroring `initializeApplication`'s existing "ingestion completes before
+ * any application is ever produced" invariant applied to discovery instead
+ * of fixture seeding. Only after that succeeds does this function
+ * construct the store pair (via `initializeApplicationExposingStores`,
  * `"connector"` mode, zero seed Evidence — ADR-0040 § 1) and start the
  * recurring poll timer against that exact store.
  */
@@ -88,12 +149,18 @@ export async function startConnectorDatasetMode(
 ): Promise<ConnectorModeHandle> {
   const { kubeconfigPath, contextName, namespace, pollIntervalMs, clock } =
     options;
+  const listOptions: KubernetesListOptions = {
+    kubeconfigPath,
+    contextName,
+    namespace,
+  };
 
-  // Pre-flight (ADR-0037 § 4 target guard, exercised inside listPods before
-  // any request is issued): a real read against the real cluster must
-  // succeed before this process is allowed to construct a store or start
-  // serving at all. Never a silent fall-back to fixtures.
-  await connector.listPods({ kubeconfigPath, contextName, namespace });
+  // Pre-flight (ADR-0037 § 4 target guard, exercised inside every list
+  // call before any request is issued): a real, complete-cycle read
+  // against the real cluster must succeed before this process is allowed
+  // to construct a store or start serving at all. Never a silent
+  // fall-back to fixtures, and never a partial success treated as ready.
+  await listResourceCycle(connector, listOptions);
 
   const { application, dependencies } =
     await initializeApplicationExposingStores(clock, [], [], "connector");
@@ -101,27 +168,25 @@ export async function startConnectorDatasetMode(
   let nextRecordedSequence = 1;
 
   async function pollOnce(): Promise<void> {
-    const observedPods: readonly ObservedPod[] = await connector.listPods({
-      kubeconfigPath,
-      contextName,
-      namespace,
-    });
-    if (observedPods.length === 0) {
-      return;
-    }
+    // All four lists must succeed before anything is derived or appended
+    // (the atomic observation cycle) — if any one rejects, this whole
+    // function rejects before touching the store, and the caller's own
+    // `.catch(...)` preserves every previously established fact untouched.
+    const cycle = await listResourceCycle(connector, listOptions);
 
     const observationInstant = clock();
-    const evidenceRecords = observedPods.map((pod) => {
-      const recordedSequence = nextRecordedSequence;
-      nextRecordedSequence += 1;
-      return connector.mapObservedPodToEvidence({
-        pod,
-        recordedSequence,
+    const { evidenceRecords, nextRecordedSequence: updatedSequence } =
+      deriveEvidenceForCycle({
+        cycle,
         observedAt: observationInstant,
         recordedAt: observationInstant,
+        firstRecordedSequence: nextRecordedSequence,
       });
-    });
+    nextRecordedSequence = updatedSequence;
 
+    if (evidenceRecords.length === 0) {
+      return;
+    }
     await dependencies.evidenceStore.appendEvidence(evidenceRecords);
   }
 
