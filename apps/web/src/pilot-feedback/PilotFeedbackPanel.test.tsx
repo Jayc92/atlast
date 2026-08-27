@@ -238,7 +238,7 @@ describe("PilotFeedbackPanel", () => {
       expect(screen.getByText("Missing relationships: 1")).toBeTruthy();
     });
 
-    it("preserves the tester-role and session notes across close/reopen", () => {
+    it("preserves the tester role across close/reopen", () => {
       forbidNetworkAccess();
       render(<PilotFeedbackHarness />);
       fireEvent.change(screen.getByLabelText("Tester role"), {
@@ -254,7 +254,29 @@ describe("PilotFeedbackPanel", () => {
       expect(testerRoleInput.value).toBe("Engineer, Platform team");
     });
 
-    it("exports the state that survived a close/reopen cycle, not just what was recorded before closing", () => {
+    it("preserves session-level notes (entered through the actual Session notes control, distinct from any one judgment's own notes) across close/reopen", () => {
+      forbidNetworkAccess();
+      render(<PilotFeedbackHarness />);
+      const sessionNotesLabel =
+        "Session notes (applies to the whole review, not one judgment)";
+      fireEvent.change(screen.getByLabelText(sessionNotesLabel), {
+        target: {
+          value: "M6-C readiness session-note preservation check",
+        },
+      });
+      closeThenReopenPanel();
+      const sessionNotesTextarea = screen.getByLabelText(sessionNotesLabel);
+      if (!(sessionNotesTextarea instanceof HTMLTextAreaElement)) {
+        throw new Error(
+          "expected a <textarea> element for the session-notes field",
+        );
+      }
+      expect(sessionNotesTextarea.value).toBe(
+        "M6-C readiness session-note preservation check",
+      );
+    });
+
+    it("exports the state that survived a close/reopen cycle, not just what was recorded before closing — including session notes, not merely inferred from shared hook ownership", () => {
       forbidNetworkAccess();
       const createObjectUrlSpy = vi
         .spyOn(URL, "createObjectURL")
@@ -271,6 +293,16 @@ describe("PilotFeedbackPanel", () => {
       fireEvent.click(
         screen.getByRole("button", { name: "Record entity judgment" }),
       );
+      fireEvent.change(
+        screen.getByLabelText(
+          "Session notes (applies to the whole review, not one judgment)",
+        ),
+        {
+          target: {
+            value: "M6-C readiness session-note preservation check",
+          },
+        },
+      );
       closeThenReopenPanel();
       fireEvent.click(
         screen.getByRole("button", { name: "Export pilot JSON" }),
@@ -280,11 +312,17 @@ describe("PilotFeedbackPanel", () => {
       const exportedBlob = createObjectUrlSpy.mock.calls[0]?.[0] as Blob;
       return exportedBlob.text().then((text) => {
         const parsed = JSON.parse(text) as {
+          schemaVersion: string;
+          notes: string;
           entityReviews: readonly { atlastEntityIdentifier: string }[];
         };
+        expect(parsed.schemaVersion).toBe(PILOT_FEEDBACK_SCHEMA_VERSION);
         expect(parsed.entityReviews).toHaveLength(1);
         expect(parsed.entityReviews[0]?.atlastEntityIdentifier).toBe(
           "atlast:entity:atlast-m6-pilot-checkout",
+        );
+        expect(parsed.notes).toBe(
+          "M6-C readiness session-note preservation check",
         );
       });
     });

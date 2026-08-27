@@ -177,6 +177,18 @@ export function PilotFeedbackPanel({
         placeholder="e.g. Engineer, Platform team"
       />
 
+      <label htmlFor={`${headingId}-session-notes`}>
+        Session notes (applies to the whole review, not one judgment)
+      </label>
+      <textarea
+        id={`${headingId}-session-notes`}
+        value={feedback.session.notes}
+        onChange={(event) => {
+          feedback.setNotes(event.target.value);
+        }}
+        placeholder="Overall observations about this review session"
+      />
+
       <form
         aria-label="Record an entity judgment"
         onSubmit={(event) => {
