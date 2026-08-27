@@ -28,6 +28,17 @@
 # script generates lives only in a private temporary file, never inside
 # this repository, and is removed on exit.
 set -euo pipefail
+# Job control (`set -m`) makes each backgrounded pipeline below (Stage 7's
+# API process, Stage 8's web process) the leader of its own new process
+# group, distinct from this script's own group and from every other
+# unrelated process on the machine. Combined with `exec`ing the actual
+# long-running command as the last statement in each subshell (so the
+# recorded PID becomes the real Node/pnpm process, never a wrapper shell
+# that can die while its child survives), this lets `cleanup` below signal
+# the exact process-group each launched command (and anything it itself
+# forks, such as pnpm's own `vite` child) belongs to — never a broader,
+# name-based kill.
+set -m
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repository_root="$(cd "${script_directory}/.." && pwd)"
@@ -55,14 +66,31 @@ web_pid=""
 restricted_kubeconfig=""
 ca_file=""
 
+# Terminates and reaps exactly one launched job's entire process group — the
+# job's own PID (its process-group leader, per `set -m` above) plus anything
+# it itself forked (e.g. pnpm's `vite` child) — never any other process on
+# the machine. `kill -0` first confirms the leader is still alive (an
+# already-exited child, e.g. one that crashed on its own, is tolerated
+# silently, never a cleanup error); the negative PID form of `kill` targets
+# the whole process group, not just the one leader process; `wait` then
+# blocks until this script's own direct child (the group leader) has
+# actually been reaped, so cleanup never reports done while a child is
+# still mid-shutdown.
+stop_and_reap() {
+  local pid="$1"
+  local label="$2"
+  if [ -z "${pid}" ] || ! kill -0 "${pid}" 2>/dev/null; then
+    return 0
+  fi
+  printf 'Stopping %s (pid %s)...\n' "${label}" "${pid}"
+  kill -TERM -- "-${pid}" 2>/dev/null || true
+  wait "${pid}" 2>/dev/null || true
+}
+
 cleanup() {
   printf '\n==> Shutting down\n'
-  if [ -n "${web_pid}" ] && kill -0 "${web_pid}" 2>/dev/null; then
-    kill "${web_pid}" 2>/dev/null || true
-  fi
-  if [ -n "${api_pid}" ] && kill -0 "${api_pid}" 2>/dev/null; then
-    kill "${api_pid}" 2>/dev/null || true
-  fi
+  stop_and_reap "${web_pid}" "web"
+  stop_and_reap "${api_pid}" "API/connector polling"
   [ -n "${restricted_kubeconfig}" ] && rm -f "${restricted_kubeconfig}"
   [ -n "${ca_file}" ] && rm -f "${ca_file}"
   printf 'Stopped. Established Evidence lived only in this process'\''s memory and is now gone.\n'
@@ -204,7 +232,7 @@ print_stage "Stage 7/8: launching the normal Atlast API in connector dataset mod
   ATLAST_KUBERNETES_KUBE_CONTEXT="${KIND_CONTEXT}" \
   ATLAST_KUBERNETES_NAMESPACE="${NAMESPACE}" \
   ATLAST_KUBERNETES_POLL_INTERVAL_MS="${POLL_INTERVAL_MS}" \
-  node src/server.ts
+  exec node src/server.ts
 ) &
 api_pid=$!
 
@@ -226,7 +254,7 @@ printf 'Normal Atlast API is up on http://127.0.0.1:%s (dataset=connector).\n' "
 print_stage "Stage 8/8: launching the normal Atlast website"
 (
   cd "${repository_root}"
-  pnpm --filter @atlast/web dev --port "${WEB_PORT}" --strictPort
+  exec pnpm --filter @atlast/web dev --port "${WEB_PORT}" --strictPort
 ) &
 web_pid=$!
 

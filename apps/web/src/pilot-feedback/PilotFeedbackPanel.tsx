@@ -4,6 +4,14 @@
  * never Evidence, never a `GraphAssertion` mutation (ADR-0041 §§ 1, 4).
  * Deliberately small: one panel, four short forms, a running tally, and
  * one explicit export action — not a dashboard.
+ *
+ * Pre-M6-C readiness fix: `feedback` (the review session) is owned by this
+ * component's caller (`TopologyShell`), never created here — this
+ * component only owns the transient, in-progress form-draft fields below,
+ * which are legitimately reset each time the panel is (re)opened. The
+ * caller's session persists across this component unmounting when the
+ * panel is closed, so every already-recorded judgment survives close and
+ * reopen.
  */
 import { useId, useState, type ReactElement } from "react";
 import type {
@@ -12,7 +20,7 @@ import type {
   RelationshipVerdict,
 } from "./pilot-feedback-artifact.ts";
 import { exportPilotFeedbackSession } from "./export-pilot-feedback.ts";
-import { usePilotFeedbackSession } from "./use-pilot-feedback-session.ts";
+import type { UsePilotFeedbackSessionResult } from "./use-pilot-feedback-session.ts";
 
 const ENTITY_VERDICTS: readonly EntityVerdict[] = [
   "correctly-discovered",
@@ -41,22 +49,15 @@ const IMPACT_VERDICTS: readonly ImpactVerdict[] = [
 const CHANGE_TYPES = ["removal", "degradation", "interface-change"] as const;
 
 export interface PilotFeedbackPanelProps {
-  readonly environmentReference: string;
+  readonly feedback: UsePilotFeedbackSessionResult;
   readonly onClose: () => void;
 }
 
 export function PilotFeedbackPanel({
-  environmentReference,
+  feedback,
   onClose,
 }: PilotFeedbackPanelProps): ReactElement {
   const headingId = useId();
-  const [sessionId] = useState(() => crypto.randomUUID());
-  const [startedAt] = useState(() => new Date().toISOString());
-  const feedback = usePilotFeedbackSession(
-    sessionId,
-    startedAt,
-    environmentReference,
-  );
 
   const [entityIdentifier, setEntityIdentifier] = useState("");
   const [entityVerdict, setEntityVerdict] = useState<EntityVerdict>(
@@ -160,9 +161,9 @@ export function PilotFeedbackPanel({
         </button>
       </header>
       <p>
-        Session {sessionId} — environment: {environmentReference}. This record
-        is session-local only; it never mutates Atlast's own Evidence or graph
-        state.
+        Session {feedback.session.sessionId} — environment:{" "}
+        {feedback.session.environmentReference}. This record is session-local
+        only; it never mutates Atlast's own Evidence or graph state.
       </p>
 
       <label htmlFor={`${headingId}-tester-role`}>Tester role</label>

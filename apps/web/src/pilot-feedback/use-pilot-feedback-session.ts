@@ -24,6 +24,14 @@ export interface UsePilotFeedbackSessionResult {
   readonly addMissingRelationship: (item: MissingItem) => void;
   readonly setTesterRole: (testerRole: string) => void;
   readonly setNotes: (notes: string) => void;
+  /**
+   * Keeps `session.environmentReference` accurate as the dataset-mode
+   * fetch resolves after this session is created (readiness fix: the
+   * session now starts as soon as the topology shell mounts, per the
+   * panel's own close/reopen state-preservation requirement — before that,
+   * `datasetMode` may still read "unknown").
+   */
+  readonly setEnvironmentReference: (environmentReference: string) => void;
   readonly setDeveloperIntervention: (
     occurred: boolean,
     description: string,
@@ -77,6 +85,9 @@ export function usePilotFeedbackSession(
     },
     setNotes: (notes) => {
       setSession((current) => ({ ...current, notes }));
+    },
+    setEnvironmentReference: (environmentReference) => {
+      setSession((current) => ({ ...current, environmentReference }));
     },
     setDeveloperIntervention: (occurred, description) => {
       setSession((current) => ({
