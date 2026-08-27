@@ -9,14 +9,24 @@
  * M6-B additions (ADR-0040 § 1, ADR-0041): the dataset-mode badge and the
  * pilot-feedback panel toggle live here, once, so both are reachable from
  * every topology-workspace page rather than duplicated per page.
+ *
+ * Pre-M6-C readiness fix: the pilot-feedback session itself (§ the
+ * `usePilotFeedbackSession` call) is owned HERE, not inside
+ * `PilotFeedbackPanel` — `isFeedbackPanelOpen` only toggles whether the
+ * panel is rendered, never whether this shell (and the session state it
+ * owns) is mounted, so hiding and reopening the panel never discards an
+ * unexported judgment. A full page navigation/reload still starts a fresh
+ * session, matching ADR-0041 § 5's session-local, never-persisted design —
+ * only the "close panel" affordance no longer means "discard review."
  */
-import { useState, type ReactElement, type ReactNode } from "react";
+import { useEffect, useState, type ReactElement, type ReactNode } from "react";
 import { Link } from "react-router";
 import {
   DatasetModeBadge,
   type DatasetModeBadgeState,
 } from "./DatasetModeBadge.tsx";
 import { PilotFeedbackPanel } from "../pilot-feedback/PilotFeedbackPanel.tsx";
+import { usePilotFeedbackSession } from "../pilot-feedback/use-pilot-feedback-session.ts";
 import { fetchHealth } from "../api/client.ts";
 import { useAsyncQuery } from "./use-async-query.ts";
 
@@ -49,6 +59,23 @@ export function TopologyShell({
       ? `datasetMode=${badgeState.datasetMode}`
       : "datasetMode=unknown";
 
+  // Owned here (not inside PilotFeedbackPanel) so the review survives the
+  // panel being hidden and reopened — see the file-level comment above.
+  const [feedbackSessionId] = useState(() => crypto.randomUUID());
+  const [feedbackStartedAt] = useState(() => new Date().toISOString());
+  const feedback = usePilotFeedbackSession(
+    feedbackSessionId,
+    feedbackStartedAt,
+    environmentReference,
+  );
+  // `feedback` (and every setter on it) is a fresh object/closure on every
+  // render — only the primitive `environmentReference` value itself is a
+  // meaningful dependency here; including the setter would re-run this
+  // effect (and therefore call `setSession`) on every render, looping.
+  useEffect(() => {
+    feedback.setEnvironmentReference(environmentReference);
+  }, [environmentReference]);
+
   return (
     <div className="topology-shell">
       <a className="topology-skip-link" href="#topology-main">
@@ -76,7 +103,7 @@ export function TopologyShell({
       </main>
       {isFeedbackPanelOpen && (
         <PilotFeedbackPanel
-          environmentReference={environmentReference}
+          feedback={feedback}
           onClose={() => {
             setIsFeedbackPanelOpen(false);
           }}
