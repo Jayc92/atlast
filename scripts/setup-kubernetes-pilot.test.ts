@@ -1,5 +1,11 @@
 import { fileURLToPath } from "node:url";
-import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+import {
+  readFileSync,
+  mkdtempSync,
+  rmSync,
+  existsSync,
+  mkdirSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -199,6 +205,44 @@ describe("scripts/setup-kubernetes-pilot.sh", () => {
     expect(result.exitCode).toBe(0);
     const logText = readFileSync(log, "utf-8");
     expect(logText).toContain(`apply -f ${workloadManifestPath}`);
+  });
+
+  it("builds workspace packages after bootstrap and before Kind cluster creation, producing the dist artifact @atlast/api needs at runtime", () => {
+    const stub = stubBin();
+    const log = newLogFile();
+    if (activeLogDir === undefined) {
+      throw new Error("newLogFile() must set activeLogDir");
+    }
+    const buildMarkerFile = join(activeLogDir, "packages/shared/dist/index.js");
+    mkdirSync(join(activeLogDir, "packages/shared/dist"), {
+      recursive: true,
+    });
+    expect(existsSync(buildMarkerFile)).toBe(false);
+
+    const result = runScript(
+      scriptPath,
+      [],
+      stub.dir,
+      happyPathEnv(stub, {
+        STUB_LOG_FILE: log,
+        STUB_BUILD_MARKER_FILE: buildMarkerFile,
+      }),
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(existsSync(buildMarkerFile)).toBe(true);
+
+    const lines = readFileSync(log, "utf-8")
+      .split("\n")
+      .filter((line) => line.length > 0);
+    const bootstrapIndex = lines.indexOf("bootstrap invoked");
+    const buildIndex = lines.indexOf("pnpm build");
+    const kindCreateIndex = lines.findIndex((line) =>
+      line.startsWith("kind create"),
+    );
+    expect(bootstrapIndex).toBeGreaterThanOrEqual(0);
+    expect(buildIndex).toBeGreaterThan(bootstrapIndex);
+    expect(kindCreateIndex).toBeGreaterThan(buildIndex);
   });
 
   it("stops with an accurate message when the namespace never receives its default ServiceAccount", () => {
