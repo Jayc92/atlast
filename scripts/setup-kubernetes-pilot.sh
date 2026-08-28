@@ -44,7 +44,7 @@ done
 # collected and reported together (not one at a time) so the employee does
 # not have to re-run this script once per fixable problem; environment
 # creation never begins if any prerequisite failed. ---
-print_stage "Stage 1/6: diagnosing prerequisites"
+print_stage "Stage 1/7: diagnosing prerequisites"
 prerequisite_failures=""
 add_failure() {
   prerequisite_failures="${prerequisite_failures}
@@ -114,12 +114,26 @@ printf 'git, node, pnpm/Corepack, docker (CLI + daemon), kubectl, kind all prese
 # existing, unmodified script rather than duplicating its logic. The path is
 # overridable only so automated tests can substitute a stub in place of a
 # real `pnpm install`; real pilot runs always use the default. ---
-print_stage "Stage 2/6: bootstrapping the Atlast workspace (./scripts/bootstrap.sh)"
+print_stage "Stage 2/7: bootstrapping the Atlast workspace (./scripts/bootstrap.sh)"
 bootstrap_script="${ATLAST_M6_BOOTSTRAP_SCRIPT:-${script_directory}/bootstrap.sh}"
 "${bootstrap_script}"
 
-# --- Stage 3: disposable Kind cluster creation/reset ---
-print_stage "Stage 3/6: preparing the disposable Kind cluster '${KIND_CLUSTER_NAME}'"
+# --- Stage 3: build workspace packages. `bootstrap.sh` only installs
+# dependencies; every workspace package @atlast/api actually imports at
+# runtime (@atlast/shared, @atlast/graph-model, @atlast/impact-model,
+# @atlast/overlay-model, @atlast/connectors) declares "main": "./dist/...",
+# so a fresh clone's plain `node src/server.ts` cannot resolve any of them
+# until they are built at least once — a real fresh-clone failure this
+# stage exists to prevent. Reuses the existing root `pnpm build` (recursive,
+# per ADR-0002) rather than enumerating packages or their build order here,
+# so this stays correct if that dependency set ever changes. @atlast/web's
+# own dev server is unaffected (its Vite config aliases @atlast/shared
+# straight to source in dev mode) but building it here is harmless. ---
+print_stage "Stage 3/7: building workspace packages (pnpm build)"
+(cd "${repository_root}" && pnpm build)
+
+# --- Stage 4: disposable Kind cluster creation/reset ---
+print_stage "Stage 4/7: preparing the disposable Kind cluster '${KIND_CLUSTER_NAME}'"
 cluster_exists=""
 if kind get clusters 2>/dev/null | grep -qx "${KIND_CLUSTER_NAME}"; then
   cluster_exists="yes"
@@ -143,10 +157,10 @@ else
   kind create cluster --name "${KIND_CLUSTER_NAME}"
 fi
 
-# --- Stage 4: apply the accepted RBAC manifest, then the deterministic
+# --- Stage 5: apply the accepted RBAC manifest, then the deterministic
 # workload manifest, always against the explicit pilot context — never
 # whatever kubectl context happens to be current. ---
-print_stage "Stage 4/6: applying the read-only RBAC manifest and the deterministic sandbox workload"
+print_stage "Stage 5/7: applying the read-only RBAC manifest and the deterministic sandbox workload"
 kubectl --context "${KIND_CONTEXT}" apply -f "${RBAC_MANIFEST}"
 # The namespace's own "default" ServiceAccount is created asynchronously by
 # a Kubernetes controller shortly after the Namespace object itself — a real
@@ -169,10 +183,10 @@ kubectl --context "${KIND_CONTEXT}" apply -f "${WORKLOAD_MANIFEST}"
 printf 'Waiting for the checkout Deployment to become available...\n'
 kubectl --context "${KIND_CONTEXT}" -n "${NAMESPACE}" rollout status deployment/checkout --timeout=120s
 
-# --- Stage 5: verify actual Kubernetes ground truth before declaring the
+# --- Stage 6: verify actual Kubernetes ground truth before declaring the
 # pilot environment ready. Never starts Atlast if any of this differs from
 # the accepted deterministic sandbox. ---
-print_stage "Stage 5/6: verifying real Kubernetes ground truth"
+print_stage "Stage 6/7: verifying real Kubernetes ground truth"
 
 require_object() {
   local kind_and_name="$1"
@@ -212,11 +226,11 @@ bare_pod_owners="$(kubectl --context "${KIND_CONTEXT}" -n "${NAMESPACE}" get pod
 
 printf 'Ground truth confirmed: checkout Deployment (2 replicas) -> 1 ReplicaSet -> 2 Pods; checkout-service matches both; unused-service matches zero; external-or-selectorless has no selector; bare-standalone-pod has no controller owner.\n'
 
-# --- Stage 6: print factual Kubernetes inspection commands and the next
+# --- Stage 7: print factual Kubernetes inspection commands and the next
 # step. Never Atlast-specific expected output — only real Kubernetes state
 # the employee can verify with their own eyes. Never starts Atlast: the
 # official M6-C pilot start boundary remains a human/conductor decision. ---
-print_stage "Stage 6/6: ready"
+print_stage "Stage 7/7: ready"
 cat <<EOF
 
 Atlast Kubernetes pilot environment is ready.

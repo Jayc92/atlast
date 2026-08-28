@@ -35,6 +35,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 const REQUIRED_SYSTEM_UTILITIES = [
   "bash",
   "cat",
+  "dirname",
   "grep",
   "seq",
   "sleep",
@@ -163,6 +164,9 @@ exit 0
 `;
 
 const BOOTSTRAP_STUB = `#!/usr/bin/env bash
+if [ -n "\${STUB_LOG_FILE:-}" ]; then
+  printf 'bootstrap invoked\\n' >> "\${STUB_LOG_FILE}"
+fi
 exit "\${STUB_BOOTSTRAP_EXIT:-0}"
 `;
 
@@ -170,8 +174,32 @@ const COREPACK_STUB = `#!/usr/bin/env bash
 exit 0
 `;
 
+/**
+ * Simulates the real root `pnpm build` producing the `dist/index.js` a real
+ * clean clone is missing until built (this is what setup-kubernetes-pilot.sh
+ * actually invokes at Stage 3) — writes to `STUB_BUILD_MARKER_FILE` only
+ * when invoked with the literal `build` argument, standing in for the real
+ * build artifact without running a real compiler or committing one.
+ */
+const PNPM_STUB = `#!/usr/bin/env bash
+if [ -n "\${STUB_LOG_FILE:-}" ]; then
+  printf 'pnpm %s\\n' "$*" >> "\${STUB_LOG_FILE}"
+fi
+if [ "\${1:-}" = "build" ] && [ -n "\${STUB_BUILD_MARKER_FILE:-}" ]; then
+  : > "\${STUB_BUILD_MARKER_FILE}"
+fi
+exit "\${STUB_PNPM_BUILD_EXIT:-0}"
+`;
+
 export type StubTool =
-  "git" | "node" | "docker" | "kubectl" | "kind" | "corepack" | "bootstrap";
+  | "git"
+  | "node"
+  | "docker"
+  | "kubectl"
+  | "kind"
+  | "corepack"
+  | "pnpm"
+  | "bootstrap";
 
 export interface StubBin {
   readonly dir: string;
@@ -188,6 +216,7 @@ const STUB_SOURCE: Record<StubTool, string> = {
   kubectl: KUBECTL_STUB,
   kind: KIND_STUB,
   corepack: COREPACK_STUB,
+  pnpm: PNPM_STUB,
   bootstrap: BOOTSTRAP_STUB,
 };
 
