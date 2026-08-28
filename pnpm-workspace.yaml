@@ -1,7 +1,11 @@
 # Workspace layout per ADR-0001 (pnpm workspaces) and ADR-0002 (pnpm recursive
 # scripts as the task runner). fixtures/ holds data, not packages, so it is
-# deliberately not a workspace glob.
+# deliberately not a workspace glob. "scripts" is a workspace member solely
+# so its shell-script packaging tests (M6-C pilot onboarding) run through the
+# existing Vitest/pnpm-recursive mechanism, per repository convention — it
+# contains no product source.
 packages:
   - "apps/*"
   - "packages/*"
   - "tests/*"
+  - "scripts"

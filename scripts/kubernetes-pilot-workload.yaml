@@ -1,0 +1,82 @@
+# M6-C deterministic pilot workload — the exact real Kubernetes ground truth
+# already proven live during M6-B (docs/audits/m0-synthetic-boundary-audit.md
+# § 25.4), packaged so a fresh-clone employee gets the identical sandbox
+# without hand-authoring it. Applied by scripts/setup-kubernetes-pilot.sh into
+# the namespace scripts/kubernetes-pilot-rbac.yaml already created — never
+# applied by scripts/connect-kubernetes-pilot.sh itself.
+#
+# Deliberately does NOT declare a ReplicaSet or the Deployment's own Pods:
+# Kubernetes creates both naturally from the Deployment below, exactly as the
+# proven M6-B live run observed them (one ReplicaSet, two Pods, each with a
+# real controller ownerReference) — reproducing that, not asserting it.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout
+  namespace: atlast-m6-a
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: checkout
+  template:
+    metadata:
+      labels:
+        app: checkout
+    spec:
+      containers:
+        - name: checkout
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+---
+# Selector matches both checkout Pods above.
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout-service
+  namespace: atlast-m6-a
+spec:
+  selector:
+    app: checkout
+  ports:
+    - port: 80
+      targetPort: 80
+---
+# A valid selector that intentionally matches no Pod in this namespace.
+apiVersion: v1
+kind: Service
+metadata:
+  name: unused-service
+  namespace: atlast-m6-a
+spec:
+  selector:
+    app: nothing-matches-this
+  ports:
+    - port: 80
+      targetPort: 80
+---
+# No selector at all. ExternalName Services never carry a selector;
+# example.invalid is the RFC 2606 reserved domain, reserved specifically for
+# use in examples like this one.
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-or-selectorless
+  namespace: atlast-m6-a
+spec:
+  type: ExternalName
+  externalName: example.invalid
+---
+# A bare Pod with no controller of any kind.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bare-standalone-pod
+  namespace: atlast-m6-a
+spec:
+  containers:
+    - name: bare-standalone-pod
+      image: nginx:1.27
+      ports:
+        - containerPort: 80

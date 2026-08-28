@@ -4,7 +4,7 @@
 
 Atlast continuously discovers the systems your organization runs, builds a living dependency graph of how they connect, overlays real-time operational health, and predicts the downstream impact of technical changes before they happen.
 
-> **Status: M0 through M5 complete; paused at checkpoint `m5-complete`.** M4 closed at checkpoint `m4-complete` (PR #82/#83). M5, the read-only local Kubernetes connector, was subsequently authorized, implemented, and closed: all three M5 exit criteria and all four M5 verification obligations evaluated PASS, including the mandatory ADR-0018 storage reassessment (resolved via [ADR-0038](docs/adr/0038-m5-reconciliation-scaling-remedy.md)'s reconciliation-algorithm remedy rather than a storage-engine change). See [docs/milestones.md](docs/milestones.md) and [HANDOFF.md](HANDOFF.md) for the complete evidence trail. **No post-M5 milestone is authorized.** Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
+> **Status: M0 through M5 complete; paused at checkpoint `m5-complete`.** M4 closed at checkpoint `m4-complete` (PR #82/#83). M5, the read-only local Kubernetes connector, was subsequently authorized, implemented, and closed: all three M5 exit criteria and all four M5 verification obligations evaluated PASS, including the mandatory ADR-0018 storage reassessment (resolved via [ADR-0038](docs/adr/0038-m5-reconciliation-scaling-remedy.md)'s reconciliation-algorithm remedy rather than a storage-engine change). **M6 — Internal Pilot Validation — is open**: M6-A, M6-B, and pre-M6-C readiness hardening are complete; M6-C requires its own separate, explicit human authorization before any pilot run. See [docs/milestones.md](docs/milestones.md) and [HANDOFF.md](HANDOFF.md) for the complete, current evidence trail. Read [PROJECT_SPEC.md](PROJECT_SPEC.md), [TASKS.md](TASKS.md), and [HANDOFF.md](HANDOFF.md) before contributing.
 
 ---
 
@@ -42,6 +42,7 @@ Atlast has deliberate boundaries. It is **not** a monitoring system, an incident
 | [GUARDRAILS.md](GUARDRAILS.md)                             | Engineering, coding, repository, documentation, and testing standards                                                                                                                                                         |
 | [CLAUDE.md](CLAUDE.md)                                     | Working instructions for AI coding assistants in this repository                                                                                                                                                              |
 | [docs/audits/](docs/audits/m0-synthetic-boundary-audit.md) | Boundary audits — M0 synthetic-data and external-connection audit                                                                                                                                                             |
+| [docs/kubernetes-pilot.md](docs/kubernetes-pilot.md)       | Fresh-clone guide to the M6-C Kubernetes pilot: setup, connect, evaluate, cleanup — start here if you were asked to run the pilot                                                                                             |
 
 ## Local Setup
 
@@ -126,6 +127,10 @@ Running the suite:
 The tests boot everything themselves through Playwright's `webServer` lifecycle: they build `@atlast/api` and start its built server on `http://127.0.0.1:3001`, build `@atlast/web` and serve the bundle with `vite preview` on `http://127.0.0.1:4173`, wait on each server's readiness URL, and tear both processes down after the run — no manually started processes or pre-existing `dist/` output are used, and everything stays on the loopback interface. Assertions are web-first (auto-waiting) with no fixed sleeps.
 
 Playwright writes generated artifacts — traces and screenshots (retained only on failure) under `test-results/`, plus any `playwright-report/` and `blob-report/` output — which are git-ignored and never committed.
+
+## Kubernetes Pilot (M6-C)
+
+If you were asked to evaluate Atlast against a real Kubernetes environment, you don't need anything below this section — see **[docs/kubernetes-pilot.md](docs/kubernetes-pilot.md)** for the complete, self-contained fresh-clone guide.
 
 ## Contributing
 
