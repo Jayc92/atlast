@@ -12,10 +12,57 @@ import {
   writeFileSync,
   chmodSync,
   unlinkSync,
+  symlinkSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
+
+/**
+ * The minimal set of genuine POSIX utilities `setup-kubernetes-pilot.sh`
+ * itself invokes (`bash` to launch it via its own shebang, plus every
+ * external command the script body calls) — resolved once, up front,
+ * against the real ambient PATH, then symlinked into a small dedicated
+ * directory. This (not `/usr/bin:/bin`) is the only directory besides the
+ * stub tool directory ever placed on a test's PATH: `/usr/bin`/`/bin` on
+ * GitHub's `ubuntu-latest` runner happen to also contain real `kubectl` and
+ * `docker` binaries, which previously defeated the "missing tool"
+ * simulation by leaving a real fallback copy reachable even after the
+ * injected stub was removed. Naming only these seven utilities keeps the
+ * simulation genuinely hermetic without guessing at, or depending on,
+ * where any given host happens to install kubectl/docker/kind/etc.
+ */
+const REQUIRED_SYSTEM_UTILITIES = [
+  "bash",
+  "cat",
+  "grep",
+  "seq",
+  "sleep",
+  "tr",
+  "wc",
+] as const;
+
+let cachedSafeUtilsDir: string | undefined;
+
+function resolveRealPath(executableName: string): string {
+  return execFileSync("bash", ["-c", `command -v ${executableName}`], {
+    encoding: "utf-8",
+  }).trim();
+}
+
+/** Built once per process and reused — these resolved paths never change
+ * mid-run, and rebuilding per test would just repeat the same lookups. */
+function safeUtilsDir(): string {
+  if (cachedSafeUtilsDir !== undefined) {
+    return cachedSafeUtilsDir;
+  }
+  const dir = mkdtempSync(join(tmpdir(), "atlast-m6-c-safe-utils-"));
+  for (const name of REQUIRED_SYSTEM_UTILITIES) {
+    symlinkSync(resolveRealPath(name), join(dir, name));
+  }
+  cachedSafeUtilsDir = dir;
+  return dir;
+}
 
 const GIT_STUB = `#!/usr/bin/env bash
 exit 0
@@ -169,9 +216,11 @@ export interface RunResult {
   readonly stderr: string;
 }
 
-/** Runs a script with only the stub tool directory (plus minimal system
- * directories real coreutils like grep/wc/tr/sed live in) on PATH, so stub
- * tools always take precedence over anything actually installed. */
+/** Runs a script with a hermetic PATH: only the stub tool directory plus a
+ * dedicated directory of resolved symlinks for the exact POSIX utilities
+ * the script itself needs (never `/usr/bin`/`/bin` wholesale, which on some
+ * hosts — e.g. GitHub's `ubuntu-latest` runner — also contain real
+ * `kubectl`/`docker` binaries that would defeat a "missing tool" test). */
 export function runScript(
   scriptPath: string,
   args: readonly string[],
@@ -181,7 +230,7 @@ export function runScript(
   const result = spawnSync(scriptPath, args, {
     env: {
       ...extraEnv,
-      PATH: `${stubBinDir}:/usr/bin:/bin`,
+      PATH: `${stubBinDir}:${safeUtilsDir()}`,
       HOME: process.env.HOME ?? "",
     },
     encoding: "utf-8",
