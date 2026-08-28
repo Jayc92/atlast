@@ -1,0 +1,15 @@
+{
+  "name": "@atlast/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Focused Vitest coverage for the M6-C pilot-onboarding shell scripts (setup/cleanup), exercised against injected stub tools — never a real Kind/Docker cluster in CI.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --project tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "vitest": "4.1.10"
+  }
+}

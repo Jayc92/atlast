@@ -1,0 +1,16 @@
+{
+  // Type-checking configuration for the M6-C pilot-onboarding script tests.
+  // No emit — Vitest runs the TypeScript sources directly.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["*.test.ts", "test-support/**/*.ts", "vitest.config.ts"]
+}
