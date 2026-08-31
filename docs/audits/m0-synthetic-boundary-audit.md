@@ -1235,3 +1235,142 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find module '.../apps/api/node_modules/@atl
 **Scope.** Limited to `scripts/setup-kubernetes-pilot.sh` (Stage 3 added, all subsequent stages renumbered 4–7), `scripts/setup-kubernetes-pilot.test.ts` (one new regression test), and `scripts/test-support/pilot-script-harness.ts` (a `pnpm` stub; the existing `bootstrap` stub now also logs its invocation for the new test's ordering proof; `dirname` added to the harness's own hermetic-PATH utility list — a real, previously-undetected gap in § 27.11's own fix, caught only because this new test's stub genuinely needed `dirname`/directory-creation semantics the setup script's own accidental working-directory coincidence had been masking). No Kubernetes topology, identity, relationship, or impact semantics changed; no RBAC change; no connector resource-scope change; no UI or pilot-feedback change; no M6 exit criterion touched.
 
 **M6-C status — explicitly unchanged.** No employee M6-C pilot occurred. No M6 exit criterion was evaluated. **This candidate is corrected and locally verified but remains uncommitted**, pending a separate checkpoint authorization to stage, commit, push, and open a PR.
+
+## 28. M6-C Pilot Authorization, Execution, and Exit-Criterion Evaluation — Evidence Record (2026-08-31, uncommitted candidate)
+
+**Status: evidence/documentation closeout only, prepared under explicit human authorization; uncommitted, pending a separate human checkpoint decision.** This section records, honestly and in full, the first real M6-C employee pilot session and evaluates it against the exact six Accepted exit criteria ([docs/m6-plan.md § 15](../m6-plan.md#15-m6-exit-criteria)). It fixes no pilot finding, changes no product or test code, and authorizes no further implementation slice or milestone.
+
+### 28.1 Authorization record — sequencing disclosed, not concealed
+
+**Exact chronology, in order:** (1) a real, unaided internal-employee pilot session was executed on 2026-08-28, under the same real-system safety boundary (§2) and the same two readiness gates (checkpoint `m6-c-readiness-complete`, §26) every prior M6 slice required; (2) **no contemporaneously durable M6-C slice-authorization record existed anywhere in this repository** at the time of that session, or for several days afterward; (3) **this sequencing irregularity was discovered during formal evaluation** of the pilot artifact against the six Accepted exit criteria; (4) **on 2026-08-31, the human maintainer (Joseph Carfagno) explicitly acknowledged and authorized M6-C as a slice, for governance purposes**; (5) **that authorization is NOT backdated to 2026-08-28 and is not represented anywhere in this repository as having preceded the pilot session.** The pilot's evidentiary content (§§ 28.2–28.12) is evaluated strictly on its actual merits, independent of this sequencing irregularity, which is disclosed here rather than concealed — consistent with this project's standing practice of disclosing process and product irregularities rather than smoothing over them (e.g. the ADR-0043 identity-collision disclosure, § 25.2). No file governing the pilot's own execution (`scripts/connect-kubernetes-pilot.sh`, the pilot-feedback panel, RBAC) was touched by this authorization or this section.
+
+### 28.2 Tester qualification and session metadata
+
+- `schemaVersion`: `atlast-m6-pilot-feedback-v1`
+- `sessionId`: `608f7d89-4b68-414f-892b-0b36cd64ddd7`
+- `testerRole`: "Incident Manager / Reliability Advocate, evaluating from a Kubernetes operator perspective" — matches the §3 target tester profile (technically competent, did not build Atlast).
+- `environmentReference`: `datasetMode=connector`
+- `startedAt` → `completedAt`: 2026-08-28T21:07:11.708Z → 2026-08-28T21:11:06.904Z — **3 minutes 55.196 seconds**, the formal feedback-recording window only. This interval does not cover, and is not represented here as covering, the tester's earlier setup work or her three deliberate live Kubernetes experiments (identity collision, readiness, deletion), which are evidenced in her session notes but not separately timestamped.
+- `developerIntervention`: `{occurred: false, description: ""}` — no developer intervention recorded.
+
+### 28.3 Raw-artifact retention boundary
+
+Per Accepted [ADR-0041 § 7](../adr/0041-m6-pilot-feedback-storage-boundary.md#7-sensitive-notes-handling), the pilot-feedback artifact is a local file the tester/facilitator controls and MUST be kept outside the git-tracked repository. **The raw JSON is retained externally and is not, and will not be, committed to this repository.** This section is the durable, factual summary of its contents; the session ID above is the durable cross-reference to the externally-retained original. No credential material, and no unnecessary personal/employee-identity data beyond the pseudonymous role description already in the artifact, is recorded here.
+
+### 28.4 Entity scorecard
+
+10 entity reviews plus 4 separately recorded missing-entity categories (14 judged items total; no invented aggregate accuracy percentage, consistent with § 11's factual-count-only scorecard):
+
+| Verdict                           | Count |
+| --------------------------------- | ----- |
+| `correctly-discovered`            | 6     |
+| `incorrectly-represented`         | 4     |
+| `missing` (via `missingEntities`) | 4     |
+| `explicitly-unknown`              | 0     |
+| `tester-uncertain`                | 0     |
+
+`correctly-discovered` is not equivalent to operationally complete: every correctly-discovered Pod/Service review notes materially missing Kubernetes attributes (podIP, container image, phase, readiness, clusterIP, ports, externalName).
+
+### 28.5 Relationship scorecard
+
+8 relationship reviews plus 4 separately recorded missing-relationship categories:
+
+| Verdict                                | Count |
+| -------------------------------------- | ----- |
+| `correct`                              | 6     |
+| `incorrect`                            | 2     |
+| `missing` (via `missingRelationships`) | 4     |
+| `known-zero`                           | **0** |
+| `unknown-insufficient-evidence`        | 0     |
+| `tester-uncertain`                     | 0     |
+
+Ownership correctness (UID-matched, held through a real rollout) is proven distinctly from selector-match correctness, which the tester further distinguishes from readiness/traffic correctness (a label match to a not-Ready, later-deleted Pod is marked `incorrect` on exactly that basis). Stale relationships after deletion are recorded directly: the deleted Pod's `owns` and `selects` edges both persisted with no retraction. **The zero count on `known-zero` is structural, not an oversight**: the deliberately-built known-zero Service (`unused-service`, required by § 12) was observed and confirmed correct in the tester's prose notes, but no relationship record exists for a zero-match to attach a `known-zero` verdict to — the tester's own `missingRelationships` entry states this directly ("the six-state Service evaluation vocabulary exists in evidence `detail.evaluation` but never reaches the graph as a relationship or a visible state"). This is the basis for the Criterion 4 evaluation in § 28.14.
+
+### 28.6 Impact scorecard
+
+- Origin: checkout Deployment
+- `changeType`: `removal`
+- Verdict: `incomplete`
+- `explanationUsable`: `true`
+
+What was predicted was correct as far as it went (ReplicaSet at 1 hop, both Pods at 2 hops — exactly the ownerReference-chain garbage-collection set). What was omitted: the surviving `checkout-service` Service, the actual user-visible breakage (it keeps its ClusterIP and routes to nothing). The tester verified this omission is structural — no traversal direction from the Deployment can reach the Service, since the `selects` edge runs Service→Pod, never Deployment/ReplicaSet-anchored.
+
+### 28.7 Positive capabilities confirmed
+
+Recorded here so the trust blockers below are not read as erasing what worked:
+
+- Initial Kubernetes entity count/type breakdown was correctly discovered.
+- Deployment → ReplicaSet → Pod ownership matched real controller `ownerReferences`, UID-based, held correct through a real rollout/rollback.
+- Normal Service `selects` matching worked for the ready-Pod case.
+- The known-zero Service case (`unused-service`) was correctly represented as zero matches.
+- The selectorless/`ExternalName` Service correctly had no invented `selects` relationship.
+- The bare Pod correctly had no owner.
+- A new ReplicaSet/Pod appeared within seconds during live re-observation.
+- Real Kubernetes data rendered through the normal Atlast website, with the connector dataset mode visibly and correctly reported ("Real Kubernetes data (connector)").
+- The tester could inspect Trust/Evidence (confidence, provenance count, `conflictState`, freshness, validity) for real entities.
+- The tester ran the impact workflow and traversed its Why-path, which she judged usable.
+- The launcher's read-only proof required a genuine, live HTTP 403 mutation rejection, which the tester called "genuinely stronger than a policy query."
+- The tester independently completed the session and exported the feedback artifact with no developer intervention.
+
+### 28.8 Trust Blocker 1 — Authoritative absence / deletion
+
+A Kubernetes Pod deleted during a real rollback remained represented as current more than a minute later: `validFrom` set, no `validUntil`, `freshness` null, `conflictState: "uncontested"`, no staleness or deletion marker anywhere in the UI, while `kubectl` returned `NotFound`. The tester called this "the most consequential defect found," precisely because the product's stated purpose is impact/trust analysis. **Source: primary employee artifact only** — no independent engineering reproduction of this finding exists in this repository or elsewhere on this machine (§ 28.13). Not fixed by this section.
+
+### 28.9 Trust Blocker 2 — Same-kind source-identity collision
+
+The tester deliberately created a second Service literally named `checkout` alongside the existing `checkout-service`. Kubernetes then held 4 Services; Atlast reported 3 entities. Both objects fed one entity (`atlast:entity:atlast-m6-a-service-checkout`), because `derivation-policy.ts` strips `-service` as a decorative affix — exactly the residual, disclosed same-kind risk ADR-0043 § 3 left unfixed (§ 25.2, § 25.8). Provenance proved the fusion (464 records from `checkout-service`, 35 from `checkout`); `conflictState` stayed `"uncontested"` throughout, and after the test Service was deleted its 35 records remained **permanently** fused into `checkout-service`'s provenance with nothing marking their different origin. **Source: primary employee artifact only.** This is a live re-confirmation of an already-disclosed residual (ADR-0043 § 3), not a new architectural finding, but the tester's live reproduction shows the consequence is a silent, permanent, unflagged data fusion, not merely a cosmetic label collision. Not fixed by this section.
+
+### 28.10 Trust Blocker 3 — Observation coverage not explicit
+
+Atlast never disclosed that its observation was scoped to one namespace, a fixed resource-type set, no readiness/EndpointSlice, and no Nodes. The tester: "I could not distinguish 'nothing depends on this' from 'I did not look there.'" **Source: primary employee artifact and companion comparison note.** This bears directly on confidence in every `missing`/absence judgment elsewhere in this scorecard, since an undisclosed observation boundary makes "not found" and "not observed" indistinguishable to the tester. Not fixed by this section.
+
+### 28.11 Other important findings (not fixed)
+
+- **Readiness/traffic semantics.** `selects` means label-selector match only, never readiness or EndpointSlice membership. A Pod with `ready: false` (and later deleted) received the identical `selects` verdict-eligible relationship, at the identical 0.5 confidence, as a genuinely traffic-serving Pod. EndpointSlice observation is an explicit, already-accepted M6 non-goal (`docs/m6-plan.md § 16`); the gap here is that the _presentation_ carries no caveat distinguishing label-match from traffic-eligibility.
+- **Surviving-entity impact gap.** Restated from § 28.6: the Deployment-removal impact result never reaches the surviving, now-unbacked Service, because the impact model's directional graph walk cannot cross from a `selects` edge's target back to its source.
+- **Confidence.** Every Kubernetes-derived claim sits at exactly 0.5 — the mathematically expected output of the accepted confidence formula with exactly one discovery source, not a correctness bug. Recorded as an unhelpful ranking signal in a single-source pilot, not a defect to fix.
+- **Evidence presentation.** ~489 evidence records accumulated for one unchanged Service in ~30 minutes of 2-second polling (append-on-every-poll regardless of change). Evidence preservation worked (byte-identical assertion identifiers across reads); presentation became impractical at that volume ("I stopped reading it").
+- **Rollout/revision state.** The retired ReplicaSet (0 replicas, kept for rollback history) and the live, serving ReplicaSet render identically at the same 0.5 confidence, with no revision ordering or replica-count fields carried.
+- **Stale UI copy.** While real Kubernetes data was connected, the product displayed "Current state M3," "M4 and M5 remain gated," "synthetic-only," and the Impact panel's "the currently loaded synthetic topology." Classified as a product/UI finding, not a topology-correctness defect; it does not, on its own text, override Criterion 2's specific requirement (the dataset-mode indicator itself), which the tester confirmed reads correctly.
+- **Setup friction.** The setup script's Stage 1 wording did not recognize a Colima runtime; a corporate TLS-intercepting network broke Kind-node image pulls until the tester manually installed the corporate root certificate and restarted containerd; the only documented partial-failure recovery path is `--reset` (destroys and recreates the cluster). All three were self-resolved without developer intervention. Viewed positively: the Stage 6 real 403 mutation-rejection proof.
+
+### 28.12 Employee catalog comparison (qualitative)
+
+Companion note, session `608f7d89`. Central distinction preserved verbatim in substance: a code-indexing catalog reads declared/code/configuration state, org-wide, current as of its last index; Atlast reads a live Kubernetes API, current to the second, scoped to what it can observe. Capabilities the tester said were worth protecting: runtime observation itself; UID-correct ownership held through rollout/rollback; sub-second observation of new runtime objects; the real, live HTTP 403 read-only proof. Catalog capabilities she found missing from Atlast: (1) ranked impact — every result comes back at confidence 0.5 with no ordering; (2) human routing — the catalog names reviewers/tickets, Atlast names only Pods; (3) stated coverage limits — the catalog discloses its own index's boundary, Atlast does not; (4) evidence as an actionable location — the catalog cites a file/path, Atlast cites an unbounded timeline. Her explicit conclusion: complementary, not competing, with runtime observation being a genuine gap no amount of code-indexing can close. She also notes a standing constraint she is not asking to change: both the launcher and the connector target-guard reject anything but a loopback Kind cluster, so she evaluated the model, not its value against a real estate — and that the deletion/readiness findings above would become "considerably more consequential" once any milestone opens that door (§ 28.17).
+
+### 28.13 Engineering corroboration
+
+**None exists.** A search of this repository (tracked and untracked content, all local and remote branches, reflog, stash, `git fsck` unreachable objects, and the three sibling worktrees of this repo) and of `~/Downloads`, `~/Desktop`, and `~/Documents` found no independent engineering-reproduction document distinct from the primary employee artifact. The findings in §§ 28.8–28.11 are **single-sourced to the tester's own artifact and notes**. They are reported as employee evidence, not as independently corroborated engineering findings, because no second source exists to corroborate them.
+
+### 28.14 Exact six-criterion evaluation
+
+1. **Unaided connect/start via documented self-service flow → PASS.** `developerIntervention.occurred: false`; setup friction was self-resolved using the tester's own operational knowledge, which does not constitute developer intervention.
+2. **Real topology through the normal website, visually distinguishable via the dataset-mode indicator → PASS.** `environmentReference: "datasetMode=connector"`; tester confirmed the header "honestly reads 'Real Kubernetes data (connector).'" (The stale-copy finding, § 28.11, is a distinct defect, not this criterion's literal text.)
+3. **Tester can inspect Evidence, trust, source, freshness → PASS.** Demonstrated directly: confidence, provenance counts, `conflictState`, freshness (including a `null` value), validity fields were all inspected and reported on for real entities. (Usability at ~489-record volume is a distinct finding, § 28.11, not a failure of the capability itself.)
+4. **Mapping evaluation capable of recording every applicable § 10 verdict, as appropriate to what was observed → FAIL.** The deliberately-built known-zero case was applicable and observed, and confirmed correct in prose, but the accepted verdict vocabulary provided no relationship record to attach a `known-zero` verdict to (§ 28.5). This is a structural product/schema gap, evidenced by the tester's own words, not tester error or an unobserved case.
+5. **Non-trivial hypothetical change run and evaluated, including explanation usability → PASS.** One `removal` impact review on the recommended § 12 shape, `explanationUsable: true` recorded explicitly; an incomplete result does not fail this criterion per §§ 5/14 of the Accepted plan.
+6. **Durable scorecard/artifact with objectively recorded intervention status → PASS.** A complete, `schemaVersion`-tagged, exported artifact exists with `developerIntervention.occurred: false` recorded explicitly.
+
+**Result: 5 of 6 Accepted exit criteria PASS. Criterion 4 evaluates FAIL.** An `incorrect`/`incomplete` mapping elsewhere does not itself contradict any PASS above — the Accepted contract deliberately tests independent testability and truthful measurement, not mapping accuracy (§§ 1, 5) — but Criterion 4's FAIL is a capability gap, not a mapping-accuracy result, and is evaluated on its own distinct textual threshold.
+
+### 28.15 Experiment success vs. milestone result
+
+**M6-C, as an executed pilot experiment: SUCCESS.** It produced exactly what a pilot is for — an honest, unaided data point plus real, previously-undisclosed correctness and product-direction findings.
+**M6 exit criteria: 5/6 PASS, not 6/6.**
+**M6: NOT eligible for formal closeout.** This project has never closed a milestone (M0–M5, `docs/milestones.md`) with fewer than all listed exit criteria at PASS, and the Accepted `docs/m6-plan.md` contains no textual provision for deferring a failing criterion into closeout. Correcting Criterion 4 (most directly: giving the pilot-feedback artifact/UI a way to record a `known-zero` relationship verdict, or exposing the Service-evaluation state at the relationship layer) would require its own separate, explicit human authorization — not granted by this section.
+
+### 28.16 Real-cluster safety gate
+
+**KEEP GATE.** ADR-0037/M6's local-Kind-only boundary remains in force; no real, shared, staging, production, or company Kubernetes environment is authorized by this section. The pilot itself supplies affirmative reasons to keep the gate: the deletion trust blocker, the identity-collision trust blocker, the undisclosed observation-coverage boundary, and the readiness/traffic limitation would all become, in the tester's own words, "considerably more consequential" against a real estate. No `PROJECT_SPEC.md` amendment is proposed or authorized here.
+
+### 28.17 Hosted/shared deployment
+
+**CORRECTNESS FIRST.** The defects found are independent of deployment topology; hosting the product more broadly before fixing them would scale exposure to known trust-undermining behavior, not merely user count. Not authorized by this section in either direction.
+
+### 28.18 Product thesis
+
+The pilot **partially supports** "Atlast is a live, evidence-backed system model for understanding the operational consequences of change." The "live, evidence-backed" half is strongly supported (real-time discovery, UID-matched ownership held through a real rollout). The "operational consequences of change" half is directly contradicted by the pilot's own central finding: the impact workflow, run on the plan's own recommended scenario, missed the one change that actually breaks user-visible behavior. The evidence supports Atlast **complementing**, not replacing, a declared/code-state software catalog, with possible future catalog-data integration a distinct, separately authorized future decision — not authorized here.
+
+### 28.19 Scope confirmation
+
+This section is documentation/evidence only. No file under `apps/`, `packages/`, `fixtures/`, `scripts/`, or `tests/` was touched to produce it. No pilot finding recorded above was fixed, softened, or marked resolved. No M7 milestone is proposed, drafted, or authorized by this section.
