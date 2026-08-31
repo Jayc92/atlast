@@ -1,14 +1,19 @@
 /**
- * The M6-B pilot-feedback artifact's conceptual shape (ADR-0041 §§ 2, 3).
- * Session-local, browser-memory-only — never `EvidenceStore`, never a
- * `GraphAssertion`, never read by reconciliation or any query-API route
- * (ADR-0041 § 1, § 4). A human's judgment about Atlast's own output is
- * never confused with Atlast's own computed epistemic state: this module
- * has no awareness of `ServiceEvaluationState` or any other Evidence
- * `detail` — a review record only ever carries the tester's verdict.
+ * The M6-B pilot-feedback artifact's conceptual shape (ADR-0041 §§ 2, 3),
+ * corrected for the M6 Criterion-4 finding (M6-C exit-criterion evaluation,
+ * `docs/audits/m0-synthetic-boundary-audit.md` § 28.14/§ 29). Session-local,
+ * browser-memory-only — never `EvidenceStore`, never a `GraphAssertion`,
+ * never read by reconciliation or any query-API route (ADR-0041 § 1, § 4).
+ * A human's judgment about Atlast's own output is never confused with
+ * Atlast's own computed epistemic state: this module has no awareness of
+ * `ServiceEvaluationState`'s internal shape or any other Evidence `detail`
+ * — a review record only ever carries the tester's verdict plus the real,
+ * already-known identifiers the tester supplies from having inspected that
+ * state elsewhere (the existing Trust Inspector/Evidence dereference,
+ * unmodified by this correction).
  */
 
-export const PILOT_FEEDBACK_SCHEMA_VERSION = "atlast-m6-pilot-feedback-v1";
+export const PILOT_FEEDBACK_SCHEMA_VERSION = "atlast-m6-pilot-feedback-v2";
 
 /** ADR-0041 § 2: Atlast's own honest computed states are distinct verdicts, never conflated with the tester's own uncertainty. */
 export type EntityVerdict =
@@ -26,6 +31,22 @@ export type RelationshipVerdict =
   | "unknown-insufficient-evidence"
   | "tester-uncertain";
 
+/**
+ * Verdicts that truthfully describe a relationship-evaluation subject with
+ * no materialized edge (ADR-0039 § 3 cases A "known zero" and D
+ * "insufficient evidence") — never `correct`/`incorrect`/`missing`, which
+ * all presuppose an actual relationship existing to judge.
+ */
+export type NonEdgeRelationshipVerdict =
+  "known-zero" | "unknown-insufficient-evidence" | "tester-uncertain";
+
+/**
+ * Relationship types ADR-0039 currently derives a selector-evaluation
+ * result for. Extend only alongside a future ADR-0039 amendment naming a
+ * new one — this is not a place to invent relationship kinds.
+ */
+export type EvaluatedRelationshipType = "selects";
+
 export type ImpactVerdict =
   "correct" | "incorrect" | "incomplete" | "uncertain";
 
@@ -36,11 +57,44 @@ export interface EntityReview {
   readonly notes: string;
 }
 
-export interface RelationshipReview {
+/**
+ * Addresses a real, materialized Relationship claim (ADR-0039 § 3 cases B
+ * "one match" / C "multiple matches") — unchanged from schema v1.
+ */
+export interface MaterializedRelationshipReview {
+  readonly reviewSubject: "materialized-relationship";
   readonly atlastRelationshipIdentifier: string;
   readonly verdict: RelationshipVerdict;
   readonly notes: string;
 }
+
+/**
+ * Criterion-4 correction: addresses a source entity's relationship-
+ * evaluation result directly (ADR-0039 § 3 cases A/D) when Atlast truthfully
+ * produced no materialized edge to reference. Never carries a target-entity
+ * identifier or a fabricated relationship identifier — there is no edge to
+ * name (ADR-0041 §§ 1, 3). The tester supplies only identifiers/values they
+ * already know from inspecting the real product elsewhere (the entity's own
+ * Trust Inspector already shows this evaluation state, unmodified by this
+ * correction); this module never fetches or parses it.
+ */
+export interface RelationshipEvaluationReview {
+  readonly reviewSubject: "relationship-evaluation";
+  /** The existing, stable Atlast identifier of the entity whose relationship-evaluation result is being judged — never fabricated. */
+  readonly sourceEntityIdentifier: string;
+  readonly relationshipType: EvaluatedRelationshipType;
+  readonly verdict: NonEdgeRelationshipVerdict;
+  readonly notes: string;
+}
+
+/**
+ * A relationship review addresses exactly one of two truthful subjects — a
+ * real materialized edge, or a real non-edge evaluation result — never a
+ * synthetic/placeholder relationship invented merely to make a verdict
+ * addressable.
+ */
+export type RelationshipReview =
+  MaterializedRelationshipReview | RelationshipEvaluationReview;
 
 export interface ImpactReview {
   readonly originEntityIdentifier: string;
