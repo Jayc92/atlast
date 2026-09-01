@@ -1236,9 +1236,9 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find module '.../apps/api/node_modules/@atl
 
 **M6-C status — explicitly unchanged.** No employee M6-C pilot occurred. No M6 exit criterion was evaluated. **This candidate is corrected and locally verified but remains uncommitted**, pending a separate checkpoint authorization to stage, commit, push, and open a PR.
 
-## 28. M6-C Pilot Authorization, Execution, and Exit-Criterion Evaluation — Evidence Record (2026-08-31, uncommitted candidate)
+## 28. M6-C Pilot Authorization, Execution, and Exit-Criterion Evaluation — Evidence Record (2026-08-31, merged)
 
-**Status: evidence/documentation closeout only, prepared under explicit human authorization; uncommitted, pending a separate human checkpoint decision.** This section records, honestly and in full, the first real M6-C employee pilot session and evaluates it against the exact six Accepted exit criteria ([docs/m6-plan.md § 15](../m6-plan.md#15-m6-exit-criteria)). It fixes no pilot finding, changes no product or test code, and authorizes no further implementation slice or milestone.
+**Status: evidence/documentation closeout, prepared under explicit human authorization, independently reviewed, and merged to `main` through [PR #111](https://github.com/Jayc92/atlast/pull/111) at `4df8a764362609253ec0a535400c7461b4d9825b` — checkpoint `m6-c-pilot-evaluated`.** This section records, honestly and in full, the first real M6-C employee pilot session and evaluates it against the exact six Accepted exit criteria ([docs/m6-plan.md § 15](../m6-plan.md#15-m6-exit-criteria)). It fixes no pilot finding, changes no product or test code, and authorizes no further implementation slice or milestone. (A separate, bounded Criterion-4 remediation candidate is recorded in § 29, below.)
 
 ### 28.1 Authorization record — sequencing disclosed, not concealed
 
@@ -1375,9 +1375,9 @@ The pilot **partially supports** "Atlast is a live, evidence-backed system model
 
 This section is documentation/evidence only. No file under `apps/`, `packages/`, `fixtures/`, `scripts/`, or `tests/` was touched to produce it. No pilot finding recorded above was fixed, softened, or marked resolved. No M7 milestone is proposed, drafted, or authorized by this section.
 
-## 29. M6 Criterion-4 Corrective Implementation — Evidence Record (2026-08-31, uncommitted candidate)
+## 29. M6 Criterion-4 Corrective Implementation — Evidence Record (2026-08-31, open as PR #112, unmerged)
 
-**Status: implemented, independently adversarially reviewed, verified, and confirmed by real developer/conductor acceptance against a real disposable Kind cluster — uncommitted, pending a separate human checkpoint decision.** Joseph Carfagno explicitly authorized exactly one bounded corrective implementation slice, scoped solely to Criterion 4 of `docs/m6-plan.md § 15`. This section does not fix, soften, or re-evaluate any other pilot finding recorded in § 28, does not mark Criterion 4 PASS, and does not mark M6 complete.
+**Status: implemented, independently adversarially reviewed, verified, and confirmed by real developer/conductor acceptance against a real disposable Kind cluster — committed, pushed, and open as [PR #112](https://github.com/Jayc92/atlast/pull/112) against `main`, pending review and a separate human merge decision.** Joseph Carfagno explicitly authorized exactly one bounded corrective implementation slice, scoped solely to Criterion 4 of `docs/m6-plan.md § 15`. This section does not fix, soften, or re-evaluate any other pilot finding recorded in § 28, does not mark Criterion 4 PASS, and does not mark M6 complete. **The remediation capability is implemented and developer-verified only — no targeted independent employee validation has occurred; developer/conductor acceptance does not substitute for it (§ 29.10).**
 
 ### 29.1 Root cause, restated and confirmed accurate
 
@@ -1428,7 +1428,7 @@ Performed against the completed candidate before this section was finalized, att
 - **Artifact boundary:** the pilot-feedback artifact remains completely outside `EvidenceStore`/`GraphAssertion`/the query API — confirmed unchanged (no new fetch, no new server route, `forbidNetworkAccess()`'s existing fetch-forbidding tests still pass unmodified). The historical v1 artifact is untouched; v2 is honestly, distinctly versioned.
 - **Verdict semantics:** only the three Accepted non-edge verdicts (`known-zero`, `unknown-insufficient-evidence`, `tester-uncertain`) are offered for a relationship-evaluation review — confirmed both by a focused test (§ 29.7 item 2) and live in the browser (§ 29.6); no new verdict value was invented; the entity/relationship vocabulary separation ADR-0041 § 2 established is preserved, not reconflated (Option B was not taken).
 - **UI comprehensibility:** the relationship-evaluation form states in plain text what is being judged ("a relationship type Atlast evaluated but found no matching target for") and directs the tester to the entity's own Trust Inspector to confirm the real state first — the tester is never asked to type a fabricated Pod or relationship identifier; the only free-text field in that mode is the real, already-known source-entity identifier.
-- **Scope:** `git diff --stat` against the M6-C-pilot-evaluated checkpoint confirms exactly three files changed, all under `apps/web/src/pilot-feedback/` (§ 29.11) — no other pilot finding (§§ 28.8–28.11) was touched, softened, or marked resolved.
+- **Scope:** `git diff --stat` against the M6-C-pilot-evaluated checkpoint confirms exactly four files changed — three under `apps/web/src/pilot-feedback/` plus this audit document itself (§ 29.11) — no other pilot finding (§§ 28.8–28.11) was touched, softened, or marked resolved.
 
 **One REQUIRED CHANGE was found and corrected** during this review: `RELATIONSHIP_REVIEW_SUBJECTS` was initially declared with `as const`, which narrowed its inferred element type to a fixed-length tuple and made `RELATIONSHIP_REVIEW_SUBJECTS[0] ?? "materialized-relationship"` an ESLint `@typescript-eslint/no-unnecessary-condition` violation (the indexed access could never actually be `undefined`) — caught by `./scripts/verify.sh` Stage 3 (linting), not by this review's own reading. Corrected by declaring the type explicitly (`type RelationshipReviewSubject = ...`) and typing the constant as `readonly RelationshipReviewSubject[]`, matching this file's own existing pattern for `ENTITY_VERDICTS`/`RELATIONSHIP_VERDICTS`/`NON_EDGE_RELATIONSHIP_VERDICTS`. No other REQUIRED CHANGE finding was identified.
 
