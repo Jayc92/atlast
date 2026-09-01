@@ -1375,9 +1375,9 @@ The pilot **partially supports** "Atlast is a live, evidence-backed system model
 
 This section is documentation/evidence only. No file under `apps/`, `packages/`, `fixtures/`, `scripts/`, or `tests/` was touched to produce it. No pilot finding recorded above was fixed, softened, or marked resolved. No M7 milestone is proposed, drafted, or authorized by this section.
 
-## 29. M6 Criterion-4 Corrective Implementation — Evidence Record (2026-08-31, open as PR #112, unmerged)
+## 29. M6 Criterion-4 Corrective Implementation — Evidence Record (2026-08-31, merged as PR #112 at `de14555`)
 
-**Status: implemented, independently adversarially reviewed, verified, and confirmed by real developer/conductor acceptance against a real disposable Kind cluster — committed, pushed, and open as [PR #112](https://github.com/Jayc92/atlast/pull/112) against `main`, pending review and a separate human merge decision.** Joseph Carfagno explicitly authorized exactly one bounded corrective implementation slice, scoped solely to Criterion 4 of `docs/m6-plan.md § 15`. This section does not fix, soften, or re-evaluate any other pilot finding recorded in § 28, does not mark Criterion 4 PASS, and does not mark M6 complete. **The remediation capability is implemented and developer-verified only — no targeted independent employee validation has occurred; developer/conductor acceptance does not substitute for it (§ 29.10).**
+**Status: implemented, independently adversarially reviewed, verified, confirmed by real developer/conductor acceptance against a real disposable Kind cluster, and merged to `main` through [PR #112](https://github.com/Jayc92/atlast/pull/112) at squash commit `de14555`.** Joseph Carfagno explicitly authorized exactly one bounded corrective implementation slice, scoped solely to Criterion 4 of `docs/m6-plan.md § 15`. This section does not fix, soften, or re-evaluate any other pilot finding recorded in § 28, does not mark Criterion 4 PASS, and does not mark M6 complete. **The remediation capability is implemented and developer-verified only — no targeted independent employee validation has occurred; developer/conductor acceptance does not substitute for it (§ 29.10). Criterion 4 remains FAIL and M6 remains open, 5 of 6 exit criteria PASS.**
 
 ### 29.1 Root cause, restated and confirmed accurate
 
