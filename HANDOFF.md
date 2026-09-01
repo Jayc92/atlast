@@ -127,7 +127,7 @@ The same n = 3,707 cold read now medians **26.18 ms** (p95 28.14 ms), under this
 
 ## 7. Current Git State
 
-At the latest **merged** state on `main` (the Criterion-4 remediation candidate, `docs/audits/m0-synthetic-boundary-audit.md § 29`, is open as PR #112 on branch `fix/m6-criterion-4-known-zero-feedback`, one commit ahead of this, still unmerged):
+At the latest **merged** state on `main` (the Criterion-4 remediation candidate, `docs/audits/m0-synthetic-boundary-audit.md § 29`, is open as PR #112 on branch `fix/m6-criterion-4-known-zero-feedback`, which remains ahead of `main` and unmerged — inspect real Git state for the exact commit count rather than trusting a number recorded here):
 
 ```text
 4df8a76 (HEAD -> main, origin/main, origin/HEAD) docs: record M6-C pilot evaluation (#111)
