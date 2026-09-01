@@ -1,5 +1,11 @@
 import { useState, type ReactElement } from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PilotFeedbackPanel } from "./PilotFeedbackPanel.tsx";
 import { PILOT_FEEDBACK_SCHEMA_VERSION } from "./pilot-feedback-artifact.ts";
@@ -62,6 +68,15 @@ function closeThenReopenPanel(): void {
   fireEvent.click(screen.getByRole("button", { name: "Reopen panel" }));
 }
 
+/**
+ * "Verdict" is a label reused by the entity, relationship, and impact
+ * judgment forms alike — `screen.getByLabelText("Verdict")` alone is
+ * ambiguous. Scope to the relationship-judgment form specifically.
+ */
+function relationshipJudgmentForm(): HTMLElement {
+  return screen.getByRole("form", { name: "Record a relationship judgment" });
+}
+
 describe("PilotFeedbackPanel", () => {
   it("records an entity judgment and reflects it in the running tally", () => {
     forbidNetworkAccess();
@@ -75,7 +90,7 @@ describe("PilotFeedbackPanel", () => {
     expect(screen.getByText("Entity judgments: 1")).toBeTruthy();
   });
 
-  it("records a relationship judgment", () => {
+  it("records a materialized-relationship judgment (default review subject, unchanged from schema v1)", () => {
     forbidNetworkAccess();
     render(<PilotFeedbackHarness />);
     fireEvent.change(screen.getByLabelText("Atlast relationship identifier"), {
@@ -85,6 +100,190 @@ describe("PilotFeedbackPanel", () => {
       screen.getByRole("button", { name: "Record relationship judgment" }),
     );
     expect(screen.getByText("Relationship judgments: 1")).toBeTruthy();
+  });
+
+  describe("Criterion-4 correction: relationship-evaluation review subject (no materialized edge)", () => {
+    it("records a known-zero relationship-evaluation review without a relationship identifier or fabricated target", () => {
+      forbidNetworkAccess();
+      render(<PilotFeedbackHarness />);
+      fireEvent.change(screen.getByLabelText("Review subject"), {
+        target: { value: "relationship-evaluation" },
+      });
+      fireEvent.change(screen.getByLabelText("Source entity identifier"), {
+        target: { value: "atlast:entity:atlast-m6-a-service-unused" },
+      });
+      fireEvent.click(
+        screen.getByRole("button", { name: "Record relationship judgment" }),
+      );
+      expect(screen.getByText("Relationship judgments: 1")).toBeTruthy();
+    });
+
+    it("never offers correct/incorrect/missing verdicts for a relationship-evaluation review — only the non-edge verdicts are selectable", () => {
+      forbidNetworkAccess();
+      render(<PilotFeedbackHarness />);
+      fireEvent.change(screen.getByLabelText("Review subject"), {
+        target: { value: "relationship-evaluation" },
+      });
+      const verdictSelect = within(relationshipJudgmentForm()).getByLabelText(
+        "Verdict",
+      );
+      if (!(verdictSelect instanceof HTMLSelectElement)) {
+        throw new Error("expected a <select> element for the verdict field");
+      }
+      expect(
+        Array.from(verdictSelect.options).map((option) => option.value),
+      ).toEqual([
+        "known-zero",
+        "unknown-insufficient-evidence",
+        "tester-uncertain",
+      ]);
+    });
+
+    it("still offers the full, unchanged materialized-relationship verdict vocabulary after switching subjects and back", () => {
+      forbidNetworkAccess();
+      render(<PilotFeedbackHarness />);
+      fireEvent.change(screen.getByLabelText("Review subject"), {
+        target: { value: "relationship-evaluation" },
+      });
+      fireEvent.change(screen.getByLabelText("Review subject"), {
+        target: { value: "materialized-relationship" },
+      });
+      const verdictSelect = within(relationshipJudgmentForm()).getByLabelText(
+        "Verdict",
+      );
+      if (!(verdictSelect instanceof HTMLSelectElement)) {
+        throw new Error("expected a <select> element for the verdict field");
+      }
+      expect(
+        Array.from(verdictSelect.options).map((option) => option.value),
+      ).toEqual([
+        "correct",
+        "incorrect",
+        "missing",
+        "known-zero",
+        "unknown-insufficient-evidence",
+        "tester-uncertain",
+      ]);
+      fireEvent.change(
+        screen.getByLabelText("Atlast relationship identifier"),
+        {
+          target: { value: "atlast:relationship:owns/checkout" },
+        },
+      );
+      fireEvent.click(
+        screen.getByRole("button", { name: "Record relationship judgment" }),
+      );
+      expect(screen.getByText("Relationship judgments: 1")).toBeTruthy();
+    });
+
+    it("preserves a relationship-evaluation review across close/reopen", () => {
+      forbidNetworkAccess();
+      render(<PilotFeedbackHarness />);
+      fireEvent.change(screen.getByLabelText("Review subject"), {
+        target: { value: "relationship-evaluation" },
+      });
+      fireEvent.change(screen.getByLabelText("Source entity identifier"), {
+        target: { value: "atlast:entity:atlast-m6-a-service-unused" },
+      });
+      fireEvent.click(
+        screen.getByRole("button", { name: "Record relationship judgment" }),
+      );
+      closeThenReopenPanel();
+      expect(screen.getByText("Relationship judgments: 1")).toBeTruthy();
+    });
+
+    it("exports a relationship-evaluation review with the exact structured shape — no relationship identifier, no fabricated target, correct verdict and schemaVersion", () => {
+      forbidNetworkAccess();
+      const createObjectUrlSpy = vi
+        .spyOn(URL, "createObjectURL")
+        .mockReturnValue("blob:fake-url");
+      vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => undefined);
+      vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(
+        () => undefined,
+      );
+
+      render(<PilotFeedbackHarness />);
+      fireEvent.change(screen.getByLabelText("Review subject"), {
+        target: { value: "relationship-evaluation" },
+      });
+      fireEvent.change(screen.getByLabelText("Source entity identifier"), {
+        target: { value: "atlast:entity:atlast-m6-a-service-unused" },
+      });
+      fireEvent.click(
+        screen.getByRole("button", { name: "Record relationship judgment" }),
+      );
+      fireEvent.click(
+        screen.getByRole("button", { name: "Export pilot JSON" }),
+      );
+
+      expect(createObjectUrlSpy).toHaveBeenCalledTimes(1);
+      const exportedBlob = createObjectUrlSpy.mock.calls[0]?.[0] as Blob;
+      return exportedBlob.text().then((text) => {
+        const parsed = JSON.parse(text) as {
+          schemaVersion: string;
+          relationshipReviews: readonly Record<string, unknown>[];
+        };
+        expect(parsed.schemaVersion).toBe(PILOT_FEEDBACK_SCHEMA_VERSION);
+        expect(parsed.relationshipReviews).toHaveLength(1);
+        const review = parsed.relationshipReviews[0];
+        expect(review).toMatchObject({
+          reviewSubject: "relationship-evaluation",
+          sourceEntityIdentifier: "atlast:entity:atlast-m6-a-service-unused",
+          relationshipType: "selects",
+          verdict: "known-zero",
+        });
+        expect(review).not.toHaveProperty("atlastRelationshipIdentifier");
+        expect(review).not.toHaveProperty("targetEntityIdentifier");
+      });
+    });
+
+    it("Criterion-4 regression: the real unused-service known-zero case (previously unrecordable, docs/audits/m0-synthetic-boundary-audit.md § 25.13/§ 28.5) can now be recorded truthfully, with no relationship ID and no fabricated target", () => {
+      forbidNetworkAccess();
+      const createObjectUrlSpy = vi
+        .spyOn(URL, "createObjectURL")
+        .mockReturnValue("blob:fake-url");
+      vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => undefined);
+      vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(
+        () => undefined,
+      );
+
+      render(<PilotFeedbackHarness />);
+      fireEvent.change(screen.getByLabelText("Review subject"), {
+        target: { value: "relationship-evaluation" },
+      });
+      fireEvent.change(screen.getByLabelText("Source entity identifier"), {
+        target: { value: "atlast:entity:atlast-m6-a-service-unused" },
+      });
+      fireEvent.change(screen.getByLabelText("Relationship type"), {
+        target: { value: "selects" },
+      });
+      fireEvent.change(
+        within(relationshipJudgmentForm()).getByLabelText("Verdict"),
+        {
+          target: { value: "known-zero" },
+        },
+      );
+      fireEvent.click(
+        screen.getByRole("button", { name: "Record relationship judgment" }),
+      );
+      fireEvent.click(
+        screen.getByRole("button", { name: "Export pilot JSON" }),
+      );
+
+      const exportedBlob = createObjectUrlSpy.mock.calls[0]?.[0] as Blob;
+      return exportedBlob.text().then((text) => {
+        const parsed = JSON.parse(text) as {
+          relationshipReviews: readonly Record<string, unknown>[];
+        };
+        const review = parsed.relationshipReviews[0];
+        expect(review?.["verdict"]).toBe("known-zero");
+        expect(review?.["sourceEntityIdentifier"]).toBe(
+          "atlast:entity:atlast-m6-a-service-unused",
+        );
+        expect(review?.["reviewSubject"]).toBe("relationship-evaluation");
+        expect(review).not.toHaveProperty("atlastRelationshipIdentifier");
+      });
+    });
   });
 
   it("records an impact judgment, keeping explanationUsable as a distinct field from verdict", () => {
@@ -185,7 +384,7 @@ describe("PilotFeedbackPanel", () => {
       expect(screen.getByText("Entity judgments: 1")).toBeTruthy();
     });
 
-    it("preserves a relationship judgment across close/reopen", () => {
+    it("preserves a materialized-relationship judgment across close/reopen", () => {
       forbidNetworkAccess();
       render(<PilotFeedbackHarness />);
       fireEvent.change(
@@ -345,6 +544,7 @@ describe("PilotFeedbackPanel", () => {
   });
 });
 
-it("PILOT_FEEDBACK_SCHEMA_VERSION is a stable, explicit version tag", () => {
-  expect(PILOT_FEEDBACK_SCHEMA_VERSION).toBe("atlast-m6-pilot-feedback-v1");
+it("PILOT_FEEDBACK_SCHEMA_VERSION is a stable, explicit version tag, bumped to v2 for the Criterion-4 RelationshipReview shape change so v1 historical artifacts remain distinguishable rather than silently reinterpreted", () => {
+  expect(PILOT_FEEDBACK_SCHEMA_VERSION).toBe("atlast-m6-pilot-feedback-v2");
+  expect(PILOT_FEEDBACK_SCHEMA_VERSION).not.toBe("atlast-m6-pilot-feedback-v1");
 });

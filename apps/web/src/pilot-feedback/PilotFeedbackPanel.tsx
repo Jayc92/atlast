@@ -16,7 +16,9 @@
 import { useId, useState, type ReactElement } from "react";
 import type {
   EntityVerdict,
+  EvaluatedRelationshipType,
   ImpactVerdict,
+  NonEdgeRelationshipVerdict,
   RelationshipVerdict,
 } from "./pilot-feedback-artifact.ts";
 import { exportPilotFeedbackSession } from "./export-pilot-feedback.ts";
@@ -30,6 +32,7 @@ const ENTITY_VERDICTS: readonly EntityVerdict[] = [
   "tester-uncertain",
 ];
 
+/** Verdicts for a materialized relationship review only — unchanged from schema v1. */
 const RELATIONSHIP_VERDICTS: readonly RelationshipVerdict[] = [
   "correct",
   "incorrect",
@@ -37,6 +40,29 @@ const RELATIONSHIP_VERDICTS: readonly RelationshipVerdict[] = [
   "known-zero",
   "unknown-insufficient-evidence",
   "tester-uncertain",
+];
+
+/**
+ * Criterion-4 correction: the two truthful subjects a relationship review
+ * can address (`pilot-feedback-artifact.ts`'s `RelationshipReview` union).
+ */
+type RelationshipReviewSubject =
+  "materialized-relationship" | "relationship-evaluation";
+
+const RELATIONSHIP_REVIEW_SUBJECTS: readonly RelationshipReviewSubject[] = [
+  "materialized-relationship",
+  "relationship-evaluation",
+];
+
+/** Verdicts that truthfully describe a non-edge relationship-evaluation subject. */
+const NON_EDGE_RELATIONSHIP_VERDICTS: readonly NonEdgeRelationshipVerdict[] = [
+  "known-zero",
+  "unknown-insufficient-evidence",
+  "tester-uncertain",
+];
+
+const EVALUATED_RELATIONSHIP_TYPES: readonly EvaluatedRelationshipType[] = [
+  "selects",
 ];
 
 const IMPACT_VERDICTS: readonly ImpactVerdict[] = [
@@ -65,10 +91,26 @@ export function PilotFeedbackPanel({
   );
   const [entityNotes, setEntityNotes] = useState("");
 
+  const [relationshipReviewSubject, setRelationshipReviewSubject] =
+    useState<RelationshipReviewSubject>(
+      RELATIONSHIP_REVIEW_SUBJECTS[0] ?? "materialized-relationship",
+    );
   const [relationshipIdentifier, setRelationshipIdentifier] = useState("");
   const [relationshipVerdict, setRelationshipVerdict] =
     useState<RelationshipVerdict>(
       RELATIONSHIP_VERDICTS[0] ?? "tester-uncertain",
+    );
+  const [
+    relationshipSourceEntityIdentifier,
+    setRelationshipSourceEntityIdentifier,
+  ] = useState("");
+  const [relationshipType, setRelationshipType] =
+    useState<EvaluatedRelationshipType>(
+      EVALUATED_RELATIONSHIP_TYPES[0] ?? "selects",
+    );
+  const [nonEdgeRelationshipVerdict, setNonEdgeRelationshipVerdict] =
+    useState<NonEdgeRelationshipVerdict>(
+      NON_EDGE_RELATIONSHIP_VERDICTS[0] ?? "tester-uncertain",
     );
   const [relationshipNotes, setRelationshipNotes] = useState("");
 
@@ -99,15 +141,30 @@ export function PilotFeedbackPanel({
   }
 
   function submitRelationshipReview(): void {
-    if (relationshipIdentifier.trim() === "") {
-      return;
+    if (relationshipReviewSubject === "materialized-relationship") {
+      if (relationshipIdentifier.trim() === "") {
+        return;
+      }
+      feedback.addRelationshipReview({
+        reviewSubject: "materialized-relationship",
+        atlastRelationshipIdentifier: relationshipIdentifier.trim(),
+        verdict: relationshipVerdict,
+        notes: relationshipNotes,
+      });
+      setRelationshipIdentifier("");
+    } else {
+      if (relationshipSourceEntityIdentifier.trim() === "") {
+        return;
+      }
+      feedback.addRelationshipReview({
+        reviewSubject: "relationship-evaluation",
+        sourceEntityIdentifier: relationshipSourceEntityIdentifier.trim(),
+        relationshipType,
+        verdict: nonEdgeRelationshipVerdict,
+        notes: relationshipNotes,
+      });
+      setRelationshipSourceEntityIdentifier("");
     }
-    feedback.addRelationshipReview({
-      atlastRelationshipIdentifier: relationshipIdentifier.trim(),
-      verdict: relationshipVerdict,
-      notes: relationshipNotes,
-    });
-    setRelationshipIdentifier("");
     setRelationshipNotes("");
   }
 
@@ -242,31 +299,114 @@ export function PilotFeedbackPanel({
         }}
       >
         <h3>Relationship judgment</h3>
-        <label htmlFor={`${headingId}-relationship-id`}>
-          Atlast relationship identifier
+        <label htmlFor={`${headingId}-relationship-review-subject`}>
+          Review subject
         </label>
-        <input
-          id={`${headingId}-relationship-id`}
-          type="text"
-          value={relationshipIdentifier}
-          onChange={(event) => {
-            setRelationshipIdentifier(event.target.value);
-          }}
-        />
-        <label htmlFor={`${headingId}-relationship-verdict`}>Verdict</label>
         <select
-          id={`${headingId}-relationship-verdict`}
-          value={relationshipVerdict}
+          id={`${headingId}-relationship-review-subject`}
+          value={relationshipReviewSubject}
           onChange={(event) => {
-            setRelationshipVerdict(event.target.value as RelationshipVerdict);
+            setRelationshipReviewSubject(
+              event.target.value as RelationshipReviewSubject,
+            );
           }}
         >
-          {RELATIONSHIP_VERDICTS.map((verdict) => (
-            <option key={verdict} value={verdict}>
-              {verdict}
-            </option>
-          ))}
+          <option value="materialized-relationship">
+            Materialized relationship (a real edge exists)
+          </option>
+          <option value="relationship-evaluation">
+            Relationship evaluation (Atlast found no matching target, e.g. a
+            known-zero Service selector)
+          </option>
         </select>
+        {relationshipReviewSubject === "materialized-relationship" ? (
+          <>
+            <label htmlFor={`${headingId}-relationship-id`}>
+              Atlast relationship identifier
+            </label>
+            <input
+              id={`${headingId}-relationship-id`}
+              type="text"
+              value={relationshipIdentifier}
+              onChange={(event) => {
+                setRelationshipIdentifier(event.target.value);
+              }}
+            />
+            <label htmlFor={`${headingId}-relationship-verdict`}>Verdict</label>
+            <select
+              id={`${headingId}-relationship-verdict`}
+              value={relationshipVerdict}
+              onChange={(event) => {
+                setRelationshipVerdict(
+                  event.target.value as RelationshipVerdict,
+                );
+              }}
+            >
+              {RELATIONSHIP_VERDICTS.map((verdict) => (
+                <option key={verdict} value={verdict}>
+                  {verdict}
+                </option>
+              ))}
+            </select>
+          </>
+        ) : (
+          <>
+            <p>
+              For a relationship type Atlast evaluated but found no matching
+              target for — e.g. a Service selector that matched zero Pods, or
+              one Atlast could not safely evaluate this cycle. Inspect the
+              source entity in the Trust Inspector first to confirm the real
+              evaluation state; never invent a Pod or relationship here.
+            </p>
+            <label htmlFor={`${headingId}-relationship-source-entity-id`}>
+              Source entity identifier
+            </label>
+            <input
+              id={`${headingId}-relationship-source-entity-id`}
+              type="text"
+              value={relationshipSourceEntityIdentifier}
+              onChange={(event) => {
+                setRelationshipSourceEntityIdentifier(event.target.value);
+              }}
+            />
+            <label htmlFor={`${headingId}-relationship-type`}>
+              Relationship type
+            </label>
+            <select
+              id={`${headingId}-relationship-type`}
+              value={relationshipType}
+              onChange={(event) => {
+                setRelationshipType(
+                  event.target.value as EvaluatedRelationshipType,
+                );
+              }}
+            >
+              {EVALUATED_RELATIONSHIP_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+            <label htmlFor={`${headingId}-relationship-evaluation-verdict`}>
+              Verdict
+            </label>
+            <select
+              id={`${headingId}-relationship-evaluation-verdict`}
+              value={nonEdgeRelationshipVerdict}
+              onChange={(event) => {
+                setNonEdgeRelationshipVerdict(
+                  event.target.value as NonEdgeRelationshipVerdict,
+                );
+              }}
+            >
+              {NON_EDGE_RELATIONSHIP_VERDICTS.map((verdict) => (
+                <option key={verdict} value={verdict}>
+                  {verdict}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
         <label htmlFor={`${headingId}-relationship-notes`}>
           Notes (optional)
         </label>
