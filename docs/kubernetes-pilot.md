@@ -69,6 +69,8 @@ That's a page served from your own computer; `127.0.0.1` always means "this mach
 
 Explore Atlast's system map and compare it against what you found in step E. Use the "Pilot feedback" panel in Atlast to record what you find — your conductor will give you specific instructions for what to evaluate and how to record it.
 
+If you were asked to perform the narrow independent follow-up for M6 Criterion 4, use the dedicated [Criterion 4 independent validation packet](m6-criterion-4-independent-validation.md). It contains the exact `unused-service` Evidence checks, feedback fields, and exported-artifact requirements for that follow-up.
+
 If Kubernetes changes while Atlast is open, refresh the browser to display newly discovered state.
 
 ## I. Stop Atlast
